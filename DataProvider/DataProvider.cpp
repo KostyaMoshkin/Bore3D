@@ -10,9 +10,12 @@ namespace DataProvider
     static std::vector<std::string> split(std::string sLine_, std::string sDelimiter_)
     {
         std::vector<std::string> sResult;
+
         size_t pos = 0;
         std::string sToken;
-        while ((pos = sLine_.find(sDelimiter_)) != std::string::npos) {
+
+        while ((pos = sLine_.find(sDelimiter_)) != std::string::npos) 
+        {
             sToken = sLine_.substr(0, pos);
             sResult.push_back(sToken);
             sLine_.erase(0, pos + sDelimiter_.length());
@@ -37,7 +40,7 @@ namespace DataProvider
             if (index < 0)
                 continue;
 
-            sParam.replace(index, index + 1, ".");
+            sParam.replace(index, index, ".");
         }
 
         geoPoint.fDepth = (float)atof(sFields[0].c_str());
@@ -63,13 +66,10 @@ namespace DataProvider
         if (!file)
             return false;
 
-        char sLine[1024]; // буфер для чтения одной строки
-
-        while (!file.eof())
-        {
-            file.getline(sLine, 100); // прочитать строку из файла в буфер str
+        std::string sLine;
+        
+        while (std::getline(file, sLine))
             m_data.push_back(getGeoPoint(sLine));
-        }
 
         file.close();
 

@@ -1,4 +1,7 @@
-﻿// Приведенный ниже блок ifdef — это стандартный метод создания макросов, упрощающий процедуру
+﻿#pragma once
+#include "pch.h"
+
+// Приведенный ниже блок ifdef — это стандартный метод создания макросов, упрощающий процедуру
 // экспорта из библиотек DLL. Все файлы данной DLL скомпилированы с использованием символа DATAPROVIDER_EXPORTS
 // Символ, определенный в командной строке. Этот символ не должен быть определен в каком-либо проекте,
 // использующем данную DLL. Благодаря этому любой другой проект, исходные файлы которого включают данный файл, видит
@@ -10,15 +13,27 @@
 #define DATAPROVIDER_API __declspec(dllimport)
 #endif
 
+#include <vector>
+
 namespace DataProvider
 {
+	struct DATAPROVIDER_API GeoPoint
+	{
+		float fDepth;
+		std::vector<float> fDistance;
+	};
 
 	// Этот класс экспортирован из библиотеки DLL
-	class DATAPROVIDER_API CDataProvider {
+	class DATAPROVIDER_API CDataProvider 
+	{
+		std::vector<GeoPoint> m_data; ///<  Основной массив с данными
+
 	public:
 		CDataProvider(void);
 
 	public:
 		bool init(const char* sFileName_);
+
+		std::vector<GeoPoint>* getData() { return &m_data; }
 	};
 }

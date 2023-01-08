@@ -9,4 +9,10 @@
 
 #include "framework.h"
 
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+
+
 #endif //PCH_H

@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 #ifdef DATAPROVIDER_EXPORTS
 #define DATAPROVIDER_API __declspec(dllexport)

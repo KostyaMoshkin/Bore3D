@@ -1,12 +1,11 @@
 #pragma once
+#include "pch.h"
 
 #ifdef DATAPROVIDER_EXPORTS
 #define DATAPROVIDER_API __declspec(dllexport)
 #else
 #define DATAPROVIDER_API __declspec(dllimport)
 #endif
-
-#include <vector>
 
 namespace DataProvider
 {

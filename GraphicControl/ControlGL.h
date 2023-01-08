@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 #ifdef GRAPHICCONTROL_EXPORTS
 #define GRAPHICCONTROL_API __declspec(dllexport)

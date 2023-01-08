@@ -1,0 +1,78 @@
+#pragma once
+
+#include "resource.h"
+//#include "CConfig.h"
+
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+
+ namespace GL {
+
+     using Matrix4 = glm::mat4x4;
+     using Vector3 = glm::vec3;
+     using Vector4 = glm::vec4;
+
+     using dPoint3D = glm::f32vec3;
+     using iPoint3D = glm::i32vec3;
+
+
+     struct ShaderName
+     {
+         static const int orbittemperature_vertex       = IDR_DATA1;
+         static const int orbittemperature_fragment     = IDR_DATA2;
+
+         static const char* getName(int ID_)
+         {
+             switch (ID_)
+             {
+             case orbittemperature_vertex:      return "bore_vertex";
+             case orbittemperature_fragment:    return "bore_fragment";
+             default: return "";
+             }
+         }
+     };
+
+      class Render;
+      using RenderPtr = std::shared_ptr<Render>;
+
+      // Класс интерфейс рисования. Для каждой версии OpenGL и для каждой графической сущности свой наследник
+      class Render// : public lib::CConfig
+      {
+          bool m_bVisible = false;
+          int m_nVersionFull = 0;
+
+      protected:
+          float m_fScale = 5.0f;
+
+      public:
+          Render() = default;
+          virtual ~Render() = default;
+
+        public:
+            virtual bool init() = 0;
+            virtual void lookAt(Matrix4& mView_) = 0;
+            virtual void rotate(Matrix4& mRotate_) = 0;
+            virtual void translate(Matrix4& mTranslate_) = 0;
+            virtual void setViewAngle(Matrix4& mPerspective_) = 0;
+            virtual void draw() = 0;
+
+            virtual void bound() = 0;
+            virtual void unbound() = 0;
+
+
+      public:
+            virtual float getScale() = 0;
+            virtual void setScale(float fScale_) = 0;
+
+      public:
+          void setVisible(bool bVisible_) { m_bVisible = bVisible_; }
+          bool isVisible() { return m_bVisible; }
+
+          void setVersionGl(int nVersionFull_) { m_nVersionFull = nVersionFull_; }
+          int getVersionGl() { return m_nVersionFull; }
+
+          virtual void sizeChanged(int nWidth_, int nHeight_) {; }
+
+      };
+
+}

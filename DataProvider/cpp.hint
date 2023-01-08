@@ -1,0 +1,2 @@
+#define DATAPROVIDER_API __declspec(dllexport)
+#define DATAPROVIDER_API __declspec(dllimport)

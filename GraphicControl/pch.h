@@ -7,7 +7,21 @@
 #ifndef PCH_H
 #define PCH_H
 
-// Добавьте сюда заголовочные файлы для предварительной компиляции
 #include "framework.h"
+
+
+#include <utility>
+#include <memory>
+#include <vector>
+#include <array>
+#include <string>
+#include <map>
+#include <fstream>
+#include <algorithm>
+//#include <omp.h>
+
+//#include <Windows.h>
+
+#include <glew.h>
 
 #endif //PCH_H

@@ -19,9 +19,7 @@ namespace GraphicControl
 
     ControlGL::ControlGL()
     {
-        m_vBkgColor[0] = 0;
-        m_vBkgColor[1] = 0;
-        m_vBkgColor[2] = 0;
+        m_ptWindow.SetPoint(0, 0);
 
         RegisterWindowClass();
     }
@@ -47,23 +45,13 @@ namespace GraphicControl
         return true;
     }
 
-    void ControlGL::setBkgColor(float r_, float g_, float b_)
-    {
-        m_vBkgColor[0] = r_;
-        m_vBkgColor[1] = g_;
-        m_vBkgColor[2] = b_;
-    }
-
     bool ControlGL::beginDraw(int width_, int height_) const
     {
         if (!makeCurrent())
             return false;
 
-        if (width_ * height_ == 0)
-            return true;
-
-        glClearColor(m_vBkgColor[0], m_vBkgColor[1], m_vBkgColor[2], 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //if (width_ * height_ == 0)
+        //    return true;  //  Может FALSE
 
         glViewport(0, 0, width_, height_);
         glDisable(GL_DEPTH_TEST);
@@ -231,14 +219,34 @@ namespace GraphicControl
 
 
     /////////////////////////////////////////////////////////////////////////////
-    // CBitmapViewer message handlers
 
     void ControlGL::OnPaint()
     {
-        CRect rc;
-        this->GetWindowRect(&rc);
+        if (m_rendContext == nullptr)
+            return;
 
-        beginDraw(rc.Width(), rc.Height());
+        CRect rcWindow;
+        this->GetWindowRect(&rcWindow);
+
+        bool bSizeChanged = (m_ptWindow.x == rcWindow.Width()) && (m_ptWindow.y == rcWindow.Height());
+
+        if (bSizeChanged)
+            m_ptWindow.SetPoint(rcWindow.Width(), rcWindow.Height());
+
+        if (!(m_bNeedUpdate || bSizeChanged))
+        {
+            Sleep(1);
+            return;
+        }
+
+        m_bNeedUpdate = false;
+
+        if (rcWindow.IsRectEmpty())
+            return;
+
+        if(!beginDraw(rcWindow.Width(), rcWindow.Height()))
+            return;
+
         paint();
         endDraw();
     }

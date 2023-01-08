@@ -10,8 +10,6 @@
 #define CONTROLGL_CLASSNAME    _T("ControlGL")  // Window class name
 #endif
 
-#include <array>
-
 /////////////////////////////////////////////////////////////////////////////
 // ControlGL window
 
@@ -24,7 +22,9 @@ namespace GraphicControl
 		HDC m_hDC;
 		HGLRC m_rendContext = nullptr;
 
-		std::array<float, 3> m_vBkgColor;
+		bool m_bNeedUpdate = true;
+
+		CPoint m_ptWindow;
 
 		// Construction
 	public:
@@ -46,20 +46,21 @@ namespace GraphicControl
 		virtual ~ControlGL();
 
 	public:
-		virtual bool paint() = 0;
+		virtual void paint() = 0;
 
 	public:
 		bool init();
-		void setBkgColor(float r_, float g_, float b_);
+		void needUpdate(bool bUpdate_ = TRUE) { m_bNeedUpdate = bUpdate_;  }
 
 	protected:
 		bool initWindow();
 		bool initGlew();
 		bool createContext();
+		bool makeCurrent() const;
 
 		bool beginDraw(int width_, int height_) const;
 		void endDraw() const;
-		bool makeCurrent() const;
+
 
 	protected:
 		BOOL RegisterWindowClass();

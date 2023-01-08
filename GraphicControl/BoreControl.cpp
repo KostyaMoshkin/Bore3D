@@ -11,12 +11,18 @@ namespace GraphicControl
         setBkgColor(0, 0, 0.3f);
     }
 
-    bool BoreControl::paint()
+    void BoreControl::paint()
 	{
+        if (!(m_bDataInit && m_bPaletteInit))
+            return;
+
         if (m_fGreen < 1.0f)
             m_fGreen += 1.0f / 255 / 30;
         else 
             m_fGreen = 0;
+
+        glClearColor(m_vBkgColor[0], m_vBkgColor[1], m_vBkgColor[2], 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glColor3f(0.0f, m_fGreen, 1.0f); //blue color
 
@@ -33,27 +39,40 @@ namespace GraphicControl
         glEnd();//end drawing of triangles
 
         glBegin(GL_POLYGON);
-        glColor3f(1, 0, 0); glVertex3f(-0.6, -0.75, 0.5);
-        glColor3f(1, m_fGreen, 1); glVertex3f(0.6, -0.75, 0.0);
-        glColor3f(0, 0, 1); glVertex3f(0, 0.75, 0);
+        glColor3f(1, 0, 0); glVertex3f(-0.6f, -0.75f, 0.5f);
+        glColor3f(1, m_fGreen, 1); glVertex3f(0.6f, -0.75f, 0.0f);
+        glColor3f(0, 0, 1); glVertex3f(0.0f, 0.75f, 0.0f);
         glEnd();
 
         glFlush();
 
-        return false;
+        needUpdate();
+
+        return;
 	}
 
-    bool BoreControl::InitBore3D(IBoreData* pData, float fLogPerPixel)
+    void BoreControl::setBkgColor(float r_, float g_, float b_)
     {
+        m_vBkgColor[0] = r_;
+        m_vBkgColor[1] = g_;
+        m_vBkgColor[2] = b_;
+    }
+
+    bool BoreControl::InitBore3D(DataProvider::IBoreData* pData, float fLogPerPixel)
+    {
+        needUpdate();
+        m_bDataInit = true;
         return false;
     }
 
     bool BoreControl::InitPalette(const std::vector<COLORREF>& vecPalette)
     {
+        needUpdate();
+        m_bPaletteInit = true;
         return false;
     }
 
-    int BoreControl::GetBitmap(const RECT* pVisualRect, IDiaMapper* pMapper, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
+    int BoreControl::GetBitmap(const RECT* pVisualRect, DataProvider::IDiaMapper* pMapper, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
         return 0;
     }

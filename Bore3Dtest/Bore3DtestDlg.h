@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <DataProvider.h>
+
 #include "BoreControl.h"
 
 
@@ -14,6 +16,9 @@ class CBore3DtestDlg : public CDialogEx
 	CWnd* m_pParent;
 
 	GraphicControl::BoreControl m_controlGL;
+
+	DataProvider::CDataProvider m_dataProvider;
+
 	// Создание
 public:
 	CBore3DtestDlg(CWnd* pParent = nullptr);	// стандартный конструктор

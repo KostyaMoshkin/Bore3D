@@ -15,8 +15,8 @@
     <Filter Include="BoreControl">
       <UniqueIdentifier>{9431189c-ff1b-4454-9366-d2a5f71446db}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface">
-      <UniqueIdentifier>{a98aa3f7-3ce8-4627-bace-7d6bafa0d984}</UniqueIdentifier>
+    <Filter Include="OpenGL">
+      <UniqueIdentifier>{4e7a5b2e-0108-4ed1-8f76-ea9e558207b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,12 +32,40 @@
     <ClInclude Include="BoreControl.h">
       <Filter>BoreControl</Filter>
     </ClInclude>
-    <ClInclude Include="IBoreData.h">
-      <Filter>Interface</Filter>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="IDiaMapper.h">
-      <Filter>Interface</Filter>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderStorageBuffer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneRender.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferBounder.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferOpenGL.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="IndirectBuffer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderLoader.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureBuffer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -52,5 +80,37 @@
     <ClCompile Include="BoreControl.cpp">
       <Filter>BoreControl</Filter>
     </ClCompile>
+    <ClCompile Include="BufferOpenGL.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneRender.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderStorageBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderLoader.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="IndirectBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Shader.rc">
+      <Filter>Файлы ресурсов</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

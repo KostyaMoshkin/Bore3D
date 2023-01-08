@@ -6,9 +6,15 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bore3Dtest", "Bore3Dtest\Bore3Dtest.vcxproj", "{DFAD4582-8DE1-4A7C-A071-BA8FC09EFA02}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0A6DD421-B192-45AA-8861-714A7462FD79} = {0A6DD421-B192-45AA-8861-714A7462FD79}
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520} = {43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphicControl", "GraphicControl\GraphicControl.vcxproj", "{0A6DD421-B192-45AA-8861-714A7462FD79}"
+	ProjectSection(ProjectDependencies) = postProject
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520} = {43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataProvider", "DataProvider\DataProvider.vcxproj", "{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +40,14 @@ Global
 		{0A6DD421-B192-45AA-8861-714A7462FD79}.Release|x64.Build.0 = Release|x64
 		{0A6DD421-B192-45AA-8861-714A7462FD79}.Release|x86.ActiveCfg = Release|Win32
 		{0A6DD421-B192-45AA-8861-714A7462FD79}.Release|x86.Build.0 = Release|Win32
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Debug|x64.ActiveCfg = Debug|x64
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Debug|x64.Build.0 = Debug|x64
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Debug|x86.ActiveCfg = Debug|Win32
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Debug|x86.Build.0 = Debug|Win32
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Release|x64.ActiveCfg = Release|x64
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Release|x64.Build.0 = Release|x64
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Release|x86.ActiveCfg = Release|Win32
+		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

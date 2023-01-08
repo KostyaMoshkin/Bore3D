@@ -10,10 +10,6 @@
 #include "afxdialogex.h"
 #include <WinUser.h>
 
-#include <gdipluscolor.h>
-
-#include <wingdi.h>
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -111,7 +107,9 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
 
-	// TODO: добавьте дополнительную инициализацию
+	m_dataProvider.init("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+
+	m_controlGL.init();
 
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
@@ -165,22 +163,6 @@ HCURSOR CBore3DtestDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-//static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-//{
-//	switch (message)
-//	{
-//	case WM_CLOSE:
-//		DestroyWindow(hWnd);
-//		break;
-//	case WM_DESTROY:
-//		PostQuitMessage(0);
-//		break;
-//	default:
-//		return DefWindowProc(hWnd, message, wParam, lParam); // add this
-//	}
-//	return 0;
-//}
-
 void CBore3DtestDlg::BN_OPENGL_CLICKED()
 {
 	CRect rect;
@@ -188,7 +170,15 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	pWnd->GetWindowRect(&rect);
 
 
-	m_controlGL.init();
+	//m_controlGL.init();
+	
+	DataProvider::IBoreData* pData = new DataProvider::IBoreData();
+	m_controlGL.InitBore3D(pData, 0.0f);
+
+	std::vector<COLORREF> vPalette;
+	m_controlGL.InitPalette(vPalette);
+
+	delete pData;
 
 	return;
 

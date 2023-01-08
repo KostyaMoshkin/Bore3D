@@ -1,10 +1,12 @@
 #pragma once
+#include "pch.h"
 
 #include "resource.h"
-//#include "CConfig.h"
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+
+#include <memory>
 
  namespace GL {
 
@@ -18,15 +20,15 @@
 
      struct ShaderName
      {
-         static const int orbittemperature_vertex       = IDR_DATA1;
-         static const int orbittemperature_fragment     = IDR_DATA2;
+         static const int bore_vertex       = IDR_DATA1;
+         static const int bore_fragment     = IDR_DATA2;
 
          static const char* getName(int ID_)
          {
              switch (ID_)
              {
-             case orbittemperature_vertex:      return "bore_vertex";
-             case orbittemperature_fragment:    return "bore_fragment";
+             case bore_vertex:      return "bore_vertex";
+             case bore_fragment:    return "bore_fragment";
              default: return "";
              }
          }

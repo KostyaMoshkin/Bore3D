@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "ControlGL.h"
+#include "RenderBoreSurface.h"
 
 #include <IBoreData.h>
 #include <IDiaMapper.h>
@@ -13,12 +14,10 @@ namespace GraphicControl
 
 	class GRAPHICCONTROL_API BoreControl : public ControlGL
 	{
-		float m_fGreen = 0;
-
-		std::array<float, 3> m_vBkgColor;
-
 		bool m_bDataInit = false;
 		bool m_bPaletteInit = false;
+
+		GL::RenderBoreSurfacePtr m_pRenderBoreSurface;
 
 	public:
 		BoreControl();
@@ -26,9 +25,6 @@ namespace GraphicControl
 	public:
 		// Унаследовано через ControlGL
 		void paint() override;
-
-	public:
-		void setBkgColor(float r_, float g_, float b_);
 
 	public:
 		// прототип метода для отображения части 3D-ствола скважины в bitmap

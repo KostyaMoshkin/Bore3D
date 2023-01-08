@@ -18,6 +18,9 @@
     <Filter Include="OpenGL">
       <UniqueIdentifier>{4e7a5b2e-0108-4ed1-8f76-ea9e558207b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{581aa018-2a6d-4399-a8a4-5ec29c142b7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ControlGL.h">
@@ -66,6 +69,9 @@
       <Filter>OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="RenderBoreSurface.h">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -106,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderBoreSurface.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

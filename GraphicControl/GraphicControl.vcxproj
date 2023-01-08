@@ -162,6 +162,7 @@
     <ClInclude Include="IndirectBuffer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="RenderBoreSurface.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SceneRender.h" />
     <ClInclude Include="ShaderLoader.h" />
@@ -183,6 +184,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="RenderBoreSurface.cpp" />
     <ClCompile Include="SceneRender.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />

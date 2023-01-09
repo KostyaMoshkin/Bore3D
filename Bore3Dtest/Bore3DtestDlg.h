@@ -1,10 +1,4 @@
-﻿
-// Bore3DtestDlg.h: файл заголовка
-//
-
-#pragma once
-
-#include <DataProvider.h>
+﻿#pragma once
 
 #include "BoreControl.h"
 
@@ -17,11 +11,12 @@ class CBore3DtestDlg : public CDialogEx
 
 	GraphicControl::BoreControl m_controlGL;
 
-	DataProvider::CDataProvider m_dataProvider;
+	DataProvider::BoreData* m_pData;
 
 	// Создание
 public:
 	CBore3DtestDlg(CWnd* pParent = nullptr);	// стандартный конструктор
+	~CBore3DtestDlg();
 
 // Данные диалогового окна
 #ifdef AFX_DESIGN_TIME

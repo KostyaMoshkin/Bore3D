@@ -8,6 +8,7 @@
 #include <IDiaMapper.h>
 
 #include <array>
+#include <vector>
 
 namespace GraphicControl
 {
@@ -18,6 +19,8 @@ namespace GraphicControl
 		bool m_bPaletteInit = false;
 
 		GL::RenderBoreSurfacePtr m_pRenderBoreSurface;
+
+		DataProvider::IBoreData* m_pData;
 
 	public:
 		BoreControl();

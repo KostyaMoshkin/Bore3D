@@ -26,6 +26,9 @@ namespace GraphicControl
     bool BoreControl::InitBore3D(DataProvider::IBoreData* pData, float fLogPerPixel)
     {
         needUpdate();
+
+        m_pData = pData;
+
         m_bDataInit = true;
         return false;
     }

@@ -1,9 +1,6 @@
 ﻿
-// Bore3DtestDlg.cpp: файл реализации
-//
-
 #include "pch.h"
-#include "framework.h"
+//#include "framework.h"
 #include "Bore3Dtest.h"
 #include "Bore3DtestDlg.h"
 #include "resource.h"
@@ -57,6 +54,13 @@ CBore3DtestDlg::CBore3DtestDlg(CWnd* pParent /*=nullptr*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_pParent = pParent;
+
+	m_pData = new DataProvider::BoreData("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+}
+
+CBore3DtestDlg::~CBore3DtestDlg()
+{
+	delete m_pData;
 }
 
 void CBore3DtestDlg::DoDataExchange(CDataExchange* pDX)
@@ -106,8 +110,10 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Крупный значок
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
+	m_controlGL.InitBore3D(m_pData, 0.0f);
 
-	m_dataProvider.init("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+	std::vector<COLORREF> vPalette;
+	m_controlGL.InitPalette(vPalette);
 
 	m_controlGL.init();
 
@@ -168,17 +174,6 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	CRect rect;
 	CWnd* pWnd = GetDlgItem(IDC_CUSTOM1);
 	pWnd->GetWindowRect(&rect);
-
-
-	//m_controlGL.init();
-	
-	DataProvider::IBoreData* pData = new DataProvider::IBoreData();
-	m_controlGL.InitBore3D(pData, 0.0f);
-
-	std::vector<COLORREF> vPalette;
-	m_controlGL.InitPalette(vPalette);
-
-	delete pData;
 
 	return;
 

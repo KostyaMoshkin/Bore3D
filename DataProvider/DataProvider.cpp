@@ -1,7 +1,4 @@
-﻿// DataProvider.cpp : Определяет экспортируемые функции для DLL.
-//
-
-#include "pch.h"
+﻿#include "pch.h"
 #include "framework.h"
 #include "DataProvider.h"
 
@@ -21,21 +18,23 @@ namespace DataProvider
             sLine_.erase(0, pos + sDelimiter_.length());
         }
 
+        sResult.push_back(sLine_);
+
         return sResult;
     }
 
-    static GeoPoint getGeoPoint(const std::string sLine_)
+    static std::vector<std::string> getStringValues(const std::string& sLine_)
     {
         std::vector<std::string> sFields = split(sLine_, "\t");
 
         GeoPoint geoPoint;
 
         if (sFields.size() < 5)
-            return geoPoint;
+            return std::vector<std::string>(0);
 
         for (std::string& sParam : sFields)
         {
-            int index = sParam.find(',');
+            int index = (int)sParam.find(',');
 
             if (index < 0)
                 continue;
@@ -43,15 +42,26 @@ namespace DataProvider
             sParam.replace(index, index, ".");
         }
 
-        geoPoint.fDepth = (float)atof(sFields[0].c_str());
-        for (int i = 1; i < sFields.size(); ++i)
-        {
-            geoPoint.fDistance.push_back((float)atof(sFields[i].c_str()));
-        }
-
-        return geoPoint;
+        return sFields;
     }
 
+    static void addGeoPoint(GeoPoint& geoPoint_, std::string& sLine_)
+    {
+        std::vector<std::string> sFields = getStringValues(sLine_);
+
+        if (sFields.size() < 5)
+            return;
+
+        geoPoint_.vfDepth.push_back((float)atof(sFields[0].c_str()));
+
+        std::vector<float> vDistance;
+        for (int i = 1; i < sFields.size(); ++i)
+            vDistance.push_back((float)atof(sFields[i].c_str()));
+
+        geoPoint_.vvfDistance.push_back(vDistance);
+
+        geoPoint_.vfRotation.push_back(0.0f);
+    }
 
     // Конструктор для экспортированного класса.
     CDataProvider::CDataProvider()
@@ -69,10 +79,10 @@ namespace DataProvider
         std::string sLine;
         
         while (std::getline(file, sLine))
-            m_data.push_back(getGeoPoint(sLine));
+            addGeoPoint(m_data, sLine);
 
         file.close();
 
-        return false;
+        return true;
     }
 }

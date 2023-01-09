@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 
 #ifdef DATAPROVIDER_EXPORTS
 #define DATAPROVIDER_API __declspec(dllexport)
@@ -14,7 +13,8 @@ namespace DataProvider
 	class DATAPROVIDER_API IDiaMapper
 	{
 	public:
-		~IDiaMapper() {};
+		IDiaMapper() {}
+		~IDiaMapper() {}
 		//IDiaMapper* Clone();   // сделать копию маппера.
 
 		double GeoToLP(double x) { return 0; } // преобазование из геологических координат в  логические экрана (x или y)

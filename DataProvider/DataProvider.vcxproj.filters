@@ -47,5 +47,8 @@
     <ClCompile Include="pch.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="IBoreData.cpp">
+      <Filter>DataProvider</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

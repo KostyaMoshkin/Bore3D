@@ -61,9 +61,9 @@ namespace GraphicControl
 
     void ControlGL::endDraw() const
     {
-        SwapBuffers(m_hDC);
+        SwapBuffers(m_GLHDC);
 
-        wglMakeCurrent(m_hDC, nullptr);
+        wglMakeCurrent(m_GLHDC, nullptr);
     }
 
     bool ControlGL::makeCurrent() const
@@ -71,7 +71,7 @@ namespace GraphicControl
         if (!m_rendContext)
             return false;
 
-        if (!wglMakeCurrent(m_hDC, m_rendContext))
+        if (!wglMakeCurrent(m_GLHDC, m_rendContext))
         {
             return false;
         }
@@ -81,10 +81,10 @@ namespace GraphicControl
 
     bool ControlGL::initWindow()
     {
-        m_cDC = GetDC();
-        m_hDC = *m_cDC;
+        CDC* pDC = GetDC();
+        m_GLHDC = *pDC;
 
-        if (m_hDC == nullptr)
+        if (m_GLHDC == nullptr)
             return false;
 
         PIXELFORMATDESCRIPTOR pfd = {
@@ -108,13 +108,13 @@ namespace GraphicControl
           0, 0, 0                // layer masks ignored  
         };
 
-        int pixelFormat = ChoosePixelFormat(m_hDC, &pfd);
+        int pixelFormat = ChoosePixelFormat(m_GLHDC, &pfd);
         if (pixelFormat == 0)
         {
             return false;
         }
 
-        if (!SetPixelFormat(m_hDC, pixelFormat, &pfd))
+        if (!SetPixelFormat(m_GLHDC, pixelFormat, &pfd))
         {
             return false;
         }
@@ -132,13 +132,13 @@ namespace GraphicControl
         //------------------------------------------------------------------------------------------
         // init temp context
 
-        HGLRC tempContext = wglCreateContext(m_hDC);
+        HGLRC tempContext = wglCreateContext(m_GLHDC);
         if (tempContext == nullptr)
         {
             return false;
         }
 
-        if (!wglMakeCurrent(m_hDC, tempContext))
+        if (!wglMakeCurrent(m_GLHDC, tempContext))
         {
             wglDeleteContext(tempContext);
 
@@ -162,23 +162,60 @@ namespace GraphicControl
 
         if (glewInitResult != GLEW_OK)
         {
-            wglMakeCurrent(m_hDC, nullptr);
+            wglMakeCurrent(m_GLHDC, nullptr);
 
             return false;
         }
 
-        wglMakeCurrent(m_hDC, nullptr);
+        wglMakeCurrent(m_GLHDC, nullptr);
         glew_created = true;
         return true;
     }
 
     bool ControlGL::createContext()
     {
-        m_rendContext = wglCreateContext(m_hDC);
+        m_rendContext = wglCreateContext(m_GLHDC);
 
         return m_rendContext != nullptr;
     }
 
+    void ControlGL::SavePicture()
+    {
+        HBITMAP hBitmap = (HBITMAP)::GetCurrentObject(m_saveHDC, OBJ_BITMAP);
+
+        BITMAP dsBm;
+        GetObject(hBitmap, sizeof(BITMAP), &dsBm);
+
+        //nSizeX_ = std::min<int>(nSizeX_, dsBm.bmWidth);
+        //nSizeY_ = std::min<int>(nSizeY_, dsBm.bmHeight);
+
+
+        if (dsBm.bmBitsPixel == 24)
+        {
+            glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_BGR, GL_UNSIGNED_BYTE, dsBm.bmBits);
+        }
+        else
+        {
+            std::vector<byte> vPrintScreen(m_ptWindow.x * m_ptWindow.y * 4);
+            glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_RGBA, GL_UNSIGNED_BYTE, vPrintScreen.data());
+
+            for (int i = 0; i < m_ptWindow.x; ++i)
+            {
+                for (int j = 0; j < m_ptWindow.y; ++j)
+                {
+                    COLORREF c = *(COLORREF*)&vPrintScreen[(i + j * m_ptWindow.x) * 4];
+                    SetPixel(m_saveHDC, i, m_ptWindow.y - j, c & 0xffffff);
+                }
+            }
+        }
+    }
+
+    void ControlGL::fillPicture(HDC hDC_, int nSizeX_, int nSizeY_)
+    {
+        m_saveHDC = hDC_;
+
+        OnPaint(true);
+    }
 
     // Register the window class if it has not already been registered.
     BOOL ControlGL::RegisterWindowClass()
@@ -220,7 +257,7 @@ namespace GraphicControl
 
     /////////////////////////////////////////////////////////////////////////////
 
-    void ControlGL::OnPaint()
+    void ControlGL::OnPaint(bool bSave_)
     {
         if (m_rendContext == nullptr)
             return;
@@ -228,7 +265,7 @@ namespace GraphicControl
         CRect rcWindow;
         this->GetWindowRect(&rcWindow);
 
-        bool bSizeChanged = (m_ptWindow.x == rcWindow.Width()) && (m_ptWindow.y == rcWindow.Height());
+        bool bSizeChanged = !((m_ptWindow.x == rcWindow.Width()) && (m_ptWindow.y == rcWindow.Height()));
 
         if (bSizeChanged)
             m_ptWindow.SetPoint(rcWindow.Width(), rcWindow.Height());
@@ -244,16 +281,30 @@ namespace GraphicControl
         if (rcWindow.IsRectEmpty())
             return;
 
-        if(!beginDraw(rcWindow.Width(), rcWindow.Height()))
+        if (!beginDraw(rcWindow.Width(), rcWindow.Height()))
             return;
 
         paint();
+
+        if (bSave_)
+            SavePicture();
+
         endDraw();
+    }
+
+    void ControlGL::OnPaint()
+    {
+        OnPaint(false);
     }
 
     BOOL ControlGL::OnEraseBkgnd(CDC* pDC)
     {
         return CWnd::OnEraseBkgnd(pDC);
+    }
+
+    void ControlGL::OnSize(UINT nType, int cx, int cy)
+    {
+        m_ptWindow.SetPoint(cx, cy);
     }
 
     void ControlGL::PreSubclassWindow()

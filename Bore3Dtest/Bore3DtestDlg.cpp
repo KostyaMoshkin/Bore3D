@@ -71,7 +71,7 @@ void CBore3DtestDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_CUSTOM1, m_controlGL);
+	//DDX_Control(pDX, IDC_CUSTOM1, m_controlGL);
 }
 
 BEGIN_MESSAGE_MAP(CBore3DtestDlg, CDialogEx)
@@ -113,12 +113,12 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Крупный значок
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
-	m_controlGL.InitBore3D(m_pData, 0.0f);
+	//m_controlGL.InitBore3D(m_pData, 0.0f);
 
-	std::vector<COLORREF> vPalette;
-	m_controlGL.InitPalette(vPalette);
+	//std::vector<COLORREF> vPalette;
+	//m_controlGL.InitPalette(vPalette);
 
-	m_controlGL.init();
+	//m_controlGL.init();
 
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
@@ -174,7 +174,17 @@ HCURSOR CBore3DtestDlg::OnQueryDragIcon()
 
 void CBore3DtestDlg::BN_OPENGL_CLICKED()
 {
+	CWnd* pWnd = GetDlgItem(IDC_PICTURE_BOX);
+	CDC* pCHC = pWnd->GetDC();
+	HDC hDC = *pCHC;
+
+	CRect rect;
+	pWnd->GetWindowRect(&rect);
+
 	m_hiddenDlg.Create("SAMPLEDIALOG", this);
+	m_hiddenDlg.SetWindowPos(NULL, 0, 0, rect.Width() + 15, rect.Height() + 37, SWP_NOMOVE | SWP_NOZORDER); // | SWP_HIDEWINDOW | SWP_NOACTIVATE
+	m_hiddenDlg.fillPicture(hDC, rect.Width(), rect.Height());
+
 	//m_hiddenDlg.ShowWindow();
 
 	//CRect rect;

@@ -79,7 +79,10 @@ namespace DataProvider
         std::string sLine;
         
         while (std::getline(file, sLine))
+        {
             addGeoPoint(m_data, sLine);
+            break;
+        }
 
         file.close();
 

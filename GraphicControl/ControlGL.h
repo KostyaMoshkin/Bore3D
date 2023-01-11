@@ -18,12 +18,13 @@ namespace GraphicControl
 
 	class GRAPHICCONTROL_API ControlGL : public CWnd
 	{
-		CDC* m_cDC = nullptr;
-		HDC m_hDC;
+		HDC m_GLHDC;
+		HDC m_saveHDC;
 		HGLRC m_rendContext = nullptr;
 
 		bool m_bNeedUpdate = true;
 
+	protected:
 		CPoint m_ptWindow;
 
 		// Construction
@@ -52,6 +53,8 @@ namespace GraphicControl
 		bool init();
 		void needUpdate(bool bUpdate_ = TRUE) { m_bNeedUpdate = bUpdate_;  }
 
+		void fillPicture(HDC hDC_, int nSizeX_, int nSizeY_);
+
 	protected:
 		bool initWindow();
 		bool initGlew();
@@ -60,7 +63,8 @@ namespace GraphicControl
 
 		bool beginDraw(int width_, int height_) const;
 		void endDraw() const;
-
+		void OnPaint(bool bSave_);
+		void SavePicture();
 
 	protected:
 		BOOL RegisterWindowClass();
@@ -69,6 +73,7 @@ namespace GraphicControl
 	protected:
 		//{{AFX_MSG(ControlGL)
 		afx_msg void OnPaint();
+		afx_msg void OnSize(UINT nType, int cx, int cy);
 		afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 		//}}AFX_MSG
 		DECLARE_MESSAGE_MAP()

@@ -174,7 +174,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Bore3D\;$(SolutionDir)GLM\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Bore3D\;$(SolutionDir)GL\;$(SolutionDir)GLEW\;$(SolutionDir)GLM\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

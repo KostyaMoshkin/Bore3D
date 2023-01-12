@@ -186,24 +186,19 @@ namespace GraphicControl
         BITMAP dsBm;
         GetObject(hBitmap, sizeof(BITMAP), &dsBm);
 
-        //nSizeX_ = std::min<int>(nSizeX_, dsBm.bmWidth);
-        //nSizeY_ = std::min<int>(nSizeY_, dsBm.bmHeight);
-
-
         if (dsBm.bmBitsPixel == 24)
         {
             glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_BGR, GL_UNSIGNED_BYTE, dsBm.bmBits);
         }
         else
         {
-            std::vector<byte> vPrintScreen(m_ptWindow.x * m_ptWindow.y * 4);
-            glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_RGBA, GL_UNSIGNED_BYTE, vPrintScreen.data());
+            glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_RGBA, GL_UNSIGNED_BYTE, m_vPrintScreen.data());
 
             for (int i = 0; i < m_ptWindow.x; ++i)
             {
                 for (int j = 0; j < m_ptWindow.y; ++j)
                 {
-                    COLORREF c = *(COLORREF*)&vPrintScreen[(i + j * m_ptWindow.x) * 4];
+                    COLORREF c = *(COLORREF*)&m_vPrintScreen[(i + j * m_ptWindow.x) * 4];
                     SetPixel(m_saveHDC, i, m_ptWindow.y - j, c & 0xffffff);
                 }
             }
@@ -268,7 +263,7 @@ namespace GraphicControl
         bool bSizeChanged = !((m_ptWindow.x == rcWindow.Width()) && (m_ptWindow.y == rcWindow.Height()));
 
         if (bSizeChanged)
-            m_ptWindow.SetPoint(rcWindow.Width(), rcWindow.Height());
+            changeWindowSize(rcWindow);
 
         if (!(m_bNeedUpdate || bSizeChanged))
         {
@@ -290,6 +285,13 @@ namespace GraphicControl
             SavePicture();
 
         endDraw();
+    }
+
+    void ControlGL::changeWindowSize(CRect rcWindow_)
+    {
+        m_ptWindow.SetPoint(rcWindow_.Width(), rcWindow_.Height());
+
+        m_vPrintScreen.resize(m_ptWindow.x * m_ptWindow.y * 4);
     }
 
     void ControlGL::OnPaint()

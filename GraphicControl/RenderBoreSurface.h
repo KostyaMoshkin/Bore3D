@@ -12,8 +12,6 @@ namespace GL
 
     class RenderBoreSurface : public Render
     {
-        float m_fGreen = 0;
-
         std::array<float, 3> m_vBkgColor;
 
     public:

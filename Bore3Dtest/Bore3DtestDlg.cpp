@@ -1,15 +1,11 @@
 ﻿
 #include "pch.h"
-//#include "framework.h"
+
 #include "Bore3Dtest.h"
 #include "Bore3DtestDlg.h"
 #include "resource.h"
 #include "afxdialogex.h"
 #include <WinUser.h>
-
-#include <glew.h>
-#include <wglew.h>
-#include <gl.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,20 +54,15 @@ CBore3DtestDlg::CBore3DtestDlg(CWnd* pParent /*=nullptr*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_pParent = pParent;
-
-	m_pData = new DataProvider::BoreData("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
 }
 
 CBore3DtestDlg::~CBore3DtestDlg()
 {
-	delete m_pData;
 }
 
 void CBore3DtestDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-
-	//DDX_Control(pDX, IDC_CUSTOM1, m_controlGL);
 }
 
 BEGIN_MESSAGE_MAP(CBore3DtestDlg, CDialogEx)
@@ -113,12 +104,7 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Крупный значок
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
-	//m_controlGL.InitBore3D(m_pData, 0.0f);
-
-	//std::vector<COLORREF> vPalette;
-	//m_controlGL.InitPalette(vPalette);
-
-	//m_controlGL.init();
+	m_hiddenDlg.Create("SAMPLEDIALOG", this);
 
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
@@ -181,9 +167,8 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	CRect rect;
 	pWnd->GetWindowRect(&rect);
 
-	m_hiddenDlg.Create("SAMPLEDIALOG", this);
-	m_hiddenDlg.SetWindowPos(NULL, 0, 0, rect.Width() + 15, rect.Height() + 37, SWP_NOMOVE | SWP_NOZORDER); // | SWP_HIDEWINDOW | SWP_NOACTIVATE
-	m_hiddenDlg.fillPicture(hDC, rect.Width(), rect.Height());
+	m_hiddenDlg.SetWindowPos(NULL, 0, 0, rect.Width() + 15, rect.Height() + 37, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE); //
+	m_hiddenDlg.fillPicture(hDC);
 
 	//m_hiddenDlg.ShowWindow();
 

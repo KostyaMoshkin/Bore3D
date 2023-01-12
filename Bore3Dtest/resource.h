@@ -7,7 +7,6 @@
 #define IDS_ABOUTBOX                    101
 #define IDD_BORE3DTEST_DIALOG           102
 #define IDR_MAINFRAME                   128
-#define IDB_BITMAP1                     129
 #define IDD_DIALOG1                     130
 #define IDD_DIALOG_HIDDEN               131
 #define IDC_PICTURE                     1000

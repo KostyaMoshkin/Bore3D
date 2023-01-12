@@ -13,16 +13,20 @@
 /////////////////////////////////////////////////////////////////////////////
 // ControlGL window
 
+#include <vector>
+
 namespace GraphicControl
 {
 
 	class GRAPHICCONTROL_API ControlGL : public CWnd
 	{
-		HDC m_GLHDC;
-		HDC m_saveHDC;
+		HDC m_GLHDC = nullptr;
+		HDC m_saveHDC = nullptr;
 		HGLRC m_rendContext = nullptr;
 
 		bool m_bNeedUpdate = true;
+
+		std::vector<byte> m_vPrintScreen;
 
 	protected:
 		CPoint m_ptWindow;
@@ -65,6 +69,8 @@ namespace GraphicControl
 		void endDraw() const;
 		void OnPaint(bool bSave_);
 		void SavePicture();
+
+		void changeWindowSize(CRect rcWindow_);
 
 	protected:
 		BOOL RegisterWindowClass();

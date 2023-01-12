@@ -4,9 +4,6 @@
 #include "ControlGL.h"
 #include "RenderBoreSurface.h"
 
-#include <IBoreData.h>
-#include <IDiaMapper.h>
-
 #include <array>
 #include <vector>
 
@@ -20,10 +17,9 @@ namespace GraphicControl
 
 		GL::RenderBoreSurfacePtr m_pRenderBoreSurface;
 
-		DataProvider::IBoreData* m_pData;
-
 	public:
 		BoreControl();
+		~BoreControl();
 
 	public:
 		// Унаследовано через ControlGL
@@ -33,7 +29,7 @@ namespace GraphicControl
 		// прототип метода для отображения части 3D-ствола скважины в bitmap
 		// 
 		bool InitBore3D(
-			DataProvider::IBoreData* pData, // интерфейс доступа к данным развёртки
+			void* pData, // интерфейс доступа к данным развёртки
 			float fLogPerPixel // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
 		);
 
@@ -48,7 +44,7 @@ namespace GraphicControl
 
 		int GetBitmap(
 			const RECT* pVisualRect, // прямоугольник в логических единицах отображающий часть 3D-ствола (top,bottom соответствует fTop,fBottom при преобразовании в pMapper)
-			DataProvider::IDiaMapper* pMapper, // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
+			void* pMapper, // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
 			float fTop, float fBottom, // интервал глубин (окно) отображения ствола скважины
 			float fRotation, // дополнительный угол поворота всего ствола вокруг своей оси
 			// совокупно следующие 4 параметра определяют шкалу для отображения ридиусов (как значение радиуса преобразуется в видимую толщину ствола)
@@ -57,6 +53,10 @@ namespace GraphicControl
 			float fIsometryAngle, // угол изометрической проекции
 			bool bDrawMesh
 		);
+
+	private:
+		struct Implementation;
+		std::shared_ptr<Implementation> m_pImpl;
 	};
 
 }

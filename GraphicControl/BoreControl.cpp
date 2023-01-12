@@ -1,14 +1,26 @@
 #include "pch.h"
 #include "BoreControl.h"
 
-#include <gl.h>
+#include <IBoreData.h>
+#include <IDiaMapper.h>
 
 namespace GraphicControl
 {
+
+    struct BoreControl::Implementation
+    {
+        DataProvider::BoreData* m_pData = nullptr;
+    };
+
     BoreControl::BoreControl()
         : ControlGL()
     {
+        m_pImpl = std::make_shared<Implementation>();
         m_pRenderBoreSurface = GL::RenderBoreSurface::Create();
+    }
+
+    BoreControl::~BoreControl()
+    {
     }
 
     void BoreControl::paint()
@@ -23,11 +35,11 @@ namespace GraphicControl
         return;
 	}
 
-    bool BoreControl::InitBore3D(DataProvider::IBoreData* pData, float fLogPerPixel)
+    bool BoreControl::InitBore3D(void* pData, float fLogPerPixel)
     {
         needUpdate();
 
-        m_pData = pData;
+        m_pImpl->m_pData = (DataProvider::BoreData* )pData;
 
         m_bDataInit = true;
         return false;
@@ -40,8 +52,9 @@ namespace GraphicControl
         return false;
     }
 
-    int BoreControl::GetBitmap(const RECT* pVisualRect, DataProvider::IDiaMapper* pMapper, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
+    int BoreControl::GetBitmap(const RECT* pVisualRect, void* pMapper, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
+        (DataProvider::IDiaMapper*)pMapper;
         return 0;
     }
 }

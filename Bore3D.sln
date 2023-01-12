@@ -6,7 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bore3Dtest", "Bore3Dtest\Bore3Dtest.vcxproj", "{DFAD4582-8DE1-4A7C-A071-BA8FC09EFA02}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0A6DD421-B192-45AA-8861-714A7462FD79} = {0A6DD421-B192-45AA-8861-714A7462FD79}
-		{43DF8E1D-A3EC-493C-BF28-D78DFC9B6520} = {43DF8E1D-A3EC-493C-BF28-D78DFC9B6520}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphicControl", "GraphicControl\GraphicControl.vcxproj", "{0A6DD421-B192-45AA-8861-714A7462FD79}"

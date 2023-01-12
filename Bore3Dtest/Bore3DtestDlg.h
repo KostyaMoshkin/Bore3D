@@ -1,18 +1,12 @@
 ﻿#pragma once
 
-#include "BoreControl.h"
-
-#include "CHiddenDlg.h"
+#include <CHiddenDlg.h>
 
 // Диалоговое окно CBore3DtestDlg
 class CBore3DtestDlg : public CDialogEx
 {
 
 	CWnd* m_pParent;
-
-	GraphicControl::BoreControl m_controlGL;
-
-	DataProvider::BoreData* m_pData;
 
 	CHiddenDlg m_hiddenDlg;
 

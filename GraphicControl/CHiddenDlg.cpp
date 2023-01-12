@@ -1,14 +1,23 @@
 #include "pch.h"
 #include "CHiddenDlg.h"
 
+#include <IBoreData.h>
+
+#include <memory>
+
+struct CHiddenDlg::Implementation
+{
+    std::shared_ptr<DataProvider::BoreData> m_pData = nullptr;
+};
+
 CHiddenDlg::CHiddenDlg()
 {
-    m_pData = new DataProvider::BoreData("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+    m_pImpl = std::make_shared<Implementation>();
+    m_pImpl->m_pData = std::make_shared<DataProvider::BoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
 }
 
 CHiddenDlg::~CHiddenDlg()
 {
-    delete m_pData;
 }
 
 BOOL CHiddenDlg::Create(LPCSTR DialogName, CWnd* Owner)
@@ -33,7 +42,7 @@ BOOL CHiddenDlg::OnInitDialog()
 
     m_controlGL.init();
 
-    m_controlGL.InitBore3D(m_pData, 0.0f);
+    m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 0.0f);
 
     std::vector<COLORREF> vPalette;
     m_controlGL.InitPalette(vPalette);
@@ -41,9 +50,9 @@ BOOL CHiddenDlg::OnInitDialog()
 	return 0;
 }
 
-void CHiddenDlg::fillPicture(HDC hDC_, int nSizeX_, int nSizeY_)
+void CHiddenDlg::fillPicture(HDC hDC_)
 {
-    m_controlGL.fillPicture(hDC_, nSizeX_, nSizeY_);
+    m_controlGL.fillPicture(hDC_, n_mWindowSizeX, n_mWindowSizeY);
 }
 
 void CHiddenDlg::DoDataExchange(CDataExchange* pDX)

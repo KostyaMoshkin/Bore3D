@@ -21,6 +21,9 @@
     <Filter Include="Render">
       <UniqueIdentifier>{581aa018-2a6d-4399-a8a4-5ec29c142b7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HiddenDialog">
+      <UniqueIdentifier>{c8d42be7-a657-4eeb-8813-9d4e37bf38cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ControlGL.h">
@@ -72,6 +75,9 @@
     <ClInclude Include="RenderBoreSurface.h">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="CHiddenDlg.h">
+      <Filter>HiddenDialog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -115,6 +121,9 @@
     </ClCompile>
     <ClCompile Include="RenderBoreSurface.cpp">
       <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CHiddenDlg.cpp">
+      <Filter>HiddenDialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

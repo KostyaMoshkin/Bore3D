@@ -120,7 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)GL\;$(SolutionDir)GLEW\;$(SolutionDir)GLM\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)GLM\;$(SolutionDir)GL\;$(SolutionDir)GLEW\;$(SolutionDir)GLM\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -141,7 +141,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)GL\;$(SolutionDir)GLEW\;$(SolutionDir)GLM\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)GLM\;$(SolutionDir)GL\;$(SolutionDir)GLEW\;$(SolutionDir)GLM\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -158,6 +158,7 @@
     <ClInclude Include="BoreControl.h" />
     <ClInclude Include="BufferBounder.h" />
     <ClInclude Include="BufferOpenGL.h" />
+    <ClInclude Include="CHiddenDlg.h" />
     <ClInclude Include="ControlGL.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="IndexBuffer.h" />
@@ -176,6 +177,7 @@
   <ItemGroup>
     <ClCompile Include="BoreControl.cpp" />
     <ClCompile Include="BufferOpenGL.cpp" />
+    <ClCompile Include="CHiddenDlg.cpp" />
     <ClCompile Include="ControlGL.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />

@@ -53,10 +53,6 @@ namespace GraphicControl
 			float fIsometryAngle, // угол изометрической проекции
 			bool bDrawMesh
 		);
-
-	private:
-		struct Implementation;
-		std::shared_ptr<Implementation> m_pImpl;
 	};
 
 }

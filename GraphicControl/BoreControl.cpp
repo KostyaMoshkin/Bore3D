@@ -7,15 +7,9 @@
 namespace GraphicControl
 {
 
-    struct BoreControl::Implementation
-    {
-        DataProvider::BoreData* m_pData = nullptr;
-    };
-
     BoreControl::BoreControl()
         : ControlGL()
     {
-        m_pImpl = std::make_shared<Implementation>();
         m_pRenderBoreSurface = GL::RenderBoreSurface::Create();
     }
 
@@ -39,22 +33,26 @@ namespace GraphicControl
     {
         needUpdate();
 
-        m_pImpl->m_pData = (DataProvider::BoreData* )pData;
+        m_pRenderBoreSurface->InitBore3D(pData, fLogPerPixel);
 
         m_bDataInit = true;
+
         return false;
     }
 
     bool BoreControl::InitPalette(const std::vector<COLORREF>& vecPalette)
     {
         needUpdate();
+
         m_bPaletteInit = true;
+
         return false;
     }
 
     int BoreControl::GetBitmap(const RECT* pVisualRect, void* pMapper, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
-        (DataProvider::IDiaMapper*)pMapper;
+        m_pRenderBoreSurface->GetBitmap(pVisualRect, pMapper, fTop, fBottom, fRotation, fMinRadius, fMaxRadius, nMinRadiusLP, nMaxRadiusLP, fIsometryAngle, bDrawMesh);
+
         return 0;
     }
 }

@@ -50,5 +50,8 @@
     <ClCompile Include="IBoreData.cpp">
       <Filter>DataProvider</Filter>
     </ClCompile>
+    <ClCompile Include="IDiaMapper.cpp">
+      <Filter>DataProvider</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

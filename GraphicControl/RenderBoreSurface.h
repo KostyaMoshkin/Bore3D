@@ -3,6 +3,10 @@
 
 #include "Render.h"
 
+#include "BufferOpenGL.h"
+#include "TextureBuffer.h"
+#include "ShaderProgram.h"
+
 #include <array>
 
 namespace GL
@@ -13,6 +17,12 @@ namespace GL
     class RenderBoreSurface : public Render
     {
         std::array<float, 3> m_vBkgColor;
+
+        unsigned int m_nVAO;
+
+        ShaderProgramPtr m_pShaderProgram = nullptr;
+        BufferOpenGLPtr m_VertexBuffer = nullptr;
+        TextureBufferPtr m_pPaletteBuffer = nullptr;
 
     public:
         RenderBoreSurface();
@@ -30,11 +40,35 @@ namespace GL
         float getScale() override;
         void setScale(float fScale_) override;
 
+    public:
+        // прототип метода для отображения части 3D-ствола скважины в bitmap
+        bool InitBore3D(
+            void* pData_, // интерфейс доступа к данным развёртки
+            float fLogPerPixel_ // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
+        );
+
+        bool InitPalette(const std::vector<COLORREF>& vecPalette_);
+
+        int GetBitmap(
+            const RECT* pVisualRect, // прямоугольник в логических единицах отображающий часть 3D-ствола (top,bottom соответствует fTop,fBottom при преобразовании в pMapper)
+            void* pMapper, // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
+            float fTop, float fBottom, // интервал глубин (окно) отображения ствола скважины
+            float fRotation, // дополнительный угол поворота всего ствола вокруг своей оси
+            // совокупно следующие 4 параметра определяют шкалу для отображения ридиусов (как значение радиуса преобразуется в видимую толщину ствола)
+            float fMinRadius, float fMaxRadius, // минимальное и максимальное значение радиуса/диаметра, соответствующее ширине 
+            int nMinRadiusLP, int nMaxRadiusLP, // видимый размер в логических единицах для минимального и максимального радиуса 
+            float fIsometryAngle, // угол изометрической проекции
+            bool bDrawMesh
+        );
+
     protected:
         void setBkgColor(float r_, float g_, float b_);
 
     public:
         static RenderBoreSurfacePtr Create() { return std::make_shared<RenderBoreSurface>(); }
 
+    private:
+        struct Implementation;
+        std::shared_ptr<Implementation> m_pImpl;
     };
 }

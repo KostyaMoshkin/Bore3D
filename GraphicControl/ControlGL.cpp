@@ -187,25 +187,21 @@ namespace GraphicControl
         GetObject(hBitmap, sizeof(BITMAP), &dsBm);
 
         if (dsBm.bmBitsPixel == 24)
-        {
             glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_BGR, GL_UNSIGNED_BYTE, dsBm.bmBits);
-        }
         else
         {
             glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_RGBA, GL_UNSIGNED_BYTE, m_vPrintScreen.data());
 
             for (int i = 0; i < m_ptWindow.x; ++i)
-            {
                 for (int j = 0; j < m_ptWindow.y; ++j)
                 {
                     COLORREF c = *(COLORREF*)&m_vPrintScreen[(i + j * m_ptWindow.x) * 4];
                     SetPixel(m_saveHDC, i, m_ptWindow.y - j, c & 0xffffff);
                 }
-            }
         }
     }
 
-    void ControlGL::fillPicture(HDC hDC_, int nSizeX_, int nSizeY_)
+    void ControlGL::fillPicture(HDC hDC_, int /*nSizeX_*/, int /*nSizeY_*/)
     {
         m_saveHDC = hDC_;
 

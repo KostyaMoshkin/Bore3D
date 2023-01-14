@@ -2,21 +2,16 @@
 #include "pch.h"
 
 #include "ControlGL.h"
-#include "RenderBoreSurface.h"
 
 #include <array>
 #include <vector>
+#include <memory>
 
 namespace GraphicControl
 {
 
 	class GRAPHICCONTROL_API BoreControl : public ControlGL
 	{
-		bool m_bDataInit = false;
-		bool m_bPaletteInit = false;
-
-		GL::RenderBoreSurfacePtr m_pRenderBoreSurface;
-
 	public:
 		BoreControl();
 		~BoreControl();
@@ -24,6 +19,7 @@ namespace GraphicControl
 	public:
 		// Унаследовано через ControlGL
 		void paint() override;
+		bool init() override;
 
 	public:
 		// прототип метода для отображения части 3D-ствола скважины в bitmap
@@ -32,6 +28,10 @@ namespace GraphicControl
 			void* pData, // интерфейс доступа к данным развёртки
 			float fLogPerPixel // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
 		);
+
+		void InitDiaMapper(
+			void* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
+			);
 
 		//bool InitWindow(
 		//	HWND hWnd, // хэндл скрытого окна для проведения теневых отрисовок в OpenGL (если надо)
@@ -44,7 +44,6 @@ namespace GraphicControl
 
 		int GetBitmap(
 			const RECT* pVisualRect, // прямоугольник в логических единицах отображающий часть 3D-ствола (top,bottom соответствует fTop,fBottom при преобразовании в pMapper)
-			void* pMapper, // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
 			float fTop, float fBottom, // интервал глубин (окно) отображения ствола скважины
 			float fRotation, // дополнительный угол поворота всего ствола вокруг своей оси
 			// совокупно следующие 4 параметра определяют шкалу для отображения ридиусов (как значение радиуса преобразуется в видимую толщину ствола)
@@ -53,6 +52,10 @@ namespace GraphicControl
 			float fIsometryAngle, // угол изометрической проекции
 			bool bDrawMesh
 		);
+
+	private:
+		struct Implementation;
+		std::shared_ptr<Implementation> m_pImpl;
 	};
 
 }

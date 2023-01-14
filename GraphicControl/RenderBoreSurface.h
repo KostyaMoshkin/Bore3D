@@ -24,6 +24,10 @@ namespace GL
         BufferOpenGLPtr m_VertexBuffer = nullptr;
         TextureBufferPtr m_pPaletteBuffer = nullptr;
 
+        bool m_bDataInit = false;
+        bool m_bPaletteInit = false;
+        bool m_bProgramInit = false;
+
     public:
         RenderBoreSurface();
 
@@ -49,9 +53,12 @@ namespace GL
 
         bool InitPalette(const std::vector<COLORREF>& vecPalette_);
 
+        void InitDiaMapper(
+            void* pMapper_  // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
+        );
+
         int GetBitmap(
             const RECT* pVisualRect, // прямоугольник в логических единицах отображающий часть 3D-ствола (top,bottom соответствует fTop,fBottom при преобразовании в pMapper)
-            void* pMapper, // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
             float fTop, float fBottom, // интервал глубин (окно) отображения ствола скважины
             float fRotation, // дополнительный угол поворота всего ствола вокруг своей оси
             // совокупно следующие 4 параметра определяют шкалу для отображения ридиусов (как значение радиуса преобразуется в видимую толщину ствола)

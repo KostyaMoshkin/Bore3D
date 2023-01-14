@@ -2,18 +2,21 @@
 #include "CHiddenDlg.h"
 
 #include <IBoreData.h>
+#include <IDiaMapper.h>
 
 #include <memory>
 
 struct CHiddenDlg::Implementation
 {
     std::shared_ptr<DataProvider::BoreData> m_pData = nullptr;
+    std::shared_ptr<DataProvider::IDiaMapper> m_pDia = nullptr;
 };
 
 CHiddenDlg::CHiddenDlg()
 {
     m_pImpl = std::make_shared<Implementation>();
     m_pImpl->m_pData = std::make_shared<DataProvider::BoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+    m_pImpl->m_pDia = std::make_shared<DataProvider::IDiaMapper>();
 }
 
 CHiddenDlg::~CHiddenDlg()
@@ -42,9 +45,20 @@ BOOL CHiddenDlg::OnInitDialog()
 
     m_controlGL.init();
 
-    m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 0.0f);
+    m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 1.0f);
+
+    m_pImpl->m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
+    m_controlGL.InitDiaMapper(m_pImpl->m_pDia.get());
 
     std::vector<COLORREF> vPalette;
+    vPalette.push_back(0x00000000);
+    vPalette.push_back(0x00FF0000);
+    vPalette.push_back(0x00FFFF00);
+    vPalette.push_back(0x0000FF00);
+    vPalette.push_back(0x0000FFFF);
+    vPalette.push_back(0x000000FF);
+    vPalette.push_back(0x00FF00FF);
+    vPalette.push_back(0x00FFFFFF);
     m_controlGL.InitPalette(vPalette);
 
 	return 0;
@@ -52,7 +66,7 @@ BOOL CHiddenDlg::OnInitDialog()
 
 void CHiddenDlg::fillPicture(HDC hDC_)
 {
-    m_controlGL.fillPicture(hDC_, n_mWindowSizeX, n_mWindowSizeY);
+    m_controlGL.fillPicture(hDC_);
 }
 
 void CHiddenDlg::DoDataExchange(CDataExchange* pDX)
@@ -67,10 +81,7 @@ void CHiddenDlg::OnSize(UINT nType, int cx, int cy)
     if (!GetDlgItem(IDC_CUSTOM1)) 
         return;
 
-    n_mWindowSizeX = cx;
-    n_mWindowSizeY = cy;
-
-    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, n_mWindowSizeX, n_mWindowSizeY, SWP_NOZORDER);
+    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOZORDER);
 }
 
 BEGIN_MESSAGE_MAP(CHiddenDlg, CDialog)

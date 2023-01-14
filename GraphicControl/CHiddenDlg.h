@@ -20,9 +20,6 @@ class GRAPHICCONTROL_API CHiddenDlg : public CDialog
 {
     GraphicControl::BoreControl m_controlGL;
 
-    int n_mWindowSizeX = 0;
-    int n_mWindowSizeY = 0;
-
 public:
 	enum { IDD = IDD_DIALOG_HIDDEN};
 

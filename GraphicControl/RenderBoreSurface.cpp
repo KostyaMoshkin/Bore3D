@@ -36,6 +36,9 @@ namespace GL
 	
 	void RenderBoreSurface::draw()
 	{
+        if (!(m_bDataInit && m_bPaletteInit && m_bProgramInit))
+            return;
+
         float fRandColor1 = (float)std::rand() / RAND_MAX;
         float fRandColor2 = (float)std::rand() / RAND_MAX;
         float fRandColor3 = (float)std::rand() / RAND_MAX;
@@ -98,9 +101,13 @@ namespace GL
         std::vector<float[3]> vColorText(vecPalette_.size());
         for (int i = 0; i < vColorText.size(); ++i)
         {
-            vColorText[i][0] = (float)((vecPalette_[i] && rgbRed)       >> 0 ) / 255;
-            vColorText[i][1] = (float)((vecPalette_[i] && rgbGreen)     >> 8 ) / 255;
-            vColorText[i][2] = (float)((vecPalette_[i] && rgbBlue)      >> 16) / 255;
+            auto a = (vecPalette_[i] & rgbGreen);
+            auto b = (vecPalette_[i] & rgbGreen) >> 8;
+            auto c = (float)((vecPalette_[i] & rgbGreen) >> 8) / 255;
+
+            vColorText[i][0] = (float)((vecPalette_[i] & rgbRed)       >> 0 ) / 255;
+            vColorText[i][1] = (float)((vecPalette_[i] & rgbGreen)     >> 8 ) / 255;
+            vColorText[i][2] = (float)((vecPalette_[i] & rgbBlue)      >> 16) / 255;
         }
 
         BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
@@ -117,21 +124,31 @@ namespace GL
         //m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fDataMin_);
         //m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fDataMax_);
 
+        m_bPaletteInit = true;
+
         return false;
     }
 
-    int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, void* pMapper, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
+
+    void RenderBoreSurface::InitDiaMapper(void* pMapper_)
     {
-        m_pImpl->pMapper = (DataProvider::IDiaMapper *)pMapper;
+        m_pImpl->pMapper = (DataProvider::IDiaMapper *)pMapper_;
 
         for (int i = 0; i < m_pImpl->nCurveCount; ++i)
         {
             m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
-            m_pImpl->vRotation[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetRotation().data()[i]);
+            m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
 
             for(int j = 0; j < m_pImpl->pData->GetRadiusCurve(0).size(); ++j)
-                m_pImpl->vvRadiusCurve[i][j] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetRadiusCurve(i).data()[i]);
+                m_pImpl->vvRadiusCurve[i][j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
         }
+
+        m_bDataInit = true;
+    }
+
+
+    int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
+    {
 
         return 0;
     }
@@ -158,6 +175,8 @@ namespace GL
         glGenVertexArrays(1, &m_nVAO);
 
         m_pShaderProgram = pShaderProgram;
+
+        m_bProgramInit = true;
 
         return false;
     }

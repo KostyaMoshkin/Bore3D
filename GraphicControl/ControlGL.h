@@ -52,12 +52,12 @@ namespace GraphicControl
 
 	public:
 		virtual void paint() = 0;
+		virtual bool init();
 
 	public:
-		bool init();
 		void needUpdate(bool bUpdate_ = TRUE) { m_bNeedUpdate = bUpdate_;  }
 
-		void fillPicture(HDC hDC_, int nSizeX_, int nSizeY_);
+		void fillPicture(HDC hDC_);
 
 	protected:
 		bool initWindow();

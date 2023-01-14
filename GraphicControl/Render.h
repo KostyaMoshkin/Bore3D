@@ -20,8 +20,8 @@
 
      struct ShaderName
      {
-         static const int bore_vertex       = IDR_DATA1;
-         static const int bore_fragment     = IDR_DATA2;
+         static const int bore_vertex       = IDR_TEXTFILE1;
+         static const int bore_fragment     = IDR_TEXTFILE2;
 
          static const char* getName(int ID_)
          {

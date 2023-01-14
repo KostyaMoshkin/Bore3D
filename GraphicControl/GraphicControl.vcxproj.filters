@@ -68,16 +68,16 @@
     <ClInclude Include="TextureBuffer.h">
       <Filter>OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="Render.h">
-      <Filter>OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h" />
     <ClInclude Include="RenderBoreSurface.h">
       <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="CHiddenDlg.h">
       <Filter>HiddenDialog</Filter>
     </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -125,10 +125,5 @@
     <ClCompile Include="CHiddenDlg.cpp">
       <Filter>HiddenDialog</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Shader.rc">
-      <Filter>Файлы ресурсов</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>

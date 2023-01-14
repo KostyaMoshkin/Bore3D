@@ -12,17 +12,21 @@ namespace DataProvider
 	// маппер одномерного преобразования физическая координаты <--> экранная координата
 	class DATAPROVIDER_API IDiaMapper
 	{
+		float m_fK, m_fX0;
+
 	public:
 		IDiaMapper();
 		~IDiaMapper();
 		//IDiaMapper* Clone();   // сделать копию маппера.
 
-		double GeoToLP(double x); // преобазование из геологических координат в  логические экрана (x или y)
-		double LPToGeo(double x); // преобазование из логических координат экрана в  геологические
+		float GeoToLP(float x); // преобазование из геологических координат в  логические экрана (x или y)
+		float LPToGeo(float x); // преобазование из логических координат экрана в  геологические
 
-		void SetGeoRangeLPRange(double Geo0, double Geo1, double LP0, double LP1);
+		void SetGeo0LP0(float Geo0, float LP0);
+
+		void SetGeoRangeLPRange(float Geo0, float Geo1, float LP0, float LP1);
 		void SetLog(bool bLogScale); // задаёт линейную/логарифмическую шкалу
-		void Move(double xOffset); // сдвигает преобразование на xOffset логических координат
+		void Move(float xOffset); // сдвигает преобразование на xOffset логических координат
 
 		// возвращает тип преобразования 
 		// DiaMapper_Linear SF_LIN	// обычная линейная шкала

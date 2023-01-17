@@ -24,6 +24,9 @@
     <Filter Include="HiddenDialog">
       <UniqueIdentifier>{c8d42be7-a657-4eeb-8813-9d4e37bf38cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{b2505a56-f07f-4052-8974-f04963b1e027}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ControlGL.h">
@@ -125,5 +128,13 @@
     <ClCompile Include="CHiddenDlg.cpp">
       <Filter>HiddenDialog</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\bore_fragment.shader">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\bore_vertex.shader">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

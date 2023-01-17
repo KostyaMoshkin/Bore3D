@@ -20,8 +20,8 @@
 
      struct ShaderName
      {
-         static const int bore_vertex       = IDR_TEXTFILE1;
-         static const int bore_fragment     = IDR_TEXTFILE2;
+         static const int bore_fragment     = IDR_TEXTFILE1;
+         static const int bore_vertex       = IDR_TEXTFILE2;
 
          static const char* getName(int ID_)
          {
@@ -61,17 +61,40 @@
             virtual void bound() = 0;
             virtual void unbound() = 0;
 
-
-      public:
-            virtual float getScale() = 0;
-            virtual void setScale(float fScale_) = 0;
-
       public:
           void setVisible(bool bVisible_) { m_bVisible = bVisible_; }
           bool isVisible() { return m_bVisible; }
 
           void setVersionGl(int nVersionFull_) { m_nVersionFull = nVersionFull_; }
-          int getVersionGl() { return m_nVersionFull; }
+          int getVersionGl() {
+                  static int nVersionFull = -1;
+
+                  if (nVersionFull != -1)
+                      return nVersionFull;
+
+                  //------------------------------------------------------------------------------------------
+
+                  const GLubyte* pVersion = glGetString(GL_VERSION);
+                  if (!pVersion)
+                      return nVersionFull;
+
+                  std::string sVersion = (const char*)pVersion;
+                  if (sVersion.length() < 3)
+                      return nVersionFull;
+
+                  int nVersionMain = sVersion[0] - '0';
+                  int nVersionSub = sVersion[2] - '0';
+
+                  nVersionFull = nVersionMain * 10 + nVersionSub;
+                  //       nVersionFull = 30;
+
+                        //------------------------------------------------------------------------------------------
+
+                  //if ( nVersionFull < 20 )
+                  //  FORCE_ASSERTM("Current Open GL version is not supported.");
+
+                  return nVersionFull;
+          }
 
           virtual void sizeChanged(int nWidth_, int nHeight_) {; }
 

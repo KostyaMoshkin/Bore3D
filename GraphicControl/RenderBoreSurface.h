@@ -3,9 +3,11 @@
 
 #include "Render.h"
 
-#include "BufferOpenGL.h"
-#include "TextureBuffer.h"
 #include "ShaderProgram.h"
+#include "VertexBuffer.h"
+#include "TextureBuffer.h"
+#include "IndexBuffer.h"
+#include "IndirectBuffer.h"
 
 #include <array>
 
@@ -16,13 +18,25 @@ namespace GL
 
     class RenderBoreSurface : public Render
     {
+
+        typedef  struct
+        {
+            GLuint  count;
+            GLuint  primCount;
+            GLuint  firstIndex;
+            GLint   baseVertex;
+            GLuint  baseInstance;
+        } DrawElementsIndirectCommand;
+
         std::array<float, 3> m_vBkgColor;
 
         unsigned int m_nVAO;
 
-        ShaderProgramPtr m_pShaderProgram = nullptr;
-        BufferOpenGLPtr m_VertexBuffer = nullptr;
-        TextureBufferPtr m_pPaletteBuffer = nullptr;
+        ShaderProgramPtr m_pShaderProgram   = nullptr;
+        VertexBufferPtr m_VertexBuffer      = nullptr;
+        TextureBufferPtr m_pPaletteBuffer   = nullptr;
+        IndirectBufferPtr m_pBufferIndirect = nullptr;
+        IndexBufferPtr   m_pBufferIndex     = nullptr;
 
         bool m_bDataInit = false;
         bool m_bPaletteInit = false;
@@ -41,8 +55,6 @@ namespace GL
         void setViewAngle(Matrix4& mPerspective_) override;
         void bound() override;
         void unbound() override;
-        float getScale() override;
-        void setScale(float fScale_) override;
 
     public:
         // прототип метода для отображения части 3D-ствола скважины в bitmap
@@ -53,7 +65,7 @@ namespace GL
 
         bool InitPalette(const std::vector<COLORREF>& vecPalette_);
 
-        void InitDiaMapper(
+        bool InitDiaMapper(
             void* pMapper_  // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
         );
 

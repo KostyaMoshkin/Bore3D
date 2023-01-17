@@ -7,6 +7,36 @@
 
 namespace GL
 {
+    static void drawTriangles()
+    {
+        float fRandColor1 = (float)std::rand() / RAND_MAX;
+        float fRandColor2 = (float)std::rand() / RAND_MAX;
+        float fRandColor3 = (float)std::rand() / RAND_MAX;
+
+        glBegin(GL_TRIANGLES);
+        {
+            glColor3f(fRandColor3, fRandColor1, fRandColor2);
+            glVertex3f(-1.0f, -0.25f, 0.0f);
+            glVertex3f(-0.5f, -0.25f, 0.0f);
+            glVertex3f(-0.75f, 0.25f, 0.0f);
+
+            glColor3f(fRandColor2, fRandColor3, fRandColor1);
+            glVertex3f(0.5f, -0.25f, 0.0f);
+            glVertex3f(1.0f, -0.25f, 0.0f);
+            glVertex3f(0.75f, 0.25f, 0.0f);
+
+            glColor3f(fRandColor1, fRandColor3, fRandColor2);
+            glVertex3f(-0.6f, -0.75f, 0.5f);
+            glColor3f(fRandColor3, fRandColor2, fRandColor1);
+            glVertex3f(0.6f, -0.75f, 0.0f);
+            glColor3f(fRandColor3, fRandColor1, fRandColor1);
+            glVertex3f(0.0f, 0.75f, 0.0f);
+        }
+        glEnd();
+
+        glFlush();
+    }
+
 
     struct RenderBoreSurface::Implementation
     {
@@ -39,42 +69,46 @@ namespace GL
         if (!(m_bDataInit && m_bPaletteInit && m_bProgramInit))
             return;
 
-        float fRandColor1 = (float)std::rand() / RAND_MAX;
-        float fRandColor2 = (float)std::rand() / RAND_MAX;
-        float fRandColor3 = (float)std::rand() / RAND_MAX;
 
         glClearColor(m_vBkgColor[0], m_vBkgColor[1], m_vBkgColor[2], 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glColor3f(fRandColor3, fRandColor1, fRandColor2);
+        //---------------------------------------------------------------------------
 
-        glBegin(GL_TRIANGLES);
-        {
-            glVertex3f(-1.0f, -0.25f, 0.0f);
-            glVertex3f(-0.5f, -0.25f, 0.0f);
-            glVertex3f(-0.75f, 0.25f, 0.0f);
+        drawTriangles();
+        return;
 
-            glColor3f(fRandColor2, fRandColor3, fRandColor1);
-            glVertex3f(0.5f, -0.25f, 0.0f);
-            glVertex3f(1.0f, -0.25f, 0.0f);
-            glVertex3f(0.75f, 0.25f, 0.0f);
-            glEnd();
+        //---------------------------------------------------------------------------
 
-            glBegin(GL_POLYGON);
-            glColor3f(fRandColor1, fRandColor3, 1); glVertex3f(-0.6f, -0.75f, 0.5f);
-            glColor3f(1, fRandColor2, 1); glVertex3f(0.6f, -0.75f, 0.0f);
-            glColor3f(fRandColor3, 0, fRandColor3); glVertex3f(0.0f, 0.75f, 0.0f);
-        }
-        glEnd();
+        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
-        glFlush();
+        BufferBounder<TextureBuffer> textureBounder(m_pPaletteBuffer);
+        BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
+
+        Matrix4 mPRV(0);
+
+        m_pShaderProgram->setUniformMat4f("m_MVP", &mPRV[0][0]);
+
+        glMultiDrawElementsIndirect(GL_TRIANGLE_STRIP,
+            GL_UNSIGNED_INT,
+            nullptr,
+            m_pImpl->nCurveCount - 1,
+            0);
+
 	}
 
     bool RenderBoreSurface::InitBore3D(void* pData_, float fLogPerPixel_)
     {
         m_pImpl->pData = (DataProvider::BoreData*) pData_;
 
-        m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();  /// !!!
+        m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();
+
+        if (m_pImpl->nCurveCount > 0)
+            m_pImpl->nDriftCount = (int)m_pImpl->pData->GetRadiusCurve(0).size();
+        else
+            return false;
+
         m_pImpl->bIsDiameters = m_pImpl->pData->IsDiameters();
 
         //----------------------------------------------------------------------------------
@@ -110,27 +144,33 @@ namespace GL
             vColorText[i][2] = (float)((vecPalette_[i] & rgbBlue)      >> 16) / 255;
         }
 
-        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
-        BufferBounder<RenderBoreSurface> sectorBounder(this);
+        //----------------------------------------------------------------------------------
 
-        if (m_pPaletteBuffer == nullptr)
-            m_pPaletteBuffer = std::make_shared<TextureBuffer>(GL_TEXTURE_1D);
+        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
         BufferBounder<TextureBuffer> textureBounder(m_pPaletteBuffer);
 
         if (!m_pPaletteBuffer->fillBuffer1D(GL_RGB, vColorText.size(), GL_RGB, GL_FLOAT, vColorText.data()))
             return false;
 
-        //m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fDataMin_);
-        //m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fDataMax_);
+        float fDataMin = 0;
+        float fDataMax = 0;
+
+        m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fDataMin);
+        m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fDataMax);
+
+        //----------------------------------------------------------------------------------
+
+        renderBoreBounder.unbound();
 
         m_bPaletteInit = true;
 
-        return false;
+        return true;
     }
 
 
-    void RenderBoreSurface::InitDiaMapper(void* pMapper_)
+    bool RenderBoreSurface::InitDiaMapper(void* pMapper_)
     {
         m_pImpl->pMapper = (DataProvider::IDiaMapper *)pMapper_;
 
@@ -143,12 +183,109 @@ namespace GL
                 m_pImpl->vvRadiusCurve[i][j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
         }
 
+        //----------------------------------------------------------------------------------
+
+
+        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+
+        BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
+
         m_bDataInit = true;
+
+        if (!m_VertexBuffer->bookSpace(int(m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float))))
+            return false;
+
+        {
+            BufferMounter<VertexBuffer> vertexMounter(m_VertexBuffer);
+
+            if (float* pPosition = (float*)vertexMounter.get_buffer())
+                memcpy((void*)pPosition, (void*)m_pImpl->vvRadiusCurve[0].data(), m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float));
+            else
+                return false;
+        }
+
+        m_pShaderProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
+        m_pShaderProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
+
+        //----------------------------------------------------------------------------------
+
+        std::vector<DrawElementsIndirectCommand> vIndirectCommand(m_pImpl->nCurveCount - 1);
+        for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
+        {
+            vIndirectCommand[i].count = m_pImpl->nDriftCount * 2;
+            vIndirectCommand[i].primCount = 1;
+            vIndirectCommand[i].firstIndex = 0;
+            vIndirectCommand[i].baseVertex = i * m_pImpl->nDriftCount;
+            vIndirectCommand[i].baseInstance = 0;
+        }
+
+        BufferBounder<IndirectBuffer> indirectBounder(m_pBufferIndirect);
+
+        if (!m_pBufferIndirect->bookSpace(int(vIndirectCommand.size() * sizeof(DrawElementsIndirectCommand))))
+            return false;
+
+        {
+            BufferMounter<IndirectBuffer> indirectMounter(m_pBufferIndirect);
+
+            if (void* pPosition = (void*)indirectMounter.get_buffer())
+                memcpy((void*)pPosition, (void*)vIndirectCommand.data(), vIndirectCommand.size() * sizeof(DrawElementsIndirectCommand));
+            else
+                return false;
+        }
+
+        //if (!m_pBufferIndirect->fillBuffer(sizeof(DrawElementsIndirectCommand) * vIndirectCommand.size(), vIndirectCommand.data()))
+        //    return false;
+
+
+        //----------------------------------------------------------------------------------
+
+        std::vector<unsigned int> indices(m_pImpl->nDriftCount * 2);
+
+        for (unsigned int i = 0; i < m_pImpl->nDriftCount; ++i)
+        {
+            indices[i * 2] = m_pImpl->nDriftCount + i;
+            indices[i * 2 + 1] = i;
+        }
+
+        BufferBounder<IndexBuffer> indexBounder(m_pBufferIndex);
+
+        if (!m_pBufferIndex->bookSpace(vIndirectCommand.size() * sizeof(unsigned int)))
+            return false;
+
+        {
+            BufferMounter<IndexBuffer> indexMounter(m_pBufferIndex);
+
+            if (void* pPosition = (void*)indexMounter.get_buffer())
+                memcpy((void*)pPosition, (void*)vIndirectCommand.data(), vIndirectCommand.size() * sizeof(unsigned int));
+            else
+                return false;
+        }
+
+        //----------------------------------------------------------------------------------
+
+        renderBoreBounder.unbound();
+
+        m_bDataInit = true;
+
+        return true;
     }
 
 
     int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
+        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+
+        m_pShaderProgram->setUniform1f("m_fTop", &fTop);
+        m_pShaderProgram->setUniform1f("m_fBottom", &fBottom);
+        m_pShaderProgram->setUniform1f("m_fRotation", &fRotation);
+        m_pShaderProgram->setUniform1f("m_fMinRadius", &fMinRadius);
+        m_pShaderProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
+        m_pShaderProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
+        m_pShaderProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
+
+        renderBoreBounder.unbound();
 
         return 0;
     }
@@ -161,13 +298,22 @@ namespace GL
     }
     bool RenderBoreSurface::init()
     {
+        int nVersionSupported = getVersionGl();
+
+        const GLubyte* pVersion = glGetString(GL_VERSION);
+
         if (!!m_pShaderProgram)
             return true;
 
         ShaderProgramPtr pShaderProgram = std::make_shared<ShaderProgram>();
 
-        pShaderProgram->addShader(ShaderName::bore_vertex, ShaderProgram::ShaderType::Vertex());
-        pShaderProgram->addShader(ShaderName::bore_fragment, ShaderProgram::ShaderType::Fragment());
+        bool bAddShader = false;
+
+        bAddShader |= !pShaderProgram->addShader(ShaderName::bore_fragment, ShaderProgram::ShaderType::Fragment());
+        bAddShader |= !pShaderProgram->addShader(ShaderName::bore_vertex, ShaderProgram::ShaderType::Vertex());
+
+        if (bAddShader)
+            return false;
 
         if (!pShaderProgram->init())
             return false;
@@ -176,9 +322,18 @@ namespace GL
 
         m_pShaderProgram = pShaderProgram;
 
+        //----------------------------------------------------------------------------------
+
+        BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+
+        m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D);
+        m_VertexBuffer      = std::make_shared<VertexBuffer>();
+        m_pBufferIndirect   = std::make_shared<IndirectBuffer>();
+        m_pBufferIndex      = std::make_shared<IndexBuffer>();
+
         m_bProgramInit = true;
 
-        return false;
+        return true;
     }
 
     void RenderBoreSurface::lookAt(Matrix4& mView_)
@@ -199,18 +354,11 @@ namespace GL
 
     void RenderBoreSurface::bound()
     {
+        glBindVertexArray(m_nVAO);
     }
 
     void RenderBoreSurface::unbound()
     {
-    }
-
-    float RenderBoreSurface::getScale()
-    {
-        return 0.0f;
-    }
-
-    void RenderBoreSurface::setScale(float fScale_)
-    {
+        glBindVertexArray(0);
     }
 }

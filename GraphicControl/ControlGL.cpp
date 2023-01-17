@@ -45,16 +45,25 @@ namespace GraphicControl
         return true;
     }
 
-    bool ControlGL::beginDraw(int width_, int height_) const
+    bool ControlGL::beginDraw()
+    {
+        return beginDraw(m_nWindowSizeX, m_nWindowSizeY);
+    }
+
+    bool ControlGL::beginDraw(int width_, int height_)
     {
         if (!makeCurrent())
             return false;
 
-        //if (width_ * height_ == 0)
-        //    return true;  //  Может FALSE
+        m_nWindowSizeX = width_;
+        m_nWindowSizeY = height_;
+
+        if (width_ * height_ == 0)
+            return false;
 
         glViewport(0, 0, width_, height_);
-        glDisable(GL_DEPTH_TEST);
+
+        glEnable(GL_DEPTH_TEST);
 
         return true;
     }

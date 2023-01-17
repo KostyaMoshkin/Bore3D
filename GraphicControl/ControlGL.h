@@ -28,6 +28,9 @@ namespace GraphicControl
 
 		std::vector<byte> m_vPrintScreen;
 
+		int m_nWindowSizeX = 10;
+		int m_nWindowSizeY = 10;
+
 	protected:
 		CPoint m_ptWindow;
 
@@ -65,10 +68,12 @@ namespace GraphicControl
 		bool createContext();
 		bool makeCurrent() const;
 
-		bool beginDraw(int width_, int height_) const;
-		void endDraw() const;
 		void OnPaint(bool bSave_);
 		void SavePicture();
+
+		bool beginDraw();
+		bool beginDraw(int width_, int height_);
+		void endDraw() const;
 
 		void changeWindowSize(CRect rcWindow_);
 

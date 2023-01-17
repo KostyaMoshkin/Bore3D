@@ -43,7 +43,8 @@ BOOL CHiddenDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
-    m_controlGL.init();
+    if (!m_controlGL.init())
+        return 0;
 
     m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 1.0f);
 

@@ -7,6 +7,8 @@
 
 #include <limits>
 
+//#define TEST_DRAW
+
 namespace GL
 {
     static void drawTriangles()
@@ -51,7 +53,7 @@ namespace GL
         int nDriftCount;
 
         std::vector<float> vDepths;
-        std::vector<std::vector<float>> vvRadiusCurve;
+        std::vector<float> vRadiusCurve;
         std::vector<float> vRotation;
 
         bool bIsDiameters;
@@ -77,17 +79,20 @@ namespace GL
 
         //---------------------------------------------------------------------------
 
-        //drawTriangles();
-        //return;
+#ifdef TEST_DRAW
+        drawTriangles();
+        return;
+#endif
 
         //---------------------------------------------------------------------------
 
         BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
-        BufferBounder<TextureBuffer> textureBounder(m_pPaletteBuffer);
+        BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
         BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
         BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
+        BufferBounder<IndirectBuffer> indirectBounder(m_pBufferIndirect);
 
         glMultiDrawElementsIndirect(GL_TRIANGLE_STRIP,
             GL_UNSIGNED_INT,
@@ -115,10 +120,7 @@ namespace GL
         m_pImpl->vDepths.resize(m_pImpl->nCurveCount); 
         m_pImpl->vRotation.resize(m_pImpl->nCurveCount);
 
-        m_pImpl->vvRadiusCurve.resize(m_pImpl->nCurveCount); 
-        for (int i = 0; i < m_pImpl->nCurveCount; ++i)
-            m_pImpl->vvRadiusCurve[i].resize(m_pImpl->pData->GetRadiusCurve(0).size());
-
+        m_pImpl->vRadiusCurve.resize(m_pImpl->nCurveCount * m_pImpl->nDriftCount);
 
         //----------------------------------------------------------------------------------
 
@@ -131,26 +133,25 @@ namespace GL
         const COLORREF rgbGreen = 0x0000FF00;
         const COLORREF rgbBlue  = 0x00FF0000;
 
-        std::vector<float[3]> vColorText(vecPalette_.size());
-        for (int i = 0; i < vColorText.size(); ++i)
+        std::vector<float[3]> vPalette(vecPalette_.size());
+        for (int i = 0; i < vPalette.size(); ++i)
         {
             auto a = (vecPalette_[i] & rgbGreen);
             auto b = (vecPalette_[i] & rgbGreen) >> 8;
             auto c = (float)((vecPalette_[i] & rgbGreen) >> 8) / 255;
 
-            vColorText[i][0] = (float)((vecPalette_[i] & rgbRed)       >> 0 ) / 255;
-            vColorText[i][1] = (float)((vecPalette_[i] & rgbGreen)     >> 8 ) / 255;
-            vColorText[i][2] = (float)((vecPalette_[i] & rgbBlue)      >> 16) / 255;
+            vPalette[i][0] = (float)((vecPalette_[i] & rgbRed)       >> 0 ) / 255;
+            vPalette[i][1] = (float)((vecPalette_[i] & rgbGreen)     >> 8 ) / 255;
+            vPalette[i][2] = (float)((vecPalette_[i] & rgbBlue)      >> 16) / 255;
         }
 
         //----------------------------------------------------------------------------------
 
         BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
-        BufferBounder<TextureBuffer> textureBounder(m_pPaletteBuffer);
-        BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
+        BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
 
-        if (!m_pPaletteBuffer->fillBuffer1D(GL_RGB, vColorText.size(), GL_RGB, GL_FLOAT, vColorText.data()))
+        if (!m_pPaletteBuffer->fillBuffer1D(GL_RGB, vPalette.size(), GL_RGB, GL_FLOAT, vPalette.data()))
             return false;
 
         //----------------------------------------------------------------------------------
@@ -181,42 +182,41 @@ namespace GL
 
             m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
 
-            for (int j = 0; j < m_pImpl->pData->GetRadiusCurve(0).size(); ++j)
+            for (int j = 0; j < m_pImpl->nDriftCount; ++j)
             {
-                m_pImpl->vvRadiusCurve[i][j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
-                fRadiusMin = std::min(fRadiusMin, m_pImpl->vvRadiusCurve[i][j]);
-                fRadiusMax = std::max(fRadiusMax, m_pImpl->vvRadiusCurve[i][j]);
+                m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
+                fRadiusMin = std::min(fRadiusMin, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
+                fRadiusMax = std::max(fRadiusMax, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
             }
         }
-
-        m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
-        m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
 
         //----------------------------------------------------------------------------------
 
         BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
+        m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
+        m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
+
         //----------------------------------------------------------------------------------
 
         BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
 
-        m_bDataInit = true;
+        int nVertexBufferSize = int(m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float));
 
-        if (!m_VertexBuffer->bookSpace(int(m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float))))
+        if (!m_VertexBuffer->bookSpace(nVertexBufferSize) )
             return false;
 
         {
             BufferMounter<VertexBuffer> vertexMounter(m_VertexBuffer);
 
-            if (float* pPosition = (float*)vertexMounter.get_buffer())
-                memcpy((void*)pPosition, (void*)m_pImpl->vvRadiusCurve[0].data(), m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float));
+            if (void* pPosition = vertexMounter.get_buffer())
+                memcpy(pPosition, m_pImpl->vRadiusCurve.data(), nVertexBufferSize);
             else
                 return false;
         }
 
         m_VertexBuffer->attribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, 0);
-
 
         m_pShaderProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
         m_pShaderProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
@@ -225,14 +225,16 @@ namespace GL
 
         BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
 
-        if (!m_pBufferDepth->bookSpace(int(m_pImpl->nCurveCount * sizeof(float))))
+        int nBufferDepthSize = int(m_pImpl->nCurveCount * sizeof(float));
+
+        if (!m_pBufferDepth->bookSpace(nBufferDepthSize))
             return false;
 
         {
             BufferMounter<ShaderStorageBuffer> depthMounter(m_pBufferDepth);
 
             if (void* pPosition = depthMounter.get_buffer())
-                memcpy((void*)pPosition, (void*)m_pImpl->vDepths.data(), m_pImpl->nCurveCount * sizeof(float));
+                memcpy(pPosition, m_pImpl->vDepths.data(), nBufferDepthSize);
             else
                 return false;
         }
@@ -243,7 +245,7 @@ namespace GL
         std::vector<DrawElementsIndirectCommand> vIndirectCommand(m_pImpl->nCurveCount - 1);
         for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
         {
-            vIndirectCommand[i].count = m_pImpl->nDriftCount * 2;
+            vIndirectCommand[i].count = m_pImpl->nDriftCount * 2 - 2;
             vIndirectCommand[i].primCount = 1;
             vIndirectCommand[i].firstIndex = 0;
             vIndirectCommand[i].baseVertex = i * m_pImpl->nDriftCount;
@@ -252,38 +254,42 @@ namespace GL
 
         BufferBounder<IndirectBuffer> indirectBounder(m_pBufferIndirect);
 
-        if (!m_pBufferIndirect->bookSpace(int(vIndirectCommand.size() * sizeof(DrawElementsIndirectCommand))))
+        int nBufferIndirectSize = int(vIndirectCommand.size() * sizeof(DrawElementsIndirectCommand));
+
+        if (!m_pBufferIndirect->bookSpace(nBufferIndirectSize))
             return false;
 
         {
             BufferMounter<IndirectBuffer> indirectMounter(m_pBufferIndirect);
 
-            if (void* pPosition = (void*)indirectMounter.get_buffer())
-                memcpy((void*)pPosition, (void*)vIndirectCommand.data(), vIndirectCommand.size() * sizeof(DrawElementsIndirectCommand));
+            if (void* pPosition = indirectMounter.get_buffer())
+                memcpy(pPosition, vIndirectCommand.data(), nBufferIndirectSize);
             else
                 return false;
         }
 
         //----------------------------------------------------------------------------------
 
-        std::vector<unsigned int> indices(m_pImpl->nDriftCount * 2);
+        std::vector<unsigned int> vIndices(m_pImpl->nDriftCount * 2);
 
         for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
         {
-            indices[i * 2] = m_pImpl->nDriftCount + i;
-            indices[i * 2 + 1] = i;
+            vIndices[i * 2] = m_pImpl->nDriftCount + i;
+            vIndices[i * 2 + 1] = i;
         }
 
         BufferBounder<IndexBuffer> indexBounder(m_pBufferIndex);
 
-        if (!m_pBufferIndex->bookSpace((int)vIndirectCommand.size() * sizeof(unsigned int)))
+        int nBufferIndexSize = (int)vIndices.size() * sizeof(unsigned int);
+
+        if (!m_pBufferIndex->bookSpace(nBufferIndexSize))
             return false;
 
         {
             BufferMounter<IndexBuffer> indexMounter(m_pBufferIndex);
 
-            if (void* pPosition = (void*)indexMounter.get_buffer())
-                memcpy((void*)pPosition, (void*)vIndirectCommand.data(), vIndirectCommand.size() * sizeof(unsigned int));
+            if (void* pPosition = indexMounter.get_buffer())
+                memcpy(pPosition, vIndices.data(), nBufferIndexSize);
             else
                 return false;
         }
@@ -311,7 +317,8 @@ namespace GL
         m_pShaderProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
         m_pShaderProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
 
-        m_mPRV = glm::ortho(-nMaxRadiusLP, nMaxRadiusLP, 0, 1000);
+        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, 0.0f, 10.0f, -fMaxRadius*2, fMaxRadius*2);
+        m_mPRV = glm::ortho(-0.5f, 1.5f, -0.0f, float(m_pImpl->nCurveCount), -2.0f, 2.0f);
 
         m_pShaderProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 
@@ -356,11 +363,13 @@ namespace GL
 
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
-        m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D);
+        m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D, GL_TEXTURE0, GL_LINEAR);
         m_VertexBuffer      = std::make_shared<VertexBuffer>();
         m_pBufferIndirect   = std::make_shared<IndirectBuffer>();
         m_pBufferIndex      = std::make_shared<IndexBuffer>();
         m_pBufferDepth      = std::make_shared<ShaderStorageBuffer>(0);
+
+        m_pPaletteBuffer->alignment(1);
 
         m_bProgramInit = true;
 

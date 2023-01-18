@@ -5,6 +5,8 @@
 #include <IBoreData.h>
 #include <IDiaMapper.h>
 
+#include <limits>
+
 namespace GL
 {
     static void drawTriangles()
@@ -57,7 +59,7 @@ namespace GL
 
     RenderBoreSurface::RenderBoreSurface()
 	{
-        setBkgColor(0, 0, 0.3f);
+        setBkgColor(0, 0, 0);
 
         std::srand((unsigned)std::time(nullptr));
 
@@ -75,8 +77,8 @@ namespace GL
 
         //---------------------------------------------------------------------------
 
-        drawTriangles();
-        return;
+        //drawTriangles();
+        //return;
 
         //---------------------------------------------------------------------------
 
@@ -85,10 +87,7 @@ namespace GL
 
         BufferBounder<TextureBuffer> textureBounder(m_pPaletteBuffer);
         BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
-
-        Matrix4 mPRV(0);
-
-        m_pShaderProgram->setUniformMat4f("m_MVP", &mPRV[0][0]);
+        BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
 
         glMultiDrawElementsIndirect(GL_TRIANGLE_STRIP,
             GL_UNSIGNED_INT,
@@ -148,17 +147,11 @@ namespace GL
 
         BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
-
         BufferBounder<TextureBuffer> textureBounder(m_pPaletteBuffer);
+        BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
 
         if (!m_pPaletteBuffer->fillBuffer1D(GL_RGB, vColorText.size(), GL_RGB, GL_FLOAT, vColorText.data()))
             return false;
-
-        float fDataMin = 0;
-        float fDataMax = 0;
-
-        m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fDataMin);
-        m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fDataMax);
 
         //----------------------------------------------------------------------------------
 
@@ -172,22 +165,39 @@ namespace GL
 
     bool RenderBoreSurface::InitDiaMapper(void* pMapper_)
     {
+        float fRadiusMin = std::numeric_limits<float>::max();
+        float fRadiusMax = -std::numeric_limits<float>::max();
+
+        float fDepthMin = std::numeric_limits<float>::max();
+        float fDepthMax = -std::numeric_limits<float>::max();
+
         m_pImpl->pMapper = (DataProvider::IDiaMapper *)pMapper_;
 
         for (int i = 0; i < m_pImpl->nCurveCount; ++i)
         {
             m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
+            fDepthMin = std::min(fDepthMin, m_pImpl->vDepths[i]);
+            fDepthMax = std::max(fDepthMax, m_pImpl->vDepths[i]);
+
             m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
 
-            for(int j = 0; j < m_pImpl->pData->GetRadiusCurve(0).size(); ++j)
+            for (int j = 0; j < m_pImpl->pData->GetRadiusCurve(0).size(); ++j)
+            {
                 m_pImpl->vvRadiusCurve[i][j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
+                fRadiusMin = std::min(fRadiusMin, m_pImpl->vvRadiusCurve[i][j]);
+                fRadiusMax = std::max(fRadiusMax, m_pImpl->vvRadiusCurve[i][j]);
+            }
         }
+
+        m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
+        m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
 
         //----------------------------------------------------------------------------------
 
-
         BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+
+        //----------------------------------------------------------------------------------
 
         BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
 
@@ -205,8 +215,28 @@ namespace GL
                 return false;
         }
 
+        m_VertexBuffer->attribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, 0);
+
+
         m_pShaderProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
         m_pShaderProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
+
+        //----------------------------------------------------------------------------------
+
+        BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
+
+        if (!m_pBufferDepth->bookSpace(int(m_pImpl->nCurveCount * sizeof(float))))
+            return false;
+
+        {
+            BufferMounter<ShaderStorageBuffer> depthMounter(m_pBufferDepth);
+
+            if (void* pPosition = depthMounter.get_buffer())
+                memcpy((void*)pPosition, (void*)m_pImpl->vDepths.data(), m_pImpl->nCurveCount * sizeof(float));
+            else
+                return false;
+        }
+
 
         //----------------------------------------------------------------------------------
 
@@ -234,15 +264,11 @@ namespace GL
                 return false;
         }
 
-        //if (!m_pBufferIndirect->fillBuffer(sizeof(DrawElementsIndirectCommand) * vIndirectCommand.size(), vIndirectCommand.data()))
-        //    return false;
-
-
         //----------------------------------------------------------------------------------
 
         std::vector<unsigned int> indices(m_pImpl->nDriftCount * 2);
 
-        for (unsigned int i = 0; i < m_pImpl->nDriftCount; ++i)
+        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
         {
             indices[i * 2] = m_pImpl->nDriftCount + i;
             indices[i * 2 + 1] = i;
@@ -250,7 +276,7 @@ namespace GL
 
         BufferBounder<IndexBuffer> indexBounder(m_pBufferIndex);
 
-        if (!m_pBufferIndex->bookSpace(vIndirectCommand.size() * sizeof(unsigned int)))
+        if (!m_pBufferIndex->bookSpace((int)vIndirectCommand.size() * sizeof(unsigned int)))
             return false;
 
         {
@@ -284,6 +310,10 @@ namespace GL
         m_pShaderProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
         m_pShaderProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
         m_pShaderProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
+
+        m_mPRV = glm::ortho(-nMaxRadiusLP, nMaxRadiusLP, 0, 1000);
+
+        m_pShaderProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 
         renderBoreBounder.unbound();
 
@@ -330,6 +360,7 @@ namespace GL
         m_VertexBuffer      = std::make_shared<VertexBuffer>();
         m_pBufferIndirect   = std::make_shared<IndirectBuffer>();
         m_pBufferIndex      = std::make_shared<IndexBuffer>();
+        m_pBufferDepth      = std::make_shared<ShaderStorageBuffer>(0);
 
         m_bProgramInit = true;
 

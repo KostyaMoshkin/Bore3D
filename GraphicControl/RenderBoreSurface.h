@@ -8,6 +8,7 @@
 #include "TextureBuffer.h"
 #include "IndexBuffer.h"
 #include "IndirectBuffer.h"
+#include "ShaderStorageBuffer.h"
 
 #include <array>
 
@@ -32,11 +33,14 @@ namespace GL
 
         unsigned int m_nVAO;
 
+        Matrix4 m_mPRV;
+
         ShaderProgramPtr m_pShaderProgram   = nullptr;
         VertexBufferPtr m_VertexBuffer      = nullptr;
         TextureBufferPtr m_pPaletteBuffer   = nullptr;
         IndirectBufferPtr m_pBufferIndirect = nullptr;
         IndexBufferPtr   m_pBufferIndex     = nullptr;
+        ShaderStorageBufferPtr   m_pBufferDepth     = nullptr;
 
         bool m_bDataInit = false;
         bool m_bPaletteInit = false;

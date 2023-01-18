@@ -76,9 +76,7 @@ namespace GL {
 
     bool BufferOpenGL::fillBuffer(size_t size_, const void * data_)
     {
-      bookSpace((int)size_);
-
-      if ( !m_bInit )
+      if ( !bookSpace((int)size_) )
         return false;
 
       glBufferSubData(m_nBufferTarget, 0, (int)size_, data_);

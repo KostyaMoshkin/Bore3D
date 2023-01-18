@@ -89,6 +89,7 @@ namespace GraphicControl
             return 0;
 
         m_pImpl->pRenderBoreSurface->GetBitmap(pVisualRect, fTop, fBottom, fRotation, fMinRadius, fMaxRadius, nMinRadiusLP, nMaxRadiusLP, fIsometryAngle, bDrawMesh);
+
         endDraw();
 
         return 0;

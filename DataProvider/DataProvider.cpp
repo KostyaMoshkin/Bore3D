@@ -52,6 +52,10 @@ namespace DataProvider
         if (sFields.size() < 5)
             return;
 
+        for (const std::string& value : sFields)
+            if (value.empty())
+                return;
+
         geoPoint_.vfDepth.push_back((float)atof(sFields[0].c_str()));
 
         std::vector<float> vDistance;
@@ -79,10 +83,7 @@ namespace DataProvider
         std::string sLine;
         
         while (std::getline(file, sLine))
-        {
-            addGeoPoint(m_data, sLine);
-            break;
-        }
+                addGeoPoint(m_data, sLine);
 
         file.close();
 

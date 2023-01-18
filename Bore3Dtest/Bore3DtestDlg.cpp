@@ -149,6 +149,8 @@ void CBore3DtestDlg::OnPaint()
 	{
 		CDialogEx::OnPaint();
 	}
+
+	BN_OPENGL_CLICKED();
 }
 
 // Система вызывает эту функцию для получения отображения курсора при перемещении
@@ -168,8 +170,16 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	pWnd->GetWindowRect(&rect);
 
 	m_hiddenDlg.SetWindowPos(NULL, 0, 0, rect.Width() + 15, rect.Height() + 37, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE); //
-	m_hiddenDlg.fillPicture(hDC);
 
+	RECT rcVisualRect;
+	rcVisualRect.left = 0;
+	rcVisualRect.right = 0;
+	rcVisualRect.top = 0;
+	rcVisualRect.bottom = 100;
+
+	m_hiddenDlg.GetBitmap(&rcVisualRect, 0, 500, 0.0f, 0.0f, 5.0f, 0, 100, 15.0f, false);
+	m_hiddenDlg.fillPicture(hDC);
+	/*
 	//m_hiddenDlg.ShowWindow();
 
 	//CRect rect;
@@ -258,7 +268,7 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	//wglMakeCurrent(memDC, m_hrc);
 
 	//wglDeleteContext(m_hrc);
-
+	*/
 
 	return;
 

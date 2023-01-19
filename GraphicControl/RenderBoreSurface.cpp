@@ -108,14 +108,14 @@ namespace GL
         //---------------------------------------------------------------------------
     
         BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
-        //BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+        BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
 
-        //BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
-        //BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
-        //BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
-        //BufferBounder<IndirectBuffer> indirectBounder(m_pBufferIndirect);
+        BufferBounder<TextureBuffer> paletteMeshBounder(m_pPaletteBuffer);
+        BufferBounder<VertexBuffer> vertexMeshBounder(m_VertexBuffer);
+        BufferBounder<ShaderStorageBuffer> depthMeshBounder(m_pBufferDepth);
+        BufferBounder<IndirectBuffer> indirectMeshBounder(m_pBufferIndirect);
 
-        glMultiDrawElementsIndirect(GL_LINE_STRIP,
+        glMultiDrawElementsIndirect(GL_LINE_STRIP, // GL_LINE_STRIP,  GL_TRIANGLE_STRIP
             GL_UNSIGNED_INT,
             nullptr,
             m_pImpl->nCurveCount - 1,
@@ -169,7 +169,6 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
         BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
 
@@ -184,7 +183,6 @@ namespace GL
 
         return true;
     }
-
 
     bool RenderBoreSurface::InitDiaMapper(void* pMapper_)
     {
@@ -324,6 +322,20 @@ namespace GL
 
         renderBoreBounder.unbound();
 
+        //----------------------------------------------------------------------------------
+
+        BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
+        BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
+
+        m_pMeshProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
+        m_pMeshProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
+        m_pMeshProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
+        m_pMeshProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
+
+        renderMeshBoreBounder.unbound();
+
+        //----------------------------------------------------------------------------------
+
         m_bDataInit = true;
 
         return true;
@@ -347,6 +359,25 @@ namespace GL
         m_pSufraceProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 
         renderBoreBounder.unbound();
+
+        //----------------------------------------------------------------------------------
+
+        BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
+        BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
+
+        m_pMeshProgram->setUniform1f("m_fTop", &fTop);
+        m_pMeshProgram->setUniform1f("m_fBottom", &fBottom);
+        m_pMeshProgram->setUniform1f("m_fRotation", &fRotation);
+        m_pMeshProgram->setUniform1f("m_fMinRadius", &fMinRadius);
+        m_pMeshProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
+        m_pMeshProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
+        m_pMeshProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
+
+        m_pMeshProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
+
+        renderMeshBoreBounder.unbound();
+
+        //----------------------------------------------------------------------------------
 
         return 0;
     }

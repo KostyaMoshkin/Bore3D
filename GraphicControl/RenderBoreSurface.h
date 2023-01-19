@@ -33,6 +33,9 @@ namespace GL
 
         unsigned int m_nVAO;
 
+        float m_fDepthMin;
+        float m_fDepthMax;
+
         Matrix4 m_mPRV;
 
         ShaderProgramPtr m_pShaderProgram   = nullptr;

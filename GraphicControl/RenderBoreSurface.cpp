@@ -170,16 +170,16 @@ namespace GL
         float fRadiusMin = std::numeric_limits<float>::max();
         float fRadiusMax = -std::numeric_limits<float>::max();
 
-        float fDepthMin = std::numeric_limits<float>::max();
-        float fDepthMax = -std::numeric_limits<float>::max();
+        m_fDepthMin = std::numeric_limits<float>::max();
+        m_fDepthMax = -std::numeric_limits<float>::max();
 
         m_pImpl->pMapper = (DataProvider::IDiaMapper *)pMapper_;
 
         for (int i = 0; i < m_pImpl->nCurveCount; ++i)
         {
             m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
-            fDepthMin = std::min(fDepthMin, m_pImpl->vDepths[i]);
-            fDepthMax = std::max(fDepthMax, m_pImpl->vDepths[i]);
+            m_fDepthMin = std::min(m_fDepthMin, m_pImpl->vDepths[i]);
+            m_fDepthMax = std::max(m_fDepthMax, m_pImpl->vDepths[i]);
 
             m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
 
@@ -323,8 +323,7 @@ namespace GL
         m_pShaderProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
         m_pShaderProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
 
-        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, -0.0f, float(m_pImpl->nCurveCount), -fMaxRadius, fMaxRadius);
-
+        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, m_fDepthMin, m_fDepthMax, -fMaxRadius, fMaxRadius);
         m_pShaderProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 
         renderBoreBounder.unbound();

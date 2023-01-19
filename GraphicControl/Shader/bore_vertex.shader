@@ -46,7 +46,7 @@ void main()
 
 	vec3 vPosition = vec3(
 		m_fValue * sin(m_fRotation + getAngle(nVertexId)),
-		positionY(nVertexId),
+		m_vDepth[int(nRawNumber + positionY(nVertexId))],
 		m_fValue * cos(m_fRotation + getAngle(nVertexId))
 	);
 

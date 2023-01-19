@@ -100,6 +100,7 @@ namespace GL
             m_pImpl->nCurveCount - 1,
             0);
 
+        renderBoreBounder.unbound();
 	}
 
     bool RenderBoreSurface::InitBore3D(void* pData_, float fLogPerPixel_)
@@ -245,7 +246,7 @@ namespace GL
         std::vector<DrawElementsIndirectCommand> vIndirectCommand(m_pImpl->nCurveCount - 1);
         for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
         {
-            vIndirectCommand[i].count = m_pImpl->nDriftCount * 2 - 2;
+            vIndirectCommand[i].count = m_pImpl->nDriftCount * 2 + 2;  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
             vIndirectCommand[i].primCount = 1;
             vIndirectCommand[i].firstIndex = 0;
             vIndirectCommand[i].baseVertex = i * m_pImpl->nDriftCount;
@@ -270,13 +271,18 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        std::vector<unsigned int> vIndices(m_pImpl->nDriftCount * 2);
+        std::vector<unsigned int> vIndices(m_pImpl->nDriftCount * 2 + 2);
 
         for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
         {
             vIndices[i * 2] = m_pImpl->nDriftCount + i;
             vIndices[i * 2 + 1] = i;
         }
+
+        //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
+        vIndices[m_pImpl->nDriftCount * 2] = m_pImpl->nDriftCount;
+        vIndices[m_pImpl->nDriftCount * 2 + 1] = 0;
+
 
         BufferBounder<IndexBuffer> indexBounder(m_pBufferIndex);
 
@@ -317,8 +323,7 @@ namespace GL
         m_pShaderProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
         m_pShaderProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
 
-        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, 0.0f, 10.0f, -fMaxRadius*2, fMaxRadius*2);
-        m_mPRV = glm::ortho(-0.5f, 1.5f, -0.0f, float(m_pImpl->nCurveCount), -2.0f, 2.0f);
+        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, -0.0f, float(m_pImpl->nCurveCount), -fMaxRadius, fMaxRadius);
 
         m_pShaderProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 
@@ -363,12 +368,12 @@ namespace GL
 
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
-        m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D, GL_TEXTURE0, GL_LINEAR);
         m_VertexBuffer      = std::make_shared<VertexBuffer>();
         m_pBufferIndirect   = std::make_shared<IndirectBuffer>();
         m_pBufferIndex      = std::make_shared<IndexBuffer>();
         m_pBufferDepth      = std::make_shared<ShaderStorageBuffer>(0);
 
+        m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D, GL_TEXTURE0, GL_LINEAR);
         m_pPaletteBuffer->alignment(1);
 
         m_bProgramInit = true;

@@ -9,9 +9,11 @@
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG1                     130
 #define IDD_DIALOG_HIDDEN               131
-#define TEXTFILE   256
 #define IDR_TEXTFILE1                   132
 #define IDR_TEXTFILE2                   133
+#define IDR_TEXTFILE3                   134
+#define IDR_TEXTFILE4                   135
+#define TEXTFILE                        256
 #define IDC_PICTURE                     1000
 #define IDC_BUTTON_TEST_GL              1001
 #define IDC_PICTURE_BOX                 1003
@@ -21,7 +23,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           101

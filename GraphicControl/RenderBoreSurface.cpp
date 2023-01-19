@@ -283,7 +283,6 @@ namespace GL
         vIndices[m_pImpl->nDriftCount * 2] = m_pImpl->nDriftCount;
         vIndices[m_pImpl->nDriftCount * 2 + 1] = 0;
 
-
         BufferBounder<IndexBuffer> indexBounder(m_pBufferIndex);
 
         int nBufferIndexSize = (int)vIndices.size() * sizeof(unsigned int);

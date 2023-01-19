@@ -10,6 +10,8 @@ class CBore3DtestDlg : public CDialogEx
 
 	CHiddenDlg m_hiddenDlg;
 
+	float m_fRotationAngle = 0;
+
 	// Создание
 public:
 	CBore3DtestDlg(CWnd* pParent = nullptr);	// стандартный конструктор

@@ -86,7 +86,7 @@ namespace GL
 
         //---------------------------------------------------------------------------
 
-        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
         BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
@@ -101,7 +101,28 @@ namespace GL
             0);
 
         renderBoreBounder.unbound();
-	}
+
+        if (!m_bDrawMesh)
+            return;
+
+        //---------------------------------------------------------------------------
+    
+        BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
+        //BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+
+        //BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
+        //BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
+        //BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
+        //BufferBounder<IndirectBuffer> indirectBounder(m_pBufferIndirect);
+
+        glMultiDrawElementsIndirect(GL_LINE_STRIP,
+            GL_UNSIGNED_INT,
+            nullptr,
+            m_pImpl->nCurveCount - 1,
+            0);
+
+        renderBoreBounder.unbound();
+    }
 
     bool RenderBoreSurface::InitBore3D(void* pData_, float fLogPerPixel_)
     {
@@ -148,7 +169,7 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
         BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
 
@@ -193,11 +214,11 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
-        m_pShaderProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
-        m_pShaderProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
+        m_pSufraceProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
+        m_pSufraceProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
 
         //----------------------------------------------------------------------------------
 
@@ -219,8 +240,8 @@ namespace GL
 
         m_VertexBuffer->attribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, 0);
 
-        m_pShaderProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
-        m_pShaderProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
+        m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
+        m_pSufraceProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
 
         //----------------------------------------------------------------------------------
 
@@ -311,19 +332,19 @@ namespace GL
 
     int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
-        BufferBounder<ShaderProgram> programBounder(m_pShaderProgram);
+        BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
-        m_pShaderProgram->setUniform1f("m_fTop", &fTop);
-        m_pShaderProgram->setUniform1f("m_fBottom", &fBottom);
-        m_pShaderProgram->setUniform1f("m_fRotation", &fRotation);
-        m_pShaderProgram->setUniform1f("m_fMinRadius", &fMinRadius);
-        m_pShaderProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
-        m_pShaderProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
-        m_pShaderProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
+        m_pSufraceProgram->setUniform1f("m_fTop", &fTop);
+        m_pSufraceProgram->setUniform1f("m_fBottom", &fBottom);
+        m_pSufraceProgram->setUniform1f("m_fRotation", &fRotation);
+        m_pSufraceProgram->setUniform1f("m_fMinRadius", &fMinRadius);
+        m_pSufraceProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
+        m_pSufraceProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
+        m_pSufraceProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
 
         m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, m_fDepthMin, m_fDepthMax, -fMaxRadius, fMaxRadius);
-        m_pShaderProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
+        m_pSufraceProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 
         renderBoreBounder.unbound();
 
@@ -342,29 +363,43 @@ namespace GL
 
         const GLubyte* pVersion = glGetString(GL_VERSION);
 
-        if (!!m_pShaderProgram)
-            return true;
+        ShaderProgramPtr pSufraceProgram = std::make_shared<ShaderProgram>();
 
-        ShaderProgramPtr pShaderProgram = std::make_shared<ShaderProgram>();
+        bool bAddSufraceShaderError = false;
 
-        bool bAddShader = false;
+        bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_fragment, ShaderProgram::ShaderType::Fragment());
+        bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_vertex, ShaderProgram::ShaderType::Vertex());
 
-        bAddShader |= !pShaderProgram->addShader(ShaderName::bore_fragment, ShaderProgram::ShaderType::Fragment());
-        bAddShader |= !pShaderProgram->addShader(ShaderName::bore_vertex, ShaderProgram::ShaderType::Vertex());
-
-        if (bAddShader)
+        if (bAddSufraceShaderError)
             return false;
 
-        if (!pShaderProgram->init())
+        if (!pSufraceProgram->init())
             return false;
 
         glGenVertexArrays(1, &m_nVAO);
 
-        m_pShaderProgram = pShaderProgram;
+        m_pSufraceProgram = pSufraceProgram;
 
         //----------------------------------------------------------------------------------
 
-        BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+        ShaderProgramPtr pMeshProgram = std::make_shared<ShaderProgram>();
+
+        bool bAddMeshShaderError = false;
+
+        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_fragment, ShaderProgram::ShaderType::Fragment());
+        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_vertex, ShaderProgram::ShaderType::Vertex());
+
+        if (bAddMeshShaderError)
+            return false;
+
+        if (!pMeshProgram->init())
+            return false;
+
+        glGenVertexArrays(1, &m_nVAO);
+
+        m_pMeshProgram = pMeshProgram;
+
+        //----------------------------------------------------------------------------------
 
         m_VertexBuffer      = std::make_shared<VertexBuffer>();
         m_pBufferIndirect   = std::make_shared<IndirectBuffer>();

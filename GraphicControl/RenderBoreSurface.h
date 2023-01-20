@@ -44,11 +44,14 @@ namespace GL
         ShaderProgramPtr m_pMeshProgram     = nullptr;
         VertexBufferPtr m_VertexBuffer      = nullptr;
         TextureBufferPtr m_pPaletteBuffer   = nullptr;
-        IndirectBufferPtr m_pBufferIndirect = nullptr;
-        IndexBufferPtr m_pBufferIndex       = nullptr;
+        IndirectBufferPtr m_pSurfaceIndirect = nullptr;
+        IndirectBufferPtr m_pMeshIndirect   = nullptr;
+        IndexBufferPtr m_pSurfaceIndex      = nullptr;
+        IndexBufferPtr m_pMeshIndex         = nullptr;
         ShaderStorageBufferPtr m_pBufferDepth     = nullptr;
 
         bool m_bDataInit = false;
+        bool m_bMiaInit = false;
         bool m_bPaletteInit = false;
         bool m_bProgramInit = false;
 

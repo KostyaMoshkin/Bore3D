@@ -70,7 +70,7 @@ namespace GL
 	
 	void RenderBoreSurface::draw()
 	{
-        if (!(m_bDataInit && m_bPaletteInit && m_bProgramInit))
+        if (!(m_bDataInit && m_bMiaInit && m_bPaletteInit && m_bProgramInit))
             return;
 
 
@@ -92,7 +92,8 @@ namespace GL
         BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
         BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
         BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
-        BufferBounder<IndirectBuffer> indirectBounder(m_pBufferIndirect);
+        BufferBounder<IndirectBuffer> indirectSurfaceBounder(m_pSurfaceIndirect);
+        BufferBounder<IndexBuffer> indexSurfaceBounder(m_pSurfaceIndex);
 
         glMultiDrawElementsIndirect(GL_TRIANGLE_STRIP,
             GL_UNSIGNED_INT,
@@ -102,20 +103,20 @@ namespace GL
 
         renderBoreBounder.unbound();
 
-        if (!m_bDrawMesh)
-            return;
+        //if (!m_bDrawMesh)
+        //    return;
 
         //---------------------------------------------------------------------------
     
         BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
         BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
 
-        BufferBounder<TextureBuffer> paletteMeshBounder(m_pPaletteBuffer);
         BufferBounder<VertexBuffer> vertexMeshBounder(m_VertexBuffer);
         BufferBounder<ShaderStorageBuffer> depthMeshBounder(m_pBufferDepth);
-        BufferBounder<IndirectBuffer> indirectMeshBounder(m_pBufferIndirect);
+        BufferBounder<IndirectBuffer> indirectMeshBounder(m_pMeshIndirect);
+        BufferBounder<IndexBuffer> indexMeshBounder(m_pMeshIndex);
 
-        glMultiDrawElementsIndirect(GL_LINE_STRIP, // GL_LINE_STRIP,  GL_TRIANGLE_STRIP
+        glMultiDrawElementsIndirect(GL_LINES, // GL_LINE_STRIP,  GL_TRIANGLE_STRIP
             GL_UNSIGNED_INT,
             nullptr,
             m_pImpl->nCurveCount - 1,
@@ -145,6 +146,184 @@ namespace GL
         m_pImpl->vRadiusCurve.resize(m_pImpl->nCurveCount * m_pImpl->nDriftCount);
 
         //----------------------------------------------------------------------------------
+
+        float fRadiusMin = std::numeric_limits<float>::max();
+        float fRadiusMax = -std::numeric_limits<float>::max();
+
+        for (int i = 0; i < m_pImpl->nCurveCount; ++i)
+        {
+            m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
+
+            for (int j = 0; j < m_pImpl->nDriftCount; ++j)
+            {
+                m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
+                fRadiusMin = std::min(fRadiusMin, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
+                fRadiusMax = std::max(fRadiusMax, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
+            }
+        }
+
+        BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
+        BufferBounder<RenderBoreSurface> renderBoreBounder(this);
+
+        m_pSufraceProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
+        m_pSufraceProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
+
+        //----------------------------------------------------------------------------------
+
+        BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
+
+        int nVertexBufferSize = int(m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float));
+
+        if (!m_VertexBuffer->bookSpace(nVertexBufferSize))
+            return false;
+
+        {
+            BufferMounter<VertexBuffer> vertexMounter(m_VertexBuffer);
+
+            if (void* pPosition = vertexMounter.get_buffer())
+                memcpy(pPosition, m_pImpl->vRadiusCurve.data(), nVertexBufferSize);
+            else
+                return false;
+        }
+
+        m_VertexBuffer->attribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, 0);
+
+        m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
+        m_pSufraceProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
+
+        //----------------------------------------------------------------------------------
+
+        std::vector<DrawElementsIndirectCommand> vSurfaceIndirect(m_pImpl->nCurveCount - 1);
+        for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
+        {
+            vSurfaceIndirect[i].count = m_pImpl->nDriftCount * 2 + 2;  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
+            vSurfaceIndirect[i].primCount = 1;
+            vSurfaceIndirect[i].firstIndex = 0;
+            vSurfaceIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
+            vSurfaceIndirect[i].baseInstance = 0;
+        }
+
+        BufferBounder<IndirectBuffer> indirectSurfaceBounder(m_pSurfaceIndirect);
+
+        int nSurfaceIndirectSize = int(vSurfaceIndirect.size() * sizeof(DrawElementsIndirectCommand));
+
+        if (!m_pSurfaceIndirect->bookSpace(nSurfaceIndirectSize))
+            return false;
+
+        {
+            BufferMounter<IndirectBuffer> indirectMounter(m_pSurfaceIndirect);
+
+            if (void* pPosition = indirectMounter.get_buffer())
+                memcpy(pPosition, vSurfaceIndirect.data(), nSurfaceIndirectSize);
+            else
+                return false;
+        }
+
+        //----------------------------------------------------------------------------------
+
+        std::vector<unsigned int> vSurfaceIndices(m_pImpl->nDriftCount * 2 + 2);
+
+        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
+        {
+            vSurfaceIndices[i * 2] = m_pImpl->nDriftCount + i;
+            vSurfaceIndices[i * 2 + 1] = i;
+        }
+
+        //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
+        vSurfaceIndices[m_pImpl->nDriftCount * 2] = m_pImpl->nDriftCount;
+        vSurfaceIndices[m_pImpl->nDriftCount * 2 + 1] = 0;
+
+        BufferBounder<IndexBuffer> indexSurfaceBounder(m_pSurfaceIndex);
+
+        int nSurfaceIndexSize = (int)vSurfaceIndices.size() * sizeof(unsigned int);
+
+        if (!m_pSurfaceIndex->bookSpace(nSurfaceIndexSize))
+            return false;
+
+        {
+            BufferMounter<IndexBuffer> indexSurfaceMounter(m_pSurfaceIndex);
+
+            if (void* pPosition = indexSurfaceMounter.get_buffer())
+                memcpy(pPosition, vSurfaceIndices.data(), nSurfaceIndexSize);
+            else
+                return false;
+        }
+
+        //----------------------------------------------------------------------------------
+
+        renderBoreBounder.unbound();
+
+        //----------------------------------------------------------------------------------
+
+        std::vector<unsigned int> vMeshIndices(m_pImpl->nDriftCount * 3 + 1);
+
+        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
+        {
+            vMeshIndices[i * 3 + 0] = m_pImpl->nDriftCount + i;
+            vMeshIndices[i * 3 + 1] = i;
+            vMeshIndices[i * 3 + 2] = i + 1;
+        }
+
+        //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
+        vMeshIndices[m_pImpl->nDriftCount * 3 + 0] = 0;
+
+        BufferBounder<IndexBuffer> indexMeshBounder(m_pMeshIndex);
+
+        int nMeshIndexSize = (int)vMeshIndices.size() * sizeof(unsigned int);
+
+        if (!m_pMeshIndex->bookSpace(nMeshIndexSize))
+            return false;
+
+        {
+            BufferMounter<IndexBuffer> indexMeshMounter(m_pMeshIndex);
+
+            if (void* pPosition = indexMeshMounter.get_buffer())
+                memcpy(pPosition, vMeshIndices.data(), nMeshIndexSize);
+            else
+                return false;
+        }
+
+        //----------------------------------------------------------------------------------
+
+        std::vector<DrawElementsIndirectCommand> vMeshIndirect(m_pImpl->nCurveCount - 1);
+        for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
+        {
+            vMeshIndirect[i].count = m_pImpl->nDriftCount * 3 + 1;  // +1 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
+            vMeshIndirect[i].primCount = 1;
+            vMeshIndirect[i].firstIndex = 0;
+            vMeshIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
+            vMeshIndirect[i].baseInstance = 0;
+        }
+
+        BufferBounder<IndirectBuffer> indirectMeshBounder(m_pMeshIndirect);
+
+        int nMeshIndirectSize = int(vMeshIndirect.size() * sizeof(DrawElementsIndirectCommand));
+
+        if (!m_pMeshIndirect->bookSpace(nMeshIndirectSize))
+            return false;
+
+        {
+            BufferMounter<IndirectBuffer> indirectMounter(m_pMeshIndirect);
+
+            if (void* pPosition = indirectMounter.get_buffer())
+                memcpy(pPosition, vMeshIndirect.data(), nMeshIndirectSize);
+            else
+                return false;
+        }
+
+        //----------------------------------------------------------------------------------
+
+        BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
+        BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
+
+        m_pMeshProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
+        m_pMeshProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
+
+        renderMeshBoreBounder.unbound();
+
+        //----------------------------------------------------------------------------------
+
+        m_bDataInit = true;
 
         return false;
     }
@@ -186,9 +365,6 @@ namespace GL
 
     bool RenderBoreSurface::InitDiaMapper(void* pMapper_)
     {
-        float fRadiusMin = std::numeric_limits<float>::max();
-        float fRadiusMax = -std::numeric_limits<float>::max();
-
         m_fDepthMin = std::numeric_limits<float>::max();
         m_fDepthMax = -std::numeric_limits<float>::max();
 
@@ -199,47 +375,12 @@ namespace GL
             m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
             m_fDepthMin = std::min(m_fDepthMin, m_pImpl->vDepths[i]);
             m_fDepthMax = std::max(m_fDepthMax, m_pImpl->vDepths[i]);
-
-            m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
-
-            for (int j = 0; j < m_pImpl->nDriftCount; ++j)
-            {
-                m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
-                fRadiusMin = std::min(fRadiusMin, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
-                fRadiusMax = std::max(fRadiusMax, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
-            }
         }
 
         //----------------------------------------------------------------------------------
 
         BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
-
-        m_pSufraceProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
-        m_pSufraceProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
-
-        //----------------------------------------------------------------------------------
-
-        BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
-
-        int nVertexBufferSize = int(m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float));
-
-        if (!m_VertexBuffer->bookSpace(nVertexBufferSize) )
-            return false;
-
-        {
-            BufferMounter<VertexBuffer> vertexMounter(m_VertexBuffer);
-
-            if (void* pPosition = vertexMounter.get_buffer())
-                memcpy(pPosition, m_pImpl->vRadiusCurve.data(), nVertexBufferSize);
-            else
-                return false;
-        }
-
-        m_VertexBuffer->attribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, 0);
-
-        m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
-        m_pSufraceProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
 
         //----------------------------------------------------------------------------------
 
@@ -259,84 +400,13 @@ namespace GL
                 return false;
         }
 
-
-        //----------------------------------------------------------------------------------
-
-        std::vector<DrawElementsIndirectCommand> vIndirectCommand(m_pImpl->nCurveCount - 1);
-        for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
-        {
-            vIndirectCommand[i].count = m_pImpl->nDriftCount * 2 + 2;  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
-            vIndirectCommand[i].primCount = 1;
-            vIndirectCommand[i].firstIndex = 0;
-            vIndirectCommand[i].baseVertex = i * m_pImpl->nDriftCount;
-            vIndirectCommand[i].baseInstance = 0;
-        }
-
-        BufferBounder<IndirectBuffer> indirectBounder(m_pBufferIndirect);
-
-        int nBufferIndirectSize = int(vIndirectCommand.size() * sizeof(DrawElementsIndirectCommand));
-
-        if (!m_pBufferIndirect->bookSpace(nBufferIndirectSize))
-            return false;
-
-        {
-            BufferMounter<IndirectBuffer> indirectMounter(m_pBufferIndirect);
-
-            if (void* pPosition = indirectMounter.get_buffer())
-                memcpy(pPosition, vIndirectCommand.data(), nBufferIndirectSize);
-            else
-                return false;
-        }
-
-        //----------------------------------------------------------------------------------
-
-        std::vector<unsigned int> vIndices(m_pImpl->nDriftCount * 2 + 2);
-
-        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
-        {
-            vIndices[i * 2] = m_pImpl->nDriftCount + i;
-            vIndices[i * 2 + 1] = i;
-        }
-
-        //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
-        vIndices[m_pImpl->nDriftCount * 2] = m_pImpl->nDriftCount;
-        vIndices[m_pImpl->nDriftCount * 2 + 1] = 0;
-
-        BufferBounder<IndexBuffer> indexBounder(m_pBufferIndex);
-
-        int nBufferIndexSize = (int)vIndices.size() * sizeof(unsigned int);
-
-        if (!m_pBufferIndex->bookSpace(nBufferIndexSize))
-            return false;
-
-        {
-            BufferMounter<IndexBuffer> indexMounter(m_pBufferIndex);
-
-            if (void* pPosition = indexMounter.get_buffer())
-                memcpy(pPosition, vIndices.data(), nBufferIndexSize);
-            else
-                return false;
-        }
-
         //----------------------------------------------------------------------------------
 
         renderBoreBounder.unbound();
 
         //----------------------------------------------------------------------------------
 
-        BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
-        BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
-
-        m_pMeshProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
-        m_pMeshProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
-        m_pMeshProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
-        m_pMeshProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
-
-        renderMeshBoreBounder.unbound();
-
-        //----------------------------------------------------------------------------------
-
-        m_bDataInit = true;
+        m_bMiaInit = true;
 
         return true;
     }
@@ -388,6 +458,7 @@ namespace GL
         m_vBkgColor[1] = g_;
         m_vBkgColor[2] = b_;
     }
+
     bool RenderBoreSurface::init()
     {
         int nVersionSupported = getVersionGl();
@@ -433,8 +504,10 @@ namespace GL
         //----------------------------------------------------------------------------------
 
         m_VertexBuffer      = std::make_shared<VertexBuffer>();
-        m_pBufferIndirect   = std::make_shared<IndirectBuffer>();
-        m_pBufferIndex      = std::make_shared<IndexBuffer>();
+        m_pSurfaceIndirect  = std::make_shared<IndirectBuffer>();
+        m_pMeshIndirect     = std::make_shared<IndirectBuffer>();
+        m_pSurfaceIndex     = std::make_shared<IndexBuffer>();
+        m_pMeshIndex        = std::make_shared<IndexBuffer>();
         m_pBufferDepth      = std::make_shared<ShaderStorageBuffer>(0);
 
         m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D, GL_TEXTURE0, GL_LINEAR);

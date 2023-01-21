@@ -116,13 +116,15 @@ namespace GL
         BufferBounder<IndirectBuffer> indirectMeshBounder(m_pMeshIndirect);
         BufferBounder<IndexBuffer> indexMeshBounder(m_pMeshIndex);
 
-        glMultiDrawElementsIndirect(GL_LINES, // GL_LINE_STRIP,  GL_TRIANGLE_STRIP
+        glLineWidth(1);
+
+        glMultiDrawElementsIndirect(GL_LINES,
             GL_UNSIGNED_INT,
             nullptr,
             m_pImpl->nCurveCount - 1,
             0);
 
-        renderBoreBounder.unbound();
+        renderMeshBoreBounder.unbound();
     }
 
     bool RenderBoreSurface::InitBore3D(void* pData_, float fLogPerPixel_)
@@ -193,10 +195,40 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        std::vector<DrawElementsIndirectCommand> vSurfaceIndirect(m_pImpl->nCurveCount - 1);
-        for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
+        std::vector<unsigned int> vSurfaceIndices(m_pImpl->nDriftCount * 2 + 2);  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
+
+        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
         {
-            vSurfaceIndirect[i].count = m_pImpl->nDriftCount * 2 + 2;  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
+            vSurfaceIndices[i * 2] = m_pImpl->nDriftCount + i;
+            vSurfaceIndices[i * 2 + 1] = i;
+        }
+
+        //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
+        vSurfaceIndices[m_pImpl->nDriftCount * 2 + 0] = m_pImpl->nDriftCount;
+        vSurfaceIndices[m_pImpl->nDriftCount * 2 + 1] = 0;
+
+        BufferBounder<IndexBuffer> indexSurfaceBounder(m_pSurfaceIndex);
+
+        int nSurfaceIndexSize = (int)vSurfaceIndices.size() * sizeof(unsigned int);
+
+        if (!m_pSurfaceIndex->bookSpace(nSurfaceIndexSize))
+            return false;
+
+        {
+            BufferMounter<IndexBuffer> indexSurfaceMounter(m_pSurfaceIndex);
+
+            if (void* pPosition = indexSurfaceMounter.get_buffer())
+                memcpy(pPosition, vSurfaceIndices.data(), nSurfaceIndexSize);
+            else
+                return false;
+        }
+
+        //----------------------------------------------------------------------------------
+
+        std::vector<DrawElementsIndirectCommand> vSurfaceIndirect(m_pImpl->nCurveCount);
+        for (int i = 0; i < m_pImpl->nCurveCount; ++i)
+        {
+            vSurfaceIndirect[i].count = vSurfaceIndices.size();
             vSurfaceIndirect[i].primCount = 1;
             vSurfaceIndirect[i].firstIndex = 0;
             vSurfaceIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
@@ -221,51 +253,22 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        std::vector<unsigned int> vSurfaceIndices(m_pImpl->nDriftCount * 2 + 2);
-
-        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
-        {
-            vSurfaceIndices[i * 2] = m_pImpl->nDriftCount + i;
-            vSurfaceIndices[i * 2 + 1] = i;
-        }
-
-        //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
-        vSurfaceIndices[m_pImpl->nDriftCount * 2] = m_pImpl->nDriftCount;
-        vSurfaceIndices[m_pImpl->nDriftCount * 2 + 1] = 0;
-
-        BufferBounder<IndexBuffer> indexSurfaceBounder(m_pSurfaceIndex);
-
-        int nSurfaceIndexSize = (int)vSurfaceIndices.size() * sizeof(unsigned int);
-
-        if (!m_pSurfaceIndex->bookSpace(nSurfaceIndexSize))
-            return false;
-
-        {
-            BufferMounter<IndexBuffer> indexSurfaceMounter(m_pSurfaceIndex);
-
-            if (void* pPosition = indexSurfaceMounter.get_buffer())
-                memcpy(pPosition, vSurfaceIndices.data(), nSurfaceIndexSize);
-            else
-                return false;
-        }
-
-        //----------------------------------------------------------------------------------
-
         renderBoreBounder.unbound();
 
         //----------------------------------------------------------------------------------
 
-        std::vector<unsigned int> vMeshIndices(m_pImpl->nDriftCount * 3 + 1);
+        std::vector<unsigned int> vMeshIndices(m_pImpl->nDriftCount * 4);
 
         for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
         {
-            vMeshIndices[i * 3 + 0] = m_pImpl->nDriftCount + i;
-            vMeshIndices[i * 3 + 1] = i;
-            vMeshIndices[i * 3 + 2] = i + 1;
+            vMeshIndices[i * 4 + 0] = m_pImpl->nDriftCount + i;
+            vMeshIndices[i * 4 + 1] = i;
+            vMeshIndices[i * 4 + 2] = i;
+            vMeshIndices[i * 4 + 3] = i + 1;
         }
 
         //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
-        vMeshIndices[m_pImpl->nDriftCount * 3 + 0] = 0;
+        vMeshIndices[(m_pImpl->nDriftCount - 1) * 4 + 3] = 0;
 
         BufferBounder<IndexBuffer> indexMeshBounder(m_pMeshIndex);
 
@@ -288,7 +291,7 @@ namespace GL
         std::vector<DrawElementsIndirectCommand> vMeshIndirect(m_pImpl->nCurveCount - 1);
         for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
         {
-            vMeshIndirect[i].count = m_pImpl->nDriftCount * 3 + 1;  // +1 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
+            vMeshIndirect[i].count = vMeshIndices.size();
             vMeshIndirect[i].primCount = 1;
             vMeshIndirect[i].firstIndex = 0;
             vMeshIndirect[i].baseVertex = i * m_pImpl->nDriftCount;

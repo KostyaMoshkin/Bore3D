@@ -26,22 +26,21 @@ float getAngle(uint nVertexId_)
 	return Pi * 2.0 * float(nDrift) / float(m_nDriftCount);
 }
 
-int positionY(uint nVertexId_)
+int positionY()
 {
-	if (nVertexId_ < m_nDriftCount)
-		return gl_VertexID / gl_BaseVertex + gl_BaseVertex / m_nDriftCount;
-
-	return gl_VertexID / gl_BaseVertex + gl_BaseVertex / m_nDriftCount + 1;
+	return gl_VertexID / m_nDriftCount;
 }
 
 void main()
 {
 	uint nVertexId = gl_VertexID - gl_BaseVertex;
 
+	float fRadius = 1.001 * m_fValue;
+
 	vec3 vPosition = vec3(
-		m_fValue * sin(m_fRotation + getAngle(nVertexId)),
-		m_vDepth[positionY(nVertexId)],
-		m_fValue * cos(m_fRotation + getAngle(nVertexId))
+		fRadius * sin(m_fRotation + getAngle(nVertexId)),
+		m_vDepth[positionY()],
+		fRadius * cos(m_fRotation + getAngle(nVertexId))
 	);
 
 	gl_Position = m_MVP * vec4(vPosition, 1.0);

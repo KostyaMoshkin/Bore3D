@@ -1,8 +1,9 @@
 #version 460 core
 
-layout(location = 0) in float m_fValue;
+layout(location = 0) in float m_fRadius;
 
 layout(std430, binding = 0) buffer BufferDepth { float m_vDepth[]; };
+layout(std430, binding = 1) buffer BufferAngle { float m_fAddAngle[]; };
 
 uniform float m_fTop;
 uniform float m_fBottom;
@@ -35,12 +36,12 @@ void main()
 {
 	uint nVertexId = gl_VertexID - gl_BaseVertex;
 
-	float fRadius = 1.001 * m_fValue;
+	float fRadius = 1.001 * m_fRadius;
 
 	vec3 vPosition = vec3(
-		fRadius * sin(m_fRotation + getAngle(nVertexId)),
+		fRadius * sin(m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)),
 		m_vDepth[positionY()],
-		fRadius * cos(m_fRotation + getAngle(nVertexId))
+		fRadius * cos(m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))
 	);
 
 	gl_Position = m_MVP * vec4(vPosition, 1.0);

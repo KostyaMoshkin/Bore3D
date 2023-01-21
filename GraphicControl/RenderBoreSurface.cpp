@@ -61,7 +61,7 @@ namespace GL
 
     RenderBoreSurface::RenderBoreSurface()
 	{
-        setBkgColor(0, 0, 0);
+        setBkgColor(1, 1, 1);
 
         std::srand((unsigned)std::time(nullptr));
 
@@ -228,7 +228,7 @@ namespace GL
         std::vector<DrawElementsIndirectCommand> vSurfaceIndirect(m_pImpl->nCurveCount);
         for (int i = 0; i < m_pImpl->nCurveCount; ++i)
         {
-            vSurfaceIndirect[i].count = vSurfaceIndices.size();
+            vSurfaceIndirect[i].count = (GLuint)vSurfaceIndices.size();
             vSurfaceIndirect[i].primCount = 1;
             vSurfaceIndirect[i].firstIndex = 0;
             vSurfaceIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
@@ -261,7 +261,7 @@ namespace GL
 
         for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
         {
-            vMeshIndices[i * 4 + 0] = m_pImpl->nDriftCount + i;
+            vMeshIndices[i * 4 + 0] = (GLuint)m_pImpl->nDriftCount + i;
             vMeshIndices[i * 4 + 1] = i;
             vMeshIndices[i * 4 + 2] = i;
             vMeshIndices[i * 4 + 3] = i + 1;
@@ -291,7 +291,7 @@ namespace GL
         std::vector<DrawElementsIndirectCommand> vMeshIndirect(m_pImpl->nCurveCount - 1);
         for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
         {
-            vMeshIndirect[i].count = vMeshIndices.size();
+            vMeshIndirect[i].count = (GLuint)vMeshIndices.size();
             vMeshIndirect[i].primCount = 1;
             vMeshIndirect[i].firstIndex = 0;
             vMeshIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
@@ -405,6 +405,24 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
+        BufferBounder<ShaderStorageBuffer> angleBounder(m_pBufferAngle);
+
+        int nBufferAngleSize = int(m_pImpl->nCurveCount * sizeof(float));
+
+        if (!m_pBufferAngle->bookSpace(nBufferAngleSize))
+            return false;
+
+        {
+            BufferMounter<ShaderStorageBuffer> angleMounter(m_pBufferAngle);
+
+            if (void* pPosition = angleMounter.get_buffer())
+                memcpy(pPosition, m_pImpl->vRotation.data(), nBufferAngleSize);
+            else
+                return false;
+        }
+
+        //----------------------------------------------------------------------------------
+
         renderBoreBounder.unbound();
 
         //----------------------------------------------------------------------------------
@@ -512,6 +530,7 @@ namespace GL
         m_pSurfaceIndex     = std::make_shared<IndexBuffer>();
         m_pMeshIndex        = std::make_shared<IndexBuffer>();
         m_pBufferDepth      = std::make_shared<ShaderStorageBuffer>(0);
+        m_pBufferAngle      = std::make_shared<ShaderStorageBuffer>(1);
 
         m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D, GL_TEXTURE0, GL_LINEAR);
         m_pPaletteBuffer->alignment(1);

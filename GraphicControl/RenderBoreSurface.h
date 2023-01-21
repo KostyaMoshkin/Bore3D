@@ -49,6 +49,7 @@ namespace GL
         IndexBufferPtr m_pSurfaceIndex      = nullptr;
         IndexBufferPtr m_pMeshIndex         = nullptr;
         ShaderStorageBufferPtr m_pBufferDepth     = nullptr;
+        ShaderStorageBufferPtr m_pBufferAngle     = nullptr;
 
         bool m_bDataInit = false;
         bool m_bMiaInit = false;

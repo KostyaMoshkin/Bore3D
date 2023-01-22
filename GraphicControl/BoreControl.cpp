@@ -58,7 +58,7 @@ namespace GraphicControl
         m_pImpl->pRenderBoreSurface->InitBore3D(pData, fLogPerPixel);
         endDraw();
 
-        return false;
+        return true;
     }
 
     void BoreControl::InitDiaMapper(void* pMapper_)
@@ -80,7 +80,7 @@ namespace GraphicControl
         m_pImpl->pRenderBoreSurface->InitPalette(vecPalette);
         endDraw();
 
-        return false;
+        return true;
     }
 
     int BoreControl::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
@@ -93,5 +93,27 @@ namespace GraphicControl
         endDraw();
 
         return 0;
+    }
+
+    bool BoreControl::setBkgColor(float r_, float g_, float b_)
+    {
+        if (!beginDraw())
+            return false;
+
+        m_pImpl->pRenderBoreSurface->setBkgColor(r_, g_, b_);
+        endDraw();
+
+        return true;
+    }
+
+    bool BoreControl::setMesColor(float r_, float g_, float b_)
+    {
+        if (!beginDraw())
+            return false;
+
+        m_pImpl->pRenderBoreSurface->setMesColor(r_, g_, b_);
+        endDraw();
+
+        return true;
     }
 }

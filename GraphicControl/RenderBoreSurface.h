@@ -90,8 +90,9 @@ namespace GL
             bool bDrawMesh
         );
 
-    protected:
+    public:
         void setBkgColor(float r_, float g_, float b_);
+        void setMesColor(float r_, float g_, float b_);
 
     public:
         static RenderBoreSurfacePtr Create() { return std::make_shared<RenderBoreSurface>(); }

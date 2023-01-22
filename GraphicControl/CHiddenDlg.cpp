@@ -46,6 +46,9 @@ BOOL CHiddenDlg::OnInitDialog()
     if (!m_controlGL.init())
         return 0;
 
+    m_controlGL.setBkgColor(1, 1, 1);
+    m_controlGL.setMesColor(0, 0, 0);
+
     m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 1.0f);
 
     m_pImpl->m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
@@ -74,6 +77,16 @@ int CHiddenDlg::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, fl
 {
     m_controlGL.GetBitmap(pVisualRect, fTop, fBottom, fRotation, fMinRadius, fMaxRadius, nMinRadiusLP, nMaxRadiusLP, fIsometryAngle, bDrawMesh);
     return 0;
+}
+
+void CHiddenDlg::setBkgColor(float r_, float g_, float b_)
+{
+    m_controlGL.setBkgColor(r_, g_, b_);
+}
+
+void CHiddenDlg::setMesColor(float r_, float g_, float b_)
+{
+    m_controlGL.setMesColor(r_, g_, b_);
 }
 
 void CHiddenDlg::DoDataExchange(CDataExchange* pDX)

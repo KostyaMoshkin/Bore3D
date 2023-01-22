@@ -44,6 +44,10 @@ public:
         bool bDrawMesh
     );
 
+public:
+    void setBkgColor(float r_, float g_, float b_);
+    void setMesColor(float r_, float g_, float b_);
+
 protected:
     virtual void DoDataExchange(CDataExchange* pDX);	// поддержка DDX/DDV
 

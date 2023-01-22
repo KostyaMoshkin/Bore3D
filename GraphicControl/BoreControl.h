@@ -53,6 +53,10 @@ namespace GraphicControl
 			bool bDrawMesh
 		);
 
+	public:
+		bool setBkgColor(float r_, float g_, float b_);
+		bool setMesColor(float r_, float g_, float b_);
+
 	private:
 		struct Implementation;
 		std::shared_ptr<Implementation> m_pImpl;

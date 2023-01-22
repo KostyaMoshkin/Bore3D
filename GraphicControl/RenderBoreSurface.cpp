@@ -445,13 +445,29 @@ namespace GL
         m_vBkgColor[2] = b_;
     }
 
+    void RenderBoreSurface::setMesColor(float r_, float g_, float b_)
+    {
+        std::array<float, 3> vMeshColor;
+
+        vMeshColor[0] = r_;
+        vMeshColor[1] = g_;
+        vMeshColor[2] = b_;
+
+        BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
+        BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
+
+        m_pMeshProgram->setUniformVecf("m_vMesColor", &vMeshColor[0]);
+
+        renderMeshBoreBounder.unbound();
+    }
+
     bool RenderBoreSurface::init()
     {
         int nVersionSupported = getVersionGl();
 
         const GLubyte* pVersion = glGetString(GL_VERSION);
 
-        ShaderProgramPtr pSufraceProgram = std::make_shared<ShaderProgram>();
+        ShaderProgramPtr pSufraceProgram = ShaderProgram::Create();
 
         bool bAddSufraceShaderError = false;
 
@@ -470,7 +486,7 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        ShaderProgramPtr pMeshProgram = std::make_shared<ShaderProgram>();
+        ShaderProgramPtr pMeshProgram = ShaderProgram::Create();
 
         bool bAddMeshShaderError = false;
 

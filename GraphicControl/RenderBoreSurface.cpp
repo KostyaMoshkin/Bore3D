@@ -103,8 +103,8 @@ namespace GL
 
         renderBoreBounder.unbound();
 
-        //if (!m_bDrawMesh)
-        //    return;
+        if (!m_bDrawMesh)
+            return;
 
         //---------------------------------------------------------------------------
     
@@ -435,6 +435,10 @@ namespace GL
 
     int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
+        m_bDrawMesh = bDrawMesh;
+
+        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, m_fDepthMin, m_fDepthMax, -fMaxRadius, fMaxRadius);
+
         BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
@@ -445,8 +449,8 @@ namespace GL
         m_pSufraceProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
         m_pSufraceProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
         m_pSufraceProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
+        m_pSufraceProgram->setUniform1f("m_fIsometryAngle", &fIsometryAngle);
 
-        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, m_fDepthMin, m_fDepthMax, -fMaxRadius, fMaxRadius);
         m_pSufraceProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 
         renderBoreBounder.unbound();
@@ -463,6 +467,7 @@ namespace GL
         m_pMeshProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
         m_pMeshProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
         m_pMeshProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
+        m_pMeshProgram->setUniform1f("m_fIsometryAngle", &fIsometryAngle);
 
         m_pMeshProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 

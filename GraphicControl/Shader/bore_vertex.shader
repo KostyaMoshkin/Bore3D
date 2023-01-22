@@ -13,6 +13,7 @@ uniform float m_fBottom;
 uniform float m_fRotation;
 uniform float m_fMinRadius;
 uniform float m_fMaxRadius;
+uniform float m_fIsometryAngle;
 
 uniform int m_nMinRadiusLP;
 uniform int m_nMaxRadiusLP;
@@ -42,13 +43,17 @@ void main()
 {
 	uint nVertexId = gl_VertexID - gl_BaseVertex;
 
+	float fRadius = m_fRadius;
+
 	vec3 vPosition = vec3(
-		m_fRadius * sin(m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)),
+		fRadius * sin(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))),
 		m_vDepth[positionY()],
-		m_fRadius * cos(m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))
+		fRadius * cos(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)))
 	);
 
 	gl_Position = m_MVP * vec4(vPosition, 1.0);
+
+	gl_Position = vec4(gl_Position.x, gl_Position.y * cos(-m_fIsometryAngle) + gl_Position.z * sin(-m_fIsometryAngle), gl_Position.z, gl_Position.w);
 
 	fPaletteIndex = (m_fRadius - m_fPaletteValueMin) / (m_fPaletteValueMax - m_fPaletteValueMin);
 }

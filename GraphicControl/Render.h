@@ -57,10 +57,10 @@
 
         public:
             virtual bool init() = 0;
-            virtual void lookAt(Matrix4& mView_) = 0;
-            virtual void rotate(Matrix4& mRotate_) = 0;
-            virtual void translate(Matrix4& mTranslate_) = 0;
-            virtual void setViewAngle(Matrix4& mPerspective_) = 0;
+            virtual void lookAt(Matrix4& mView_) {}
+            virtual void rotate(Matrix4& mRotate_) {}
+            virtual void translate(Matrix4& mTranslate_) {}
+            virtual void setViewAngle(Matrix4& mPerspective_) {}
             virtual void draw() = 0;
 
             virtual void bound() = 0;
@@ -71,35 +71,7 @@
           bool isVisible() { return m_bVisible; }
 
           void setVersionGl(int nVersionFull_) { m_nVersionFull = nVersionFull_; }
-          int getVersionGl() {
-                  static int nVersionFull = -1;
-
-                  if (nVersionFull != -1)
-                      return nVersionFull;
-
-                  //------------------------------------------------------------------------------------------
-
-                  const GLubyte* pVersion = glGetString(GL_VERSION);
-                  if (!pVersion)
-                      return nVersionFull;
-
-                  std::string sVersion = (const char*)pVersion;
-                  if (sVersion.length() < 3)
-                      return nVersionFull;
-
-                  int nVersionMain = sVersion[0] - '0';
-                  int nVersionSub = sVersion[2] - '0';
-
-                  nVersionFull = nVersionMain * 10 + nVersionSub;
-                  //       nVersionFull = 30;
-
-                        //------------------------------------------------------------------------------------------
-
-                  //if ( nVersionFull < 20 )
-                  //  FORCE_ASSERTM("Current Open GL version is not supported.");
-
-                  return nVersionFull;
-          }
+          int getVersionGl();
 
           virtual void sizeChanged(int nWidth_, int nHeight_) {; }
 

@@ -63,10 +63,6 @@ namespace GL
         // Унаследовано через Render
         bool init() override;
         void draw() override;
-        void lookAt(Matrix4& mView_) override;
-        void rotate(Matrix4& mRotate_) override;
-        void translate(Matrix4& mTranslate_) override;
-        void setViewAngle(Matrix4& mPerspective_) override;
         void bound() override;
         void unbound() override;
 

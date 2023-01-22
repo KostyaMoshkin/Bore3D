@@ -7,41 +7,8 @@
 
 #include <limits>
 
-//#define TEST_DRAW
-
 namespace GL
 {
-    static void drawTriangles()
-    {
-        float fRandColor1 = (float)std::rand() / RAND_MAX;
-        float fRandColor2 = (float)std::rand() / RAND_MAX;
-        float fRandColor3 = (float)std::rand() / RAND_MAX;
-
-        glBegin(GL_TRIANGLES);
-        {
-            glColor3f(fRandColor3, fRandColor1, fRandColor2);
-            glVertex3f(-1.0f, -0.25f, 0.0f);
-            glVertex3f(-0.5f, -0.25f, 0.0f);
-            glVertex3f(-0.75f, 0.25f, 0.0f);
-
-            glColor3f(fRandColor2, fRandColor3, fRandColor1);
-            glVertex3f(0.5f, -0.25f, 0.0f);
-            glVertex3f(1.0f, -0.25f, 0.0f);
-            glVertex3f(0.75f, 0.25f, 0.0f);
-
-            glColor3f(fRandColor1, fRandColor3, fRandColor2);
-            glVertex3f(-0.6f, -0.75f, 0.5f);
-            glColor3f(fRandColor3, fRandColor2, fRandColor1);
-            glVertex3f(0.6f, -0.75f, 0.0f);
-            glColor3f(fRandColor3, fRandColor1, fRandColor1);
-            glVertex3f(0.0f, 0.75f, 0.0f);
-        }
-        glEnd();
-
-        glFlush();
-    }
-
-
     struct RenderBoreSurface::Implementation
     {
         DataProvider::BoreData* pData = nullptr;
@@ -76,13 +43,6 @@ namespace GL
 
         glClearColor(m_vBkgColor[0], m_vBkgColor[1], m_vBkgColor[2], 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //---------------------------------------------------------------------------
-
-#ifdef TEST_DRAW
-        drawTriangles();
-        return;
-#endif
 
         //---------------------------------------------------------------------------
 
@@ -529,36 +489,20 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        m_VertexBuffer      = std::make_shared<VertexBuffer>();
-        m_pSurfaceIndirect  = std::make_shared<IndirectBuffer>();
-        m_pMeshIndirect     = std::make_shared<IndirectBuffer>();
-        m_pSurfaceIndex     = std::make_shared<IndexBuffer>();
-        m_pMeshIndex        = std::make_shared<IndexBuffer>();
-        m_pBufferDepth      = std::make_shared<ShaderStorageBuffer>(0);
-        m_pBufferAngle      = std::make_shared<ShaderStorageBuffer>(1);
+        m_VertexBuffer      = VertexBuffer::Create();
+        m_pSurfaceIndirect  = IndirectBuffer::Create();
+        m_pMeshIndirect     = IndirectBuffer::Create();
+        m_pSurfaceIndex     = IndexBuffer::Create();
+        m_pMeshIndex        = IndexBuffer::Create();
+        m_pBufferDepth      = ShaderStorageBuffer::Create(0);
+        m_pBufferAngle      = ShaderStorageBuffer::Create(1);
 
-        m_pPaletteBuffer    = std::make_shared<TextureBuffer>(GL_TEXTURE_1D, GL_TEXTURE0, GL_LINEAR);
+        m_pPaletteBuffer    = TextureBuffer::Create(GL_TEXTURE_1D, GL_TEXTURE0, GL_LINEAR);
         m_pPaletteBuffer->alignment(1);
 
         m_bProgramInit = true;
 
         return true;
-    }
-
-    void RenderBoreSurface::lookAt(Matrix4& mView_)
-    {
-    }
-
-    void RenderBoreSurface::rotate(Matrix4& mRotate_)
-    {
-    }
-
-    void RenderBoreSurface::translate(Matrix4& mTranslate_)
-    {
-    }
-
-    void RenderBoreSurface::setViewAngle(Matrix4& mPerspective_)
-    {
     }
 
     void RenderBoreSurface::bound()

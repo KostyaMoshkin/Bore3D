@@ -64,7 +64,9 @@ namespace DataProvider
 
         geoPoint_.vvfDistance.push_back(vDistance);
 
-        geoPoint_.vfRotation.push_back(0.0f);
+        float fRandomRotaion = 1.0f * std::rand() / RAND_MAX * 2.0f * 3.14159f / 360.0f * 5.0f;
+
+        geoPoint_.vfRotation.push_back(fRandomRotaion);
     }
 
     // Конструктор для экспортированного класса.
@@ -81,9 +83,9 @@ namespace DataProvider
             return false;
 
         std::string sLine;
-        
+
         while (std::getline(file, sLine))
-                addGeoPoint(m_data, sLine);
+            addGeoPoint(m_data, sLine);
 
         file.close();
 

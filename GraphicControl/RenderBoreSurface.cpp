@@ -40,7 +40,6 @@ namespace GL
         if (!(m_bDataInit && m_bMiaInit && m_bPaletteInit && m_bProgramInit))
             return;
 
-
         glClearColor(m_vBkgColor[0], m_vBkgColor[1], m_vBkgColor[2], 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

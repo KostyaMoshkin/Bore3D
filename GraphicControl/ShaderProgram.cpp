@@ -43,7 +43,7 @@ namespace GL {
             m_sShaderFile = std::string(ShaderName::getName(nShaderResourceID_));
         else
         {
-            m_sShaderFile += ";";
+            m_sShaderFile += "; ";
             m_sShaderFile += std::string(ShaderName::getName(nShaderResourceID_));
         }
 

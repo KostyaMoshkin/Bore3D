@@ -29,10 +29,10 @@ namespace GL
             GLuint  baseInstance;
         } DrawElementsIndirectCommand;
 
-        std::array<float, 3> m_vBkgColor;
-        std::array<float, 3> m_vMeshColor;
-        std::array<float, 3> m_vZeroLineColor;
-        int m_nZeroLineWidth;
+        std::array<float, 3> m_vBkgColor = { 1, 1, 1 };
+        std::array<float, 3> m_vMeshColor = { 0, 0, 0 };
+        std::array<float, 3> m_vZeroLineColor = { 1, 1, 1 };
+        float m_fZeroLineWidth = 3;
 
         unsigned int m_nVAO;
 

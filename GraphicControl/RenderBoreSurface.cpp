@@ -369,7 +369,7 @@ namespace GL
 
         m_pMeshProgram->setUniformVecf("m_vMesColor", &m_vZeroLineColor[0]);
 
-        glLineWidth(m_nZeroLineWidth);
+        glLineWidth(m_fZeroLineWidth);
 
         glMultiDrawElementsIndirect(GL_LINES,
             GL_UNSIGNED_INT,
@@ -450,27 +450,17 @@ namespace GL
         if (!setSurfaceIndex())
             return false;
 
-        //----------------------------------------------------------------------------------
-
         if (!setSurfaceIndirect())
             return false;
-
-        //----------------------------------------------------------------------------------
 
         if (!setMeshIndex())
             return false;
 
-        //----------------------------------------------------------------------------------
-
         if (!setMeshIndirect())
             return false;
 
-        //----------------------------------------------------------------------------------
-
         if (!setDriftIndex())
             return false;
-
-        //----------------------------------------------------------------------------------
 
         if (!setDriftIndirect())
             return false;
@@ -542,8 +532,6 @@ namespace GL
         if (!setBufferDepth())
             return false;
 
-        //----------------------------------------------------------------------------------
-
         if (!setBufferAngle())
             return false;
 
@@ -612,7 +600,7 @@ namespace GL
 
     void RenderBoreSurface::setZeroLineColor(float r_, float g_, float b_, int nWidth_)
     {
-        m_nZeroLineWidth = nWidth_;
+        m_fZeroLineWidth = (float)nWidth_;
         m_vZeroLineColor[0] = r_;
         m_vZeroLineColor[1] = g_;
         m_vZeroLineColor[2] = b_;
@@ -628,8 +616,6 @@ namespace GL
             return false;
 
         glGenVertexArrays(1, &m_nVAO);
-
-        //----------------------------------------------------------------------------------
 
         if (!setMeshProgram())
             return false;

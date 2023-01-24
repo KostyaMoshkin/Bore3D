@@ -203,6 +203,9 @@
     <None Include="Shader\mesh_fragment.shader" />
     <None Include="Shader\mesh_vertex.shader" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GraphicControl.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

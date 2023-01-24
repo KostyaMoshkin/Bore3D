@@ -198,7 +198,7 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	);
 	*/
 
-	m_hiddenDlg.GetBitmap(&rcVisualRect, 420.0f, 500.0f, m_fRotationAngle, 0.0f, 4.1f, 0.0f, float(clientRect.Width()), fIsometryAngle, true);
+	m_hiddenDlg.GetBitmap(&rcVisualRect, 420.0f, 500.0f, m_fRotationAngle, 0.0f, 4.1f, 0, clientRect.Width(), fIsometryAngle, true);
 	m_hiddenDlg.fillPicture(hDC);
 
 	return;

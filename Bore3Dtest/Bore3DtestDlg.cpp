@@ -106,6 +106,9 @@ BOOL CBore3DtestDlg::OnInitDialog()
 
 	m_hiddenDlg.Create("SAMPLEDIALOG", this);
 
+	m_hiddenDlg.setBkgColor(1, 1, 1);
+	m_hiddenDlg.setMesColor(0, 0, 0);
+
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
 
@@ -166,111 +169,37 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	CDC* pCHC = pWnd->GetDC();
 	HDC hDC = *pCHC;
 
-	CRect rect;
-	pWnd->GetWindowRect(&rect);
+	CRect clientRect;
+	//pWnd->GetWindowRect(&rect);
+	pWnd->GetClientRect(&clientRect);
 
-	m_hiddenDlg.SetWindowPos(NULL, 0, 0, rect.Width() + 15, rect.Height() + 37, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE); //
+	m_hiddenDlg.SetWindowPos(NULL, 0, 0, clientRect.Width(), clientRect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE); //
 
 	RECT rcVisualRect;
-	rcVisualRect.left = 0;
-	rcVisualRect.right = 0;
+	rcVisualRect.left = -clientRect.Width();
+	rcVisualRect.right = clientRect.Width();
 	rcVisualRect.top = 0;
-	rcVisualRect.bottom = 100;
+	rcVisualRect.bottom = clientRect.Height();
 
-	m_fRotationAngle += 3.1415926f / 30.0f;
+	m_fRotationAngle += 3.1415926f / 100.0f;
 
-	m_hiddenDlg.GetBitmap(&rcVisualRect, 0, 500, m_fRotationAngle, 0.0f, 4.1f, 0, 100, 2.0f * 3.14f / 360.0f * 15.0f, true);
-	m_hiddenDlg.fillPicture(hDC);
+	float fIsometryAngle = 2.0f * 3.14f / 360.0f * 15.0f + m_fRotationAngle / 5.0f;
+
 	/*
-	//m_hiddenDlg.ShowWindow();
-
-	//CRect rect;
-	//CWnd* pWnd = GetDlgItem(IDC_CUSTOM1);
-	//pWnd->GetWindowRect(&rect);
-
-	//int     pixelFormat;
-
-	//PIXELFORMATDESCRIPTOR pfd = {
-	//sizeof(PIXELFORMATDESCRIPTOR), // Size of this structure
-	//1, // Version of this structure
-	//PFD_DRAW_TO_WINDOW | // Draw to window (not bitmap) PFD_DRAW_TO_BITMAP PFD_DRAW_TO_WINDOW
-	//PFD_SUPPORT_OPENGL | // Support OpenGL calls
-	//PFD_DOUBLEBUFFER, // Double -buffered mode
-	//PFD_TYPE_RGBA, // RGBA Color mode
-	//24, // Want 24bit color
-	//0,0,0,0,0,0, // Not used to select mode
-	//0,0, // Not used to select mode
-	//0,0,0,0,0, // Not used to select mode
-	//32, // Size of depth buffer
-	//0, // Not used to select mode
-	//0, // Not used to select mode
-	//PFD_MAIN_PLANE, // Draw in main plane
-	//0, // Not used to select mode
-	//0,0,0 }; // Not used to select mode
-
-	////HDC memDC = CreateCompatibleDC(NULL);
-	//CDC* dc;// = GetDlgItem(IDC_PICTURE)->GetDC();
-	//dc = new CClientDC(this);
-	//HDC memDC = *dc;
-
-
-	//HBITMAP memBM = CreateCompatibleBitmap(memDC, rect.Width(), rect.Height());
-	//SelectObject(memDC, memBM);
-	//pixelFormat = ChoosePixelFormat(memDC, &pfd);
-	//SetPixelFormat(memDC, pixelFormat, &pfd);
-	//HGLRC m_hrc = wglCreateContext(memDC);
-	//wglMakeCurrent(memDC, m_hrc);
-
-	//GLenum err = glewInit();
-	//if (err != GLEW_OK)
-	//{
-	//	return;
-	//}
-
-	//wglewInit();
-
-	//glViewport(0, 0, rect.Width(), rect.Height());
-
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glLoadIdentity();
-
-	//glClearColor(0.2f, 0.0f, 0.3f, 1);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//glColor3f(0.0f, 0.5f, 1.0f); //blue color
-
-	//glBegin(GL_TRIANGLES);//start drawing triangles
-	//glVertex3f(-1.0f, -0.25f, 0.0f);//triangle one first vertex
-	//glVertex3f(-0.5f, -0.25f, 0.0f);//triangle one second vertex
-	//glVertex3f(-0.75f, 0.25f, 0.0f);//triangle one third vertex
-	////drawing a new triangle
-
-	//glColor3f(0.0f, 0, 0.5f); //blue color
-	//glVertex3f(0.5f, -0.25f, 0.0f);//triangle two first vertex
-	//glVertex3f(1.0f, -0.25f, 0.0f);//triangle two second vertex
-	//glVertex3f(0.75f, 0.25f, 0.0f);//triangle two third vertex
-	//glEnd();//end drawing of triangles
-
-	//glBegin(GL_POLYGON);
-	//glColor3f(1, 0, 0); glVertex3f(-0.6f, -0.75f, 0.5f);
-	//glColor3f(1, 0.5f, 1); glVertex3f(0.6f, -0.75f, 0.0f);
-	//glColor3f(0, 0, 1); glVertex3f(0.0f, 0.75f, 0.0f);
-	//glEnd();
-
-	//glFlush();
-
-	//std::vector<uint32_t> colours(rect.Width() * rect.Height());
-
-	//glReadPixels(0, 0, rect.Width(), rect.Height(),
-	//	GL_RGBA,
-	//	GL_UNSIGNED_INT_8_8_8_8,
-	//	colours.data());
-
-
-	//wglMakeCurrent(memDC, m_hrc);
-
-	//wglDeleteContext(m_hrc);
+	int GetBitmap(
+		const RECT * pVisualRect, // прямоугольник в логических единицах отображающий часть 3D-ствола (top,bottom соответствует fTop,fBottom при преобразовании в pMapper)
+		float fTop, float fBottom, // интервал глубин (окно) отображения ствола скважины
+		float fRotation, // дополнительный угол поворота всего ствола вокруг своей оси
+		// совокупно следующие 4 параметра определяют шкалу для отображения ридиусов (как значение радиуса преобразуется в видимую толщину ствола)
+		float fMinRadius, float fMaxRadius, // минимальное и максимальное значение радиуса/диаметра, соответствующее ширине 
+		int nMinRadiusLP, int nMaxRadiusLP, // видимый размер в логических единицах для минимального и максимального радиуса 
+		float fIsometryAngle, // угол изометрической проекции
+		bool bDrawMesh
+	);
 	*/
+
+	m_hiddenDlg.GetBitmap(&rcVisualRect, 420.0f, 500.0f, m_fRotationAngle, 0.0f, 4.1f, 0.0f, float(clientRect.Width()), fIsometryAngle, true);
+	m_hiddenDlg.fillPicture(hDC);
 
 	return;
 

@@ -198,7 +198,6 @@ namespace GraphicControl
 
         auto hOldBmp = SelectObject(MemDC, resultBitmap);
 
-        //StretchBlt(m_saveHDC, 0, 0, m_ptWindow.x, m_ptWindow.y, MemDC, 0, 0, m_ptWindow.x, m_ptWindow.y, SRCCOPY);
         BitBlt(m_saveHDC, 0, 0, m_ptWindow.x, m_ptWindow.y, MemDC, 0, 0, SRCCOPY);
 
         SelectObject(MemDC, hOldBmp);
@@ -268,12 +267,6 @@ namespace GraphicControl
         if (bSizeChanged)
             changeWindowSize(rcWindow);
 
-        if (!(m_bNeedUpdate || bSizeChanged))
-        {
-            Sleep(1);
-            return;
-        }
-
         m_bNeedUpdate = false;
 
         if (rcWindow.IsRectEmpty())
@@ -325,89 +318,3 @@ namespace GraphicControl
         return CWnd::Create(CONTROLGL_CLASSNAME, _T(""), dwStyle, rect, pParentWnd, nID);
     }
 }
-
-/*
-
-    void CRenderView::SnapClient()
-    {
-        BeginWaitCursor();
-     
-       // Получаем геометрию клиента
-       CRect rect;
-       GetClientRect(&rect);
-       CSize size(rect.Width(),rect.Height());
-
-       size.cx -= size.cx % 4;
-     
-       // Количество битов на пиксел для текущего графического устройства
-       int iBitCount = GetDeviceCaps(m_pDC->m_hDC, BITSPIXEL);
-       // Количество цветовых плоскостей для текущего графического устройства
-       int iPlanes = GetDeviceCaps(m_pDC->m_hDC, PLANES);
-     
-       // Рассчитываем кол-во необходимых байт для изображения
-       int NbBytes = (iBitCount/8) * size.cx * size.cy;
-       unsigned char *pPixelData = new unsigned char[NbBytes];
-     
-       // Определим формат копирования (в зависимости от количества битов на пиксел)
-       // Здесь только для 24 и 32 битов. При необходимости можно добавить и для других значений
-       GLenum glFormat;
-       switch(iBitCount)
-       {
-       case 24:
-          glFormat = GL_BGR_EXT;
-          break;
-       case 32:
-          glFormat = GL_BGRA_EXT;
-          break;
-       }
-       // Копируем из OpenGL
-       ::glReadPixels(0,0, size.cx, size.cy, glFormat, GL_UNSIGNED_BYTE, pPixelData);
-     
-       // Заполняем заголовок растрового изображения
-       BITMAPINFOHEADER header;
-       header.biWidth = size.cx;
-       header.biHeight = size.cy;
-       header.biSizeImage = NbBytes;
-       header.biSize = sizeof(BITMAPINFOHEADER);
-       header.biPlanes = iPlanes;
-       header.biBitCount =  iBitCount;
-       header.biCompression = 0;
-       header.biXPelsPerMeter = 0;
-       header.biYPelsPerMeter = 0;
-       header.biClrUsed = 0;
-       header.biClrImportant = 0;
-      
-       // Генерируем handle
-       HANDLE handle = (HANDLE)::GlobalAlloc (GHND, sizeof(BITMAPINFOHEADER) + NbBytes);
-       char *pData;
-       if(handle != NULL)
-       {
-          // Блокируем handle
-          pData = (char *) ::GlobalLock((HGLOBAL)handle);
-          // Копируем заголовок и данные
-          memcpy(pData, &header, sizeof(BITMAPINFOHEADER));
-          memcpy(pData + sizeof(BITMAPINFOHEADER), pPixelData, NbBytes);
-          // Разблокируем
-          ::GlobalUnlock((HGLOBAL)handle);
-
-          // Кладём DIB в clipboard
-          OpenClipboard();
-          EmptyClipboard();
-          SetClipboardData(CF_DIB, handle);
-          CloseClipboard();
-          }
-     
-          CBitmap oBmp;
-          // Создаем растровое изображение, совместимое с графическим устройством
-          // Оно пока не содержит рисунка
-          oBmp.CreateCompatibleBitmap(m_pDC, size.cx, size.cy);
-          // Устанавливаем битовый массив в растровое изображение
-          oBmp.SetBitmapBits(NbBytes, pPixelData);
-     
-          delete [] pPixelData;
-     
-          EndWaitCursor();
-    }
-
-
-*/

@@ -8,8 +8,6 @@ layout(std430, binding = 1) buffer BufferAngle { float m_fAddAngle[]; };
 uniform float m_fPaletteValueMin;
 uniform float m_fPaletteValueMax;
 
-uniform float m_fTop;
-uniform float m_fBottom;
 uniform float m_fRotation;
 uniform float m_fMinRadius;
 uniform float m_fMaxRadius;
@@ -27,12 +25,15 @@ smooth out float fPaletteIndex;
 
 float Pi = 3.1415926;
 
-float getAngle(uint nVertexId_)
+uint getDrift(uint nVertexId_)
 {
-	uint nDrift = nVertexId_ - (nVertexId_ / m_nDriftCount) * uint(m_nDriftCount);
-	return Pi * 2.0 * float(nDrift) / float(m_nDriftCount);
+	return nVertexId_ - (nVertexId_ / m_nDriftCount) * uint(m_nDriftCount);
 }
 
+float getAngle(uint nVertexId_)
+{
+	return Pi * 2.0 * float(getDrift(nVertexId_)) / float(m_nDriftCount);
+}
 
 int positionY()
 {
@@ -43,17 +44,18 @@ void main()
 {
 	uint nVertexId = gl_VertexID - gl_BaseVertex;
 
-	float fRadius = m_fRadius;
+	float fRadius = m_nMinRadiusLP + (m_fRadius - m_fMinRadius) / (m_fMaxRadius - m_fMinRadius) * (m_nMaxRadiusLP - m_nMinRadiusLP);
 
 	vec3 vPosition = vec3(
-		fRadius * sin(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))),
+		fRadius * sin(1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))),
 		m_vDepth[positionY()],
-		fRadius * cos(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)))
+		fRadius * cos(1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)))
 	);
 
 	gl_Position = m_MVP * vec4(vPosition, 1.0);
 
-	gl_Position = vec4(gl_Position.x, gl_Position.y * cos(-m_fIsometryAngle) + gl_Position.z * sin(-m_fIsometryAngle), gl_Position.z, gl_Position.w);
+	//gl_Position = vec4(gl_Position.x, gl_Position.y * cos(-m_fIsometryAngle) + gl_Position.z * sin(-m_fIsometryAngle), gl_Position.z, gl_Position.w);
+	gl_Position = vec4(gl_Position.x, gl_Position.y + gl_Position.z * sin(-m_fIsometryAngle), gl_Position.z, gl_Position.w);
 
 	fPaletteIndex = (m_fRadius - m_fPaletteValueMin) / (m_fPaletteValueMax - m_fPaletteValueMin);
 }

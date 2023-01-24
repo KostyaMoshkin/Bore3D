@@ -396,13 +396,17 @@ namespace GL
     {
         m_bDrawMesh = bDrawMesh;
 
-        m_mPRV = glm::ortho(-fMaxRadius, fMaxRadius, m_fDepthMin, m_fDepthMax, -fMaxRadius, fMaxRadius);
+        float fHalfWidth = float(pVisualRect->right);
+
+        m_mPRV = glm::ortho(
+            float(pVisualRect->left), float(pVisualRect->right), 
+            fTop, fBottom, 
+            -float(pVisualRect->right - pVisualRect->left), float(pVisualRect->right - pVisualRect->left)
+        );
 
         BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
         BufferBounder<RenderBoreSurface> renderBoreBounder(this);
 
-        m_pSufraceProgram->setUniform1f("m_fTop", &fTop);
-        m_pSufraceProgram->setUniform1f("m_fBottom", &fBottom);
         m_pSufraceProgram->setUniform1f("m_fRotation", &fRotation);
         m_pSufraceProgram->setUniform1f("m_fMinRadius", &fMinRadius);
         m_pSufraceProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);
@@ -419,8 +423,6 @@ namespace GL
         BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
         BufferBounder<RenderBoreSurface> renderMeshBoreBounder(this);
 
-        m_pMeshProgram->setUniform1f("m_fTop", &fTop);
-        m_pMeshProgram->setUniform1f("m_fBottom", &fBottom);
         m_pMeshProgram->setUniform1f("m_fRotation", &fRotation);
         m_pMeshProgram->setUniform1f("m_fMinRadius", &fMinRadius);
         m_pMeshProgram->setUniform1f("m_fMaxRadius", &fMaxRadius);

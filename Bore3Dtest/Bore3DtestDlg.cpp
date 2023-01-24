@@ -108,6 +108,7 @@ BOOL CBore3DtestDlg::OnInitDialog()
 
 	m_hiddenDlg.setBkgColor(1, 1, 1);
 	m_hiddenDlg.setMesColor(0, 0, 0);
+	m_hiddenDlg.setZeroLineColor(0.8f, 0.8f, 0.8f, 3);
 
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }

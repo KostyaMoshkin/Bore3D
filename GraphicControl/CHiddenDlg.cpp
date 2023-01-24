@@ -89,6 +89,11 @@ void CHiddenDlg::setMesColor(float r_, float g_, float b_)
     m_controlGL.setMesColor(r_, g_, b_);
 }
 
+void CHiddenDlg::setZeroLineColor(float r_, float g_, float b_, int nWidth_)
+{
+    m_controlGL.setZeroLineColor(r_, g_, b_, nWidth_);
+}
+
 void CHiddenDlg::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);

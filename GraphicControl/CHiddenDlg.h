@@ -47,6 +47,7 @@ public:
 public:
     void setBkgColor(float r_, float g_, float b_);
     void setMesColor(float r_, float g_, float b_);
+    void setZeroLineColor(float r_, float g_, float b_, int nWidth_ = 1);
 
 protected:
     virtual void DoDataExchange(CDataExchange* pDX);	// поддержка DDX/DDV

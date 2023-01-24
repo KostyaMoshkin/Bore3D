@@ -30,6 +30,9 @@ namespace GL
         } DrawElementsIndirectCommand;
 
         std::array<float, 3> m_vBkgColor;
+        std::array<float, 3> m_vMeshColor;
+        std::array<float, 3> m_vZeroLineColor;
+        int m_nZeroLineWidth;
 
         unsigned int m_nVAO;
 
@@ -40,16 +43,20 @@ namespace GL
 
         Matrix4 m_mPRV;
 
-        ShaderProgramPtr m_pSufraceProgram  = nullptr;
-        ShaderProgramPtr m_pMeshProgram     = nullptr;
-        VertexBufferPtr m_VertexBuffer      = nullptr;
-        TextureBufferPtr m_pPaletteBuffer   = nullptr;
-        IndirectBufferPtr m_pSurfaceIndirect = nullptr;
-        IndirectBufferPtr m_pMeshIndirect   = nullptr;
-        IndexBufferPtr m_pSurfaceIndex      = nullptr;
-        IndexBufferPtr m_pMeshIndex         = nullptr;
+        ShaderProgramPtr m_pSufraceProgram        = nullptr;
+        VertexBufferPtr m_VertexBuffer            = nullptr;
+        TextureBufferPtr m_pPaletteBuffer         = nullptr;
+        IndirectBufferPtr m_pSurfaceIndirect      = nullptr;
+        IndexBufferPtr m_pSurfaceIndex            = nullptr;
         ShaderStorageBufferPtr m_pBufferDepth     = nullptr;
         ShaderStorageBufferPtr m_pBufferAngle     = nullptr;
+
+        ShaderProgramPtr    m_pMeshProgram        = nullptr;
+        IndirectBufferPtr   m_pMeshIndirect       = nullptr;
+        IndexBufferPtr      m_pMeshIndex          = nullptr;
+
+        IndirectBufferPtr   m_pDriftIndirect       = nullptr;
+        IndexBufferPtr      m_pDriftIndex          = nullptr;
 
         bool m_bDataInit = false;
         bool m_bMiaInit = false;
@@ -58,6 +65,21 @@ namespace GL
 
     public:
         RenderBoreSurface();
+
+    private:
+        bool setSufraceProgram();
+        bool setVertexBuffer();
+        bool setSurfaceIndirect();
+        bool setSurfaceIndex();
+        bool setBufferDepth();
+        bool setBufferAngle();
+
+        bool setMeshProgram();
+        bool setMeshIndirect();
+        bool setMeshIndex();
+
+        bool setDriftIndirect();
+        bool setDriftIndex();
 
     public:
         // Унаследовано через Render
@@ -93,6 +115,7 @@ namespace GL
     public:
         void setBkgColor(float r_, float g_, float b_);
         void setMesColor(float r_, float g_, float b_);
+        void setZeroLineColor(float r_, float g_, float b_, int nWidth_ = 1);
 
     public:
         static RenderBoreSurfacePtr Create() { return std::make_shared<RenderBoreSurface>(); }

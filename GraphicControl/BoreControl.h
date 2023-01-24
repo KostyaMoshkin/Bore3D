@@ -56,6 +56,7 @@ namespace GraphicControl
 	public:
 		bool setBkgColor(float r_, float g_, float b_);
 		bool setMesColor(float r_, float g_, float b_);
+		bool setZeroLineColor(float r_, float g_, float b_, int nWidth_ = 1);
 
 	private:
 		struct Implementation;

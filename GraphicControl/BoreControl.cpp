@@ -116,4 +116,15 @@ namespace GraphicControl
 
         return true;
     }
+
+    bool BoreControl::setZeroLineColor(float r_, float g_, float b_, int nWidth_)
+    {
+        if (!beginDraw())
+            return false;
+
+        m_pImpl->pRenderBoreSurface->setZeroLineColor(r_, g_, b_, nWidth_);
+        endDraw();
+
+        return true;
+    }
 }

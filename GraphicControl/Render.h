@@ -43,7 +43,7 @@
       using RenderPtr = std::shared_ptr<Render>;
 
       // Класс интерфейс рисования. Для каждой версии OpenGL и для каждой графической сущности свой наследник
-      class Render// : public lib::CConfig
+      class Render
       {
           bool m_bVisible = false;
           int m_nVersionFull = 0;

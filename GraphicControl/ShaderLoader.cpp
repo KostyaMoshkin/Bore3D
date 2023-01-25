@@ -10,19 +10,28 @@
 
 namespace shader {
 
+	static HMODULE GCM()
+	{
+		HMODULE hModule = nullptr;
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)GCM, &hModule);
+
+		return hModule;
+	}
+
 	std::string ShaderLoader::get_ShaderBody(int nhaderResourceID_)
 	{
-		HMODULE handle = ::GetModuleHandleW(NULL);
 
-		if (handle == nullptr)
+		HMODULE hModule = GCM();
+
+		if (hModule == nullptr)
 			return std::string("");
 
-		HRSRC rc = ::FindResource(handle, MAKEINTRESOURCEW(nhaderResourceID_), MAKEINTRESOURCEW(TEXTFILE));
+		HRSRC rc = ::FindResource(hModule, MAKEINTRESOURCEW(nhaderResourceID_), MAKEINTRESOURCEW(TEXTFILE));
 
 		if (rc == nullptr)
 			return std::string("");
 
-		HGLOBAL rcData = ::LoadResource(handle, rc);
+		HGLOBAL rcData = ::LoadResource(hModule, rc);
 
 		if (rcData == nullptr)
 			return std::string("");

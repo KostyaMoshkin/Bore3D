@@ -2,7 +2,7 @@
 // Включаемый файл, созданный в Microsoft Visual C++.
 // Используется Shader.rc
 //
-#define TEXTFILE   256
+#define TEXTFILE						256
 #define IDR_TEXTFILE1                   132
 #define IDR_TEXTFILE2                   133
 #define IDR_TEXTFILE3                   134

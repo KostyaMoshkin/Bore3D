@@ -9,7 +9,7 @@
 
 #include "resource.h"
 
-#include "BoreControl.h"
+#include <memory>
 
 #define IDD_DIALOG_HIDDEN               131
 #define IDC_CUSTOM1                     1009
@@ -18,8 +18,6 @@ class CBore3DtestDlg;
 
 class GRAPHICCONTROL_API CHiddenDlg : public CDialog
 {
-    GraphicControl::BoreControl m_controlGL;
-
 public:
 	enum { IDD = IDD_DIALOG_HIDDEN};
 

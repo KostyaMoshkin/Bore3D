@@ -4,10 +4,14 @@
 #include <IBoreData.h>
 #include <IDiaMapper.h>
 
+#include "BoreControl.h"
+
 #include <memory>
 
 struct CHiddenDlg::Implementation
 {
+    GraphicControl::BoreControl m_controlGL;
+
     std::shared_ptr<DataProvider::BoreData> m_pData = nullptr;
     std::shared_ptr<DataProvider::IDiaMapper> m_pDia = nullptr;
 };
@@ -43,16 +47,16 @@ BOOL CHiddenDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
-    if (!m_controlGL.init())
+    if (!m_pImpl->m_controlGL.init())
         return 0;
 
-    m_controlGL.setBkgColor(1, 1, 1);
-    m_controlGL.setMesColor(0, 0, 0);
+    m_pImpl->m_controlGL.setBkgColor(1, 1, 1);
+    m_pImpl->m_controlGL.setMesColor(0, 0, 0);
 
-    m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 1.0f);
+    m_pImpl->m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 1.0f);
 
     m_pImpl->m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
-    m_controlGL.InitDiaMapper(m_pImpl->m_pDia.get());
+    m_pImpl->m_controlGL.InitDiaMapper(m_pImpl->m_pDia.get());
 
     std::vector<COLORREF> vPalette;
     vPalette.push_back(0x00000000);
@@ -63,42 +67,42 @@ BOOL CHiddenDlg::OnInitDialog()
     vPalette.push_back(0x000000FF);
     vPalette.push_back(0x00FF00FF);
     vPalette.push_back(0x00FFFFFF);
-    m_controlGL.InitPalette(vPalette);
+    m_pImpl->m_controlGL.InitPalette(vPalette);
 
 	return 0;
 }
 
 void CHiddenDlg::fillPicture(HDC hDC_)
 {
-    m_controlGL.fillPicture(hDC_);
+    m_pImpl->m_controlGL.fillPicture(hDC_);
 }
 
 int CHiddenDlg::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
 {
-    m_controlGL.GetBitmap(pVisualRect, fTop, fBottom, fRotation, fMinRadius, fMaxRadius, nMinRadiusLP, nMaxRadiusLP, fIsometryAngle, bDrawMesh);
+    m_pImpl->m_controlGL.GetBitmap(pVisualRect, fTop, fBottom, fRotation, fMinRadius, fMaxRadius, nMinRadiusLP, nMaxRadiusLP, fIsometryAngle, bDrawMesh);
     return 0;
 }
 
 void CHiddenDlg::setBkgColor(float r_, float g_, float b_)
 {
-    m_controlGL.setBkgColor(r_, g_, b_);
+    m_pImpl->m_controlGL.setBkgColor(r_, g_, b_);
 }
 
 void CHiddenDlg::setMesColor(float r_, float g_, float b_)
 {
-    m_controlGL.setMesColor(r_, g_, b_);
+    m_pImpl->m_controlGL.setMesColor(r_, g_, b_);
 }
 
 void CHiddenDlg::setZeroLineColor(float r_, float g_, float b_, int nWidth_)
 {
-    m_controlGL.setZeroLineColor(r_, g_, b_, nWidth_);
+    m_pImpl->m_controlGL.setZeroLineColor(r_, g_, b_, nWidth_);
 }
 
 void CHiddenDlg::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);
 
-    DDX_Control(pDX, IDC_CUSTOM1, m_controlGL);
+    DDX_Control(pDX, IDC_CUSTOM1, m_pImpl->m_controlGL);
 }
 
 void CHiddenDlg::OnSize(UINT nType, int cx, int cy)

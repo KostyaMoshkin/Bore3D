@@ -216,10 +216,6 @@
     <ResourceCompile Include="Bore3Dtest.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\GraphicControl\Shader\bore_fragment.shader" />
-    <None Include="..\GraphicControl\Shader\bore_vertex.shader" />
-    <None Include="..\GraphicControl\Shader\mesh_fragment.shader" />
-    <None Include="..\GraphicControl\Shader\mesh_vertex.shader" />
     <None Include="res\Bore3Dtest.rc2" />
   </ItemGroup>
   <ItemGroup>

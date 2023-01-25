@@ -9,11 +9,6 @@
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG1                     130
 #define IDD_DIALOG_HIDDEN               131
-#define IDR_TEXTFILE1                   132
-#define IDR_TEXTFILE2                   133
-#define IDR_TEXTFILE3                   134
-#define IDR_TEXTFILE4                   135
-#define TEXTFILE                        256
 #define IDC_PICTURE                     1000
 #define IDC_BUTTON_TEST_GL              1001
 #define IDC_PICTURE_BOX                 1003

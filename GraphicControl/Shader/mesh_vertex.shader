@@ -27,7 +27,7 @@ uint getDrift(uint nVertexId_)
 
 float getAngle(uint nVertexId_)
 {
-	return Pi * 2.0 * float(getDrift(nVertexId_)) / float(m_nDriftCount);
+	return 360.0 * float(getDrift(nVertexId_)) / float(m_nDriftCount);
 }
 
 int positionY()
@@ -42,10 +42,13 @@ void main()
 	float fRadius = m_nMinRadiusLP + (m_fRadius - m_fMinRadius) / (m_fMaxRadius - m_fMinRadius) * (m_nMaxRadiusLP - m_nMinRadiusLP);
 	fRadius *= 1.001;
 
+	float fRriftAndleGrad = m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId);
+	float fDriftAngle = Pi * 2.0 / 360.0 * fRriftAndleGrad;
+
 	vec3 vPosition = vec3(
-		fRadius * sin(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))),
+		fRadius * sin(-1.0 * fDriftAngle),
 		m_vDepth[positionY()],
-		fRadius * cos(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)))
+		fRadius * cos(-1.0 * fDriftAngle)
 	);
 
 	gl_Position = m_MVP * vec4(vPosition, 1.0);

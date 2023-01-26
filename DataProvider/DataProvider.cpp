@@ -64,7 +64,7 @@ namespace DataProvider
 
         geoPoint_.vvfDistance.push_back(vDistance);
 
-        float fRandomRotaion = 1.0f * std::rand() / RAND_MAX * 2.0f * 3.14159f / 360.0f * 5.0f;
+        float fRandomRotaion = 1.0f * std::rand() / RAND_MAX * 5.0f;
 
         geoPoint_.vfRotation.push_back(fRandomRotaion);
     }

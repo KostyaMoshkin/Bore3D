@@ -182,9 +182,9 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	rcVisualRect.top = 0;
 	rcVisualRect.bottom = clientRect.Height();
 
-	m_fRotationAngle += 3.1415926f / 100.0f;
+	m_fRotationAngle += 360.0f / 30.0f;
 
-	float fIsometryAngle = 2.0f * 3.14f / 360.0f * 15.0f + m_fRotationAngle / 5.0f;
+	float fIsometryAngle = 15.0f + m_fRotationAngle / 50.0f;
 
 	/*
 	int GetBitmap(

@@ -43,9 +43,9 @@ void main()
 	fRadius *= 1.001;
 
 	vec3 vPosition = vec3(
-		fRadius * sin(1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))),
+		fRadius * sin(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId))),
 		m_vDepth[positionY()],
-		fRadius * cos(1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)))
+		fRadius * cos(-1.0 * (m_fAddAngle[positionY()] + m_fRotation + getAngle(nVertexId)))
 	);
 
 	gl_Position = m_MVP * vec4(vPosition, 1.0);

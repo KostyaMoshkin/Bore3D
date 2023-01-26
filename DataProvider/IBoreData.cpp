@@ -4,38 +4,38 @@
 
 namespace DataProvider
 {
-	BoreData::BoreData(const char* sFileName_)
+	IBoreData::IBoreData(const char* sFileName_)
 	{
 		m_dataProvider.init(sFileName_);
 	}
 
-	BoreData::~BoreData()
+	IBoreData::~IBoreData()
 	{
 
 	}
 
-	int BoreData::GetCurveCount()  
+	int IBoreData::GetCurveCount()  
 	{ 
 		return (int)m_dataProvider.getData()->vfDepth.size();
 	} // возвращает кол-во кривых радиусов
 
-	const std::vector<float>& BoreData::GetDepths() 
+	const std::vector<float>& IBoreData::GetDepths() 
 	{ 
 		std::vector<float> a; 
 		return m_dataProvider.getData()->vfDepth;
 	} // возвращает монотонный массив глубин  (возрастающий или убывающий)
 
-	const std::vector<float>& BoreData::GetRadiusCurve(int iRadius) 
+	const std::vector<float>& IBoreData::GetRadiusCurve(int iRadius) 
 	{ 
 		return m_dataProvider.getData()->vvfDistance[iRadius];
 	} // возвращает массив значений i-го радиуса по глубинам, соответствующий массиву глубин
 
-	const std::vector<float>& BoreData::GetRotation() 
+	const std::vector<float>& IBoreData::GetRotation() 
 	{ 
 		return m_dataProvider.getData()->vfRotation;
 	} // возвращает массив углов (в градусах) поворота первого радиуса относительно направления на север
 
-	bool BoreData::IsDiameters()  
+	bool IBoreData::IsDiameters()  
 	{ 
 		return false; 
 	} // возвращает true, если кривые представляют из себя удвоенные радиусы, иначе просто радиусы

@@ -12,14 +12,14 @@ struct CHiddenDlg::Implementation
 {
     GraphicControl::BoreControl m_controlGL;
 
-    std::shared_ptr<DataProvider::BoreData> m_pData = nullptr;
+    std::shared_ptr<DataProvider::IBoreData> m_pData = nullptr;
     std::shared_ptr<DataProvider::IDiaMapper> m_pDia = nullptr;
 };
 
 CHiddenDlg::CHiddenDlg()
 {
     m_pImpl = std::make_shared<Implementation>();
-    m_pImpl->m_pData = std::make_shared<DataProvider::BoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+    m_pImpl->m_pData = std::make_shared<DataProvider::IBoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
     m_pImpl->m_pDia = std::make_shared<DataProvider::IDiaMapper>();
 }
 
@@ -49,9 +49,6 @@ BOOL CHiddenDlg::OnInitDialog()
 
     if (!m_pImpl->m_controlGL.init())
         return 0;
-
-    m_pImpl->m_controlGL.setBkgColor(1, 1, 1);
-    m_pImpl->m_controlGL.setMesColor(0, 0, 0);
 
     m_pImpl->m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 1.0f);
 

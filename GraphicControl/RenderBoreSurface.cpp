@@ -11,7 +11,7 @@ namespace GL
 {
     struct RenderBoreSurface::Implementation
     {
-        DataProvider::BoreData* pData = nullptr;
+        DataProvider::IBoreData* pData = nullptr;
         DataProvider::IDiaMapper* pMapper = nullptr;
 
         float fLogPerPixel;
@@ -397,7 +397,7 @@ namespace GL
 
     bool RenderBoreSurface::InitBore3D(void* pData_, float fLogPerPixel_)
     {
-        m_pImpl->pData = (DataProvider::BoreData*) pData_;
+        m_pImpl->pData = (DataProvider::IBoreData*) pData_;
 
         m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();
 
@@ -518,7 +518,11 @@ namespace GL
 
         for (int i = 0; i < m_pImpl->nCurveCount; ++i)
         {
-            m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
+            if (m_pImpl->pData->IsDiameters())
+                m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]) / 2;
+            else
+                m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
+
             m_fDepthMin = std::min(m_fDepthMin, m_pImpl->vDepths[i]);
             m_fDepthMax = std::max(m_fDepthMax, m_pImpl->vDepths[i]);
         }

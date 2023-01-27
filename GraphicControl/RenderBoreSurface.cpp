@@ -481,6 +481,9 @@ namespace GL
 
     bool RenderBoreSurface::InitPalette(const std::vector<COLORREF>& vecPalette_)
     {
+        if (vecPalette_.size() < 1)
+            return false;
+
         const COLORREF rgbRed   = 0x000000FF;
         const COLORREF rgbGreen = 0x0000FF00;
         const COLORREF rgbBlue  = 0x00FF0000;
@@ -496,6 +499,12 @@ namespace GL
             vPalette[i][1] = (float)((vecPalette_[i] & rgbGreen)     >> 8 ) / 255;
             vPalette[i][2] = (float)((vecPalette_[i] & rgbBlue)      >> 16) / 255;
         }
+
+        float fPalleteLimit = 1.0f / vPalette.size() / 2;
+
+        BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
+
+        m_pSufraceProgram->setUniform1f("m_fPalleteLimit", &fPalleteLimit);
 
         //----------------------------------------------------------------------------------
 

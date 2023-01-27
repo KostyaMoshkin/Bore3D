@@ -17,13 +17,13 @@
 
 class CBore3DtestDlg;
 
-class GRAPHICCONTROL_API CHiddenDlg : public CDialog
+class GRAPHICCONTROL_API CBoreDlg : public CDialog
 {
 public:
 	enum { IDD = IDD_DIALOG_HIDDEN};
 
-	CHiddenDlg();
-	~CHiddenDlg();
+	CBoreDlg();
+	~CBoreDlg();
 
 public:
     BOOL Create(LPCSTR DialogName, CWnd* Owner = 0);

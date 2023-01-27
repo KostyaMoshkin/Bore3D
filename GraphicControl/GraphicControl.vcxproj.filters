@@ -74,7 +74,7 @@
     <ClInclude Include="RenderBoreSurface.h">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="CHiddenDlg.h">
+    <ClInclude Include="CBoreDlg.h">
       <Filter>HiddenDialog</Filter>
     </ClInclude>
     <ClInclude Include="Render.h">
@@ -125,7 +125,7 @@
     <ClCompile Include="RenderBoreSurface.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="CHiddenDlg.cpp">
+    <ClCompile Include="CBoreDlg.cpp">
       <Filter>HiddenDialog</Filter>
     </ClCompile>
     <ClCompile Include="Render.cpp">

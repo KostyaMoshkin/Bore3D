@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <CHiddenDlg.h>
+#include <CBoreDlg.h>
 
 #include <IBoreData.h>
 #include <IDiaMapper.h>
@@ -8,10 +8,9 @@
 // Диалоговое окно CBore3DtestDlg
 class CBore3DtestDlg : public CDialogEx
 {
-
 	CWnd* m_pParent;
 
-	CHiddenDlg m_hiddenDlg;
+	CBoreDlg m_boreGL;
 
 	float m_fRotationAngle = 0;
 
@@ -30,7 +29,6 @@ public:
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// поддержка DDX/DDV
-
 
 // Реализация
 protected:

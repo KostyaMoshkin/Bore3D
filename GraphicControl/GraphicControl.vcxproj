@@ -158,7 +158,7 @@
     <ClInclude Include="BoreControl.h" />
     <ClInclude Include="BufferBounder.h" />
     <ClInclude Include="BufferOpenGL.h" />
-    <ClInclude Include="CHiddenDlg.h" />
+    <ClInclude Include="CBoreDlg.h" />
     <ClInclude Include="ControlGL.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="IndexBuffer.h" />
@@ -177,7 +177,7 @@
   <ItemGroup>
     <ClCompile Include="BoreControl.cpp" />
     <ClCompile Include="BufferOpenGL.cpp" />
-    <ClCompile Include="CHiddenDlg.cpp" />
+    <ClCompile Include="CBoreDlg.cpp" />
     <ClCompile Include="ControlGL.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />

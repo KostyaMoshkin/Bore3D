@@ -33,12 +33,6 @@ namespace GraphicControl
 			void* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пиксел€ми)
 			);
 
-		//bool InitWindow(
-		//	HWND hWnd, // хэндл скрытого окна дл€ проведени€ теневых отрисовок в OpenGL (если надо)
-		//	int nWidth,
-		//	int nHeight
-		//);
-
 		// палитра цветов, "нат€гиваема€" на диапозон значений радиусов fMinRadius, fMaxRadius);
 		bool InitPalette(const std::vector<COLORREF>& vecPalette);
 

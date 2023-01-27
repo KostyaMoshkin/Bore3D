@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "CHiddenDlg.h"
 
-#include <IBoreData.h>
-#include <IDiaMapper.h>
-
 #include "BoreControl.h"
 
 #include <memory>
@@ -11,16 +8,11 @@
 struct CHiddenDlg::Implementation
 {
     GraphicControl::BoreControl m_controlGL;
-
-    std::shared_ptr<DataProvider::IBoreData> m_pData = nullptr;
-    std::shared_ptr<DataProvider::IDiaMapper> m_pDia = nullptr;
 };
 
 CHiddenDlg::CHiddenDlg()
 {
     m_pImpl = std::make_shared<Implementation>();
-    m_pImpl->m_pData = std::make_shared<DataProvider::IBoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
-    m_pImpl->m_pDia = std::make_shared<DataProvider::IDiaMapper>();
 }
 
 CHiddenDlg::~CHiddenDlg()
@@ -50,28 +42,27 @@ BOOL CHiddenDlg::OnInitDialog()
     if (!m_pImpl->m_controlGL.init())
         return 0;
 
-    m_pImpl->m_controlGL.InitBore3D(m_pImpl->m_pData.get(), 1.0f);
-
-    m_pImpl->m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
-    m_pImpl->m_controlGL.InitDiaMapper(m_pImpl->m_pDia.get());
-
-    std::vector<COLORREF> vPalette;
-    vPalette.push_back(0x00000000);
-    vPalette.push_back(0x00FF0000);
-    vPalette.push_back(0x00FFFF00);
-    vPalette.push_back(0x0000FF00);
-    vPalette.push_back(0x0000FFFF);
-    vPalette.push_back(0x000000FF);
-    vPalette.push_back(0x00FF00FF);
-    vPalette.push_back(0x00FFFFFF);
-    m_pImpl->m_controlGL.InitPalette(vPalette);
-
 	return 0;
 }
 
 void CHiddenDlg::fillPicture(HDC hDC_)
 {
     m_pImpl->m_controlGL.fillPicture(hDC_);
+}
+
+bool CHiddenDlg::InitBore3D(void* pData, float fLogPerPixel)
+{
+    return m_pImpl->m_controlGL.InitBore3D(pData, fLogPerPixel);
+}
+
+void CHiddenDlg::InitDiaMapper(void* pMapper_)
+{
+    m_pImpl->m_controlGL.InitDiaMapper(pMapper_);
+}
+
+bool CHiddenDlg::InitPalette(const std::vector<COLORREF>& vecPalette)
+{
+    return m_pImpl->m_controlGL.InitPalette(vecPalette);
 }
 
 int CHiddenDlg::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)

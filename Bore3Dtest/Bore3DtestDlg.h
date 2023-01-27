@@ -2,6 +2,9 @@
 
 #include <CHiddenDlg.h>
 
+#include <IBoreData.h>
+#include <IDiaMapper.h>
+
 // Диалоговое окно CBore3DtestDlg
 class CBore3DtestDlg : public CDialogEx
 {
@@ -11,6 +14,9 @@ class CBore3DtestDlg : public CDialogEx
 	CHiddenDlg m_hiddenDlg;
 
 	float m_fRotationAngle = 0;
+
+	std::shared_ptr<DataProvider::IBoreData> m_pData = nullptr;
+	std::shared_ptr<DataProvider::IDiaMapper> m_pDia = nullptr;
 
 	// Создание
 public:

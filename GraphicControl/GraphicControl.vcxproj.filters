@@ -12,9 +12,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="BoreControl">
-      <UniqueIdentifier>{9431189c-ff1b-4454-9366-d2a5f71446db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="OpenGL">
       <UniqueIdentifier>{4e7a5b2e-0108-4ed1-8f76-ea9e558207b0}</UniqueIdentifier>
     </Filter>
@@ -26,6 +23,9 @@
     </Filter>
     <Filter Include="Shader">
       <UniqueIdentifier>{b2505a56-f07f-4052-8974-f04963b1e027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bore">
+      <UniqueIdentifier>{9431189c-ff1b-4454-9366-d2a5f71446db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,7 +39,7 @@
       <Filter>Базовые файлы</Filter>
     </ClInclude>
     <ClInclude Include="BoreControl.h">
-      <Filter>BoreControl</Filter>
+      <Filter>Bore</Filter>
     </ClInclude>
     <ClInclude Include="IndexBuffer.h">
       <Filter>OpenGL</Filter>
@@ -93,7 +93,7 @@
       <Filter>ControlGL</Filter>
     </ClCompile>
     <ClCompile Include="BoreControl.cpp">
-      <Filter>BoreControl</Filter>
+      <Filter>Bore</Filter>
     </ClCompile>
     <ClCompile Include="BufferOpenGL.cpp">
       <Filter>OpenGL</Filter>

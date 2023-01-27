@@ -104,7 +104,26 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Крупный значок
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
-	m_hiddenDlg.Create("SAMPLEDIALOG", this);
+	m_pData = std::make_shared<DataProvider::IBoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+	m_pDia = std::make_shared<DataProvider::IDiaMapper>();
+
+	m_hiddenDlg.Create("OPENGL DIALOG", this);
+
+	m_hiddenDlg.InitBore3D(m_pData.get(), 1.0f);
+
+	m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
+	m_hiddenDlg.InitDiaMapper(m_pDia.get());
+
+	std::vector<COLORREF> vPalette;
+	vPalette.push_back(0x00000000);
+	vPalette.push_back(0x00FF0000);
+	vPalette.push_back(0x00FFFF00);
+	vPalette.push_back(0x0000FF00);
+	vPalette.push_back(0x0000FFFF);
+	vPalette.push_back(0x000000FF);
+	vPalette.push_back(0x00FF00FF);
+	vPalette.push_back(0x00FFFFFF);
+	m_hiddenDlg.InitPalette(vPalette);
 
 	m_hiddenDlg.setBkgColor(1, 1, 1);
 	m_hiddenDlg.setMesColor(0, 0, 0);
@@ -171,10 +190,9 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	HDC hDC = *pCHC;
 
 	CRect clientRect;
-	//pWnd->GetWindowRect(&rect);
 	pWnd->GetClientRect(&clientRect);
 
-	m_hiddenDlg.SetWindowPos(NULL, 0, 0, clientRect.Width(), clientRect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE); //
+	m_hiddenDlg.SetWindowPos(NULL, 0, 0, clientRect.Width(), clientRect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
 
 	RECT rcVisualRect;
 	rcVisualRect.left = -clientRect.Width();
@@ -190,5 +208,4 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	m_hiddenDlg.fillPicture(hDC);
 
 	return;
-
 }

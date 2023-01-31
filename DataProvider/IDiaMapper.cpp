@@ -3,43 +3,43 @@
 
 namespace DataProvider
 {
-	IDiaMapper::IDiaMapper() {}
-	IDiaMapper::~IDiaMapper() {}
+	//IDiaMapper::IDiaMapper() {}
+	//IDiaMapper::~IDiaMapper() {}
 
-	float IDiaMapper::GeoToLP(float x)
-	{
-		return x * m_fK + m_fX0;
-	}
+	//float IDiaMapper::GeoToLP(float x)
+	//{
+	//	return x * m_fK + m_fX0;
+	//}
 
-	float IDiaMapper::LPToGeo(float x)
-	{ 
-		return x;
-	}
+	//float IDiaMapper::LPToGeo(float x)
+	//{ 
+	//	return x;
+	//}
 
-	void IDiaMapper::SetGeo0LP0(float Geo0, float LP0)
-	{
-		m_fX0 = -log10(Geo0) * m_fK + LP0;
-	}
+	//void IDiaMapper::SetGeo0LP0(float Geo0, float LP0)
+	//{
+	//	m_fX0 = -log10(Geo0) * m_fK + LP0;
+	//}
 
-	void IDiaMapper::SetGeoRangeLPRange(float Geo0, float Geo1, float LP0, float LP1)
-	{ 
-		m_fK = (LP1 - LP0) / (log10(Geo1) - log10(Geo0));
-		SetGeo0LP0(Geo0, LP0);
-	}
+	//void IDiaMapper::SetGeoRangeLPRange(float Geo0, float Geo1, float LP0, float LP1)
+	//{ 
+	//	m_fK = (LP1 - LP0) / (log10(Geo1) - log10(Geo0));
+	//	SetGeo0LP0(Geo0, LP0);
+	//}
 
-	void IDiaMapper::SetLog(bool bLogScale) 
-	{
-		return; 
-	}
-	void IDiaMapper::Move(float xOffset)
-	{ 
-		return; 
-	}
+	//void IDiaMapper::SetLog(bool bLogScale) 
+	//{
+	//	return; 
+	//}
+	//void IDiaMapper::Move(float xOffset)
+	//{ 
+	//	return; 
+	//}
 
-	int IDiaMapper::GetForm() 
-	{ 
-		return 0; 
-	}
+	//int IDiaMapper::GetForm() 
+	//{ 
+	//	return 0; 
+	//}
 
 }
 /*

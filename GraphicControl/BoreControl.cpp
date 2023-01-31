@@ -48,7 +48,7 @@ namespace GraphicControl
         return bResult;
     }
 
-    bool BoreControl::InitBore3D(void* pData, float fLogPerPixel)
+    bool BoreControl::InitBore3D(IBoreData* pData, float fLogPerPixel)
     {
         needUpdate();
 
@@ -61,7 +61,7 @@ namespace GraphicControl
         return true;
     }
 
-    void BoreControl::InitDiaMapper(void* pMapper_)
+    void BoreControl::InitDiaMapper(IDiaMapper* pMapper_)
     {
         if (!beginDraw())
             return;

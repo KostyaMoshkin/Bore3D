@@ -103,8 +103,8 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Крупный значок
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
-	m_pData = std::make_shared<DataProvider::IBoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
-	m_pDia = std::make_shared<DataProvider::IDiaMapper>();
+	m_pData = std::make_shared<BoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+	m_pDia = std::make_shared<DiaMapper>();
 
 	m_boreGL.Create("OPENGL DIALOG", this);
 

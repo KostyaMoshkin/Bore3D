@@ -11,8 +11,8 @@ namespace GL
 {
     struct RenderBoreSurface::Implementation
     {
-        DataProvider::IBoreData* pData = nullptr;
-        DataProvider::IDiaMapper* pMapper = nullptr;
+        IBoreData* pData = nullptr;
+        IDiaMapper* pMapper = nullptr;
 
         float fLogPerPixel;
 
@@ -395,9 +395,9 @@ namespace GL
         renderBounder.unbound();
     }
 
-    bool RenderBoreSurface::InitBore3D(void* pData_, float fLogPerPixel_)
+    bool RenderBoreSurface::InitBore3D(IBoreData* pData_, float fLogPerPixel_)
     {
-        m_pImpl->pData = (DataProvider::IBoreData*) pData_;
+        m_pImpl->pData = pData_;
 
         m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();
 
@@ -518,12 +518,12 @@ namespace GL
         return true;
     }
 
-    bool RenderBoreSurface::InitDiaMapper(void* pMapper_)
+    bool RenderBoreSurface::InitDiaMapper(IDiaMapper* pMapper_)
     {
         m_fDepthMin = std::numeric_limits<float>::max();
         m_fDepthMax = -std::numeric_limits<float>::max();
 
-        m_pImpl->pMapper = (DataProvider::IDiaMapper *)pMapper_;
+        m_pImpl->pMapper = pMapper_;
 
         for (int i = 0; i < m_pImpl->nCurveCount; ++i)
         {

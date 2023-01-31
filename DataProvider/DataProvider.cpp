@@ -84,8 +84,14 @@ namespace DataProvider
 
         std::string sLine;
 
+        int i = 0;
+
         while (std::getline(file, sLine))
+        {
             addGeoPoint(m_data, sLine);
+            if (++i > 200)
+                break;
+        }
 
         file.close();
 

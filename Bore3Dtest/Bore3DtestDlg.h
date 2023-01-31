@@ -2,8 +2,8 @@
 
 #include <CBoreDlg.h>
 
-#include <IBoreData.h>
-#include <IDiaMapper.h>
+#include "BoreData.h"
+#include "DiaMapper.h"
 
 // Диалоговое окно CBore3DtestDlg
 class CBore3DtestDlg : public CDialogEx
@@ -14,8 +14,8 @@ class CBore3DtestDlg : public CDialogEx
 
 	float m_fRotationAngle = 0;
 
-	std::shared_ptr<DataProvider::IBoreData> m_pData = nullptr;
-	std::shared_ptr<DataProvider::IDiaMapper> m_pDia = nullptr;
+	std::shared_ptr<BoreData> m_pData = nullptr;
+	std::shared_ptr<DiaMapper> m_pDia = nullptr;
 
 	// Создание
 public:

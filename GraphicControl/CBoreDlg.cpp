@@ -50,12 +50,12 @@ void CBoreDlg::fillPicture(HDC hDC_)
     m_pImpl->m_controlGL.fillPicture(hDC_);
 }
 
-bool CBoreDlg::InitBore3D(void* pData, float fLogPerPixel)
+bool CBoreDlg::InitBore3D(IBoreData* pData, float fLogPerPixel)
 {
     return m_pImpl->m_controlGL.InitBore3D(pData, fLogPerPixel);
 }
 
-void CBoreDlg::InitDiaMapper(void* pMapper_)
+void CBoreDlg::InitDiaMapper(IDiaMapper* pMapper_)
 {
     m_pImpl->m_controlGL.InitDiaMapper(pMapper_);
 }

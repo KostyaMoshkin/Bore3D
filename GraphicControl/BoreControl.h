@@ -3,6 +3,9 @@
 
 #include "ControlGL.h"
 
+#include <IBoreData.h>
+#include <IDiaMapper.h>
+
 #include <array>
 #include <vector>
 #include <memory>
@@ -25,12 +28,12 @@ namespace GraphicControl
 		// прототип метода дл€ отображени€ части 3D-ствола скважины в bitmap
 		// 
 		bool InitBore3D(
-			void* pData, // интерфейс доступа к данным развЄртки
+			IBoreData* pData, // интерфейс доступа к данным развЄртки
 			float fLogPerPixel // коэффициент соотношени€ между логическими единицами (используютс€ маппером) и пиксел€ми экрана
 		);
 
 		void InitDiaMapper(
-			void* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пиксел€ми)
+			IDiaMapper* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пиксел€ми)
 			);
 
 		// палитра цветов, "нат€гиваема€" на диапозон значений радиусов fMinRadius, fMaxRadius);

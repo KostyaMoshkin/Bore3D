@@ -10,6 +10,9 @@
 #include "IndirectBuffer.h"
 #include "ShaderStorageBuffer.h"
 
+#include <IBoreData.h>
+#include <IDiaMapper.h>
+
 #include <array>
 
 namespace GL
@@ -91,14 +94,14 @@ namespace GL
     public:
         // прототип метода для отображения части 3D-ствола скважины в bitmap
         bool InitBore3D(
-            void* pData_, // интерфейс доступа к данным развёртки
+            IBoreData* pData_, // интерфейс доступа к данным развёртки
             float fLogPerPixel_ // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
         );
 
         bool InitPalette(const std::vector<COLORREF>& vecPalette_);
 
         bool InitDiaMapper(
-            void* pMapper_  // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
+            IDiaMapper* pMapper_  // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
         );
 
         int GetBitmap(

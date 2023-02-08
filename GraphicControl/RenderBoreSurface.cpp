@@ -552,7 +552,7 @@ namespace GL
 
         m_mPRV = glm::ortho(
             float(pVisualRect->left), float(pVisualRect->right), 
-            (float)m_pImpl->pMapper->LPToGeo(pVisualRect->top), (float)m_pImpl->pMapper->LPToGeo(pVisualRect->bottom),
+            m_pImpl->pMapper->LPToGeo((float)pVisualRect->top), m_pImpl->pMapper->LPToGeo((float)pVisualRect->bottom),
             -float(pVisualRect->right - pVisualRect->left), float(pVisualRect->right - pVisualRect->left)
         );
 

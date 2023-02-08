@@ -49,10 +49,12 @@ END_MESSAGE_MAP()
 
 
 CBore3DtestDlg::CBore3DtestDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_BORE3DTEST_DIALOG, pParent), m_boreGL()
+	: CDialogEx(IDD_BORE3DTEST_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_pParent = pParent;
+
+	m_boreGL = IBore3D::Create3DBore();
 }
 
 CBore3DtestDlg::~CBore3DtestDlg()
@@ -106,12 +108,12 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	m_pData = std::make_shared<BoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
 	m_pDia = std::make_shared<DiaMapper>();
 
-	m_boreGL.Create("OPENGL DIALOG", this);
+	m_boreGL->Create("OPENGL DIALOG", this->GetSafeHwnd());
 
-	m_boreGL.InitBore3D(m_pData.get(), 1.0f);
+	m_boreGL->InitBore3D(m_pData.get(), 1.0f);
 
 	m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
-	m_boreGL.InitDiaMapper(m_pDia.get());
+	m_boreGL->InitDiaMapper(m_pDia.get());
 
 	std::vector<COLORREF> vPalette;
 	vPalette.push_back(0x00000000);
@@ -122,11 +124,11 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	vPalette.push_back(0x000000FF);
 	vPalette.push_back(0x00FF00FF);
 	vPalette.push_back(0x00FFFFFF);
-	m_boreGL.InitPalette(vPalette);
+	m_boreGL->InitPalette(vPalette);
 
-	m_boreGL.setBkgColor(1, 1, 1);
-	m_boreGL.setMesColor(0, 0, 0);
-	m_boreGL.setZeroLineColor(0.8f, 0.8f, 0.8f, 3);
+	m_boreGL->setBkgColor(1, 1, 1);
+	m_boreGL->setMesColor(0, 0, 0);
+	m_boreGL->setZeroLineColor(0.8f, 0.8f, 0.8f, 3);
 
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
@@ -191,7 +193,7 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	CRect clientRect;
 	pWnd->GetClientRect(&clientRect);
 
-	m_boreGL.SetWindowPos(NULL, 0, 0, clientRect.Width(), clientRect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
+	m_boreGL->SetPosition(clientRect.Width(), clientRect.Height());
 
 	RECT rcVisualRect;
 	rcVisualRect.left = -clientRect.Width();
@@ -203,8 +205,8 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 
 	float fIsometryAngle = 15.0f + m_fRotationAngle / 50.0f;
 
-	m_boreGL.GetBitmap(&rcVisualRect, 420.0f, 500.0f, m_fRotationAngle, 0.0f, 4.1f, 0, clientRect.Width(), fIsometryAngle, true);
-	m_boreGL.fillPicture(hDC);
+	m_boreGL->GetBitmap(&rcVisualRect, m_fRotationAngle, 2.0f, 4.1f, 0, clientRect.Width(), fIsometryAngle, true);
+	m_boreGL->fillPicture(hDC);
 
 	return;
 }

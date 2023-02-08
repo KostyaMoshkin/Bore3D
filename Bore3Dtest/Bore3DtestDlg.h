@@ -1,16 +1,18 @@
 ﻿#pragma once
 
-#include <CBoreDlg.h>
+#include "IBore3D.h"
 
 #include "BoreData.h"
 #include "DiaMapper.h"
+
+#include <memory>
 
 // Диалоговое окно CBore3DtestDlg
 class CBore3DtestDlg : public CDialogEx
 {
 	CWnd* m_pParent;
 
-	CBoreDlg m_boreGL;
+	IBore3D* m_boreGL;
 
 	float m_fRotationAngle = 0;
 

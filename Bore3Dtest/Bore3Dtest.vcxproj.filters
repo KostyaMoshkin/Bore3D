@@ -39,6 +39,9 @@
     <ClInclude Include="DiaMapper.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="IBore3D.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bore3Dtest.cpp">

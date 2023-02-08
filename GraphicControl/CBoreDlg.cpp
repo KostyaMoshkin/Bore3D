@@ -65,9 +65,9 @@ bool CBoreDlg::InitPalette(const std::vector<COLORREF>& vecPalette)
     return m_pImpl->m_controlGL.InitPalette(vecPalette);
 }
 
-int CBoreDlg::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
+int CBoreDlg::GetBitmap(const RECT* pVisualRect, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
 {
-    m_pImpl->m_controlGL.GetBitmap(pVisualRect, fTop, fBottom, fRotation, fMinRadius, fMaxRadius, nMinRadiusLP, nMaxRadiusLP, fIsometryAngle, bDrawMesh);
+    m_pImpl->m_controlGL.GetBitmap(pVisualRect, fRotation, fMinRadius, fMaxRadius, nMinRadiusLP, nMaxRadiusLP, fIsometryAngle, bDrawMesh);
     return 0;
 }
 
@@ -99,6 +99,24 @@ void CBoreDlg::OnSize(UINT nType, int cx, int cy)
         return;
 
     GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOZORDER);
+}
+
+BOOL CBoreDlg::Create(LPCSTR DialogName, HWND hwndOwner)
+{
+    return Create(DialogName, CWnd::FromHandle(hwndOwner));
+}
+
+void CBoreDlg::SetPosition(int cx, int cy)
+{
+    if (!GetDlgItem(IDC_CUSTOM1))
+        return;
+
+    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOZORDER);
+}
+
+IBore3D* IBore3D::Create3DBore()
+{
+    return static_cast<IBore3D*>(new CBoreDlg());
 }
 
 BEGIN_MESSAGE_MAP(CBoreDlg, CDialog)

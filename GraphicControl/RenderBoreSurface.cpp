@@ -417,19 +417,12 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        float fRadiusMin = std::numeric_limits<float>::max();
-        float fRadiusMax = -std::numeric_limits<float>::max();
-
         for (int i = 0; i < m_pImpl->nCurveCount; ++i)
         {
             m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
 
             for (int j = 0; j < m_pImpl->nDriftCount; ++j)
-            {
-                m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
-                fRadiusMin = std::min(fRadiusMin, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
-                fRadiusMax = std::max(fRadiusMax, m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j]);
-            }
+                m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]) * fLogPerPixel_;
         }
 
         BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
@@ -439,11 +432,6 @@ namespace GL
             return false;
 
         renderBoreBounder.unbound();
-
-        //----------------------------------------------------------------------------------
-
-        m_pSufraceProgram->setUniform1f("m_fPaletteValueMin", &fRadiusMin);
-        m_pSufraceProgram->setUniform1f("m_fPaletteValueMax", &fRadiusMax);
 
         //----------------------------------------------------------------------------------
 
@@ -489,7 +477,7 @@ namespace GL
         const COLORREF rgbBlue  = 0x00FF0000;
 
         std::vector<float[3]> vPalette(vecPalette_.size());
-        for (int i = 0; i < vPalette.size(); ++i)
+        for (size_t i = 0; i < vPalette.size(); ++i)
         {
             auto a = (vecPalette_[i] & rgbGreen);
             auto b = (vecPalette_[i] & rgbGreen) >> 8;
@@ -556,7 +544,7 @@ namespace GL
     }
 
 
-    int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fTop, float fBottom, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
+    int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
         m_bDrawMesh = bDrawMesh;
 
@@ -564,7 +552,7 @@ namespace GL
 
         m_mPRV = glm::ortho(
             float(pVisualRect->left), float(pVisualRect->right), 
-            fTop, fBottom, 
+            (float)m_pImpl->pMapper->LPToGeo(pVisualRect->top), (float)m_pImpl->pMapper->LPToGeo(pVisualRect->bottom),
             -float(pVisualRect->right - pVisualRect->left), float(pVisualRect->right - pVisualRect->left)
         );
 
@@ -576,6 +564,9 @@ namespace GL
         m_pSufraceProgram->setUniform1i("m_nMinRadiusLP", &nMinRadiusLP);
         m_pSufraceProgram->setUniform1i("m_nMaxRadiusLP", &nMaxRadiusLP);
         m_pSufraceProgram->setUniform1f("m_fIsometryAngle", &fIsometryAngle);
+
+        m_pSufraceProgram->setUniform1f("m_fPaletteValueMin", &fMinRadius);
+        m_pSufraceProgram->setUniform1f("m_fPaletteValueMax", &fMaxRadius);
 
         m_pSufraceProgram->setUniformMat4f("m_MVP", &m_mPRV[0][0]);
 

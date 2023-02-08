@@ -12,15 +12,14 @@
 #include <memory>
 #include <vector>
 
-#include <IBoreData.h>
-#include <IDiaMapper.h>
+#include "IBore3D.h"
 
 #define IDD_DIALOG_HIDDEN               131
 #define IDC_CUSTOM1                     1009
 
 class CBore3DtestDlg;
 
-class GRAPHICCONTROL_API CBoreDlg : public CDialog
+class GRAPHICCONTROL_API CBoreDlg : public CDialog, public IBore3D
 {
 public:
 	enum { IDD = IDD_DIALOG_HIDDEN};
@@ -50,14 +49,13 @@ public:
 
     int GetBitmap(
         const RECT* pVisualRect, // прямоугольник в логических единицах отображающий часть 3D-ствола (top,bottom соответствует fTop,fBottom при преобразовании в pMapper)
-        float fTop, float fBottom, // интервал глубин (окно) отображения ствола скважины
         float fRotation, // дополнительный угол поворота всего ствола вокруг своей оси
         // совокупно следующие 4 параметра определяют шкалу для отображения ридиусов (как значение радиуса преобразуется в видимую толщину ствола)
         float fMinRadius, float fMaxRadius, // минимальное и максимальное значение радиуса/диаметра, соответствующее ширине 
         int nMinRadiusLP, int nMaxRadiusLP, // видимый размер в логических единицах для минимального и максимального радиуса 
         float fIsometryAngle, // угол изометрической проекции
         bool bDrawMesh
-    );
+    ) override;
 
 public:
     void setBkgColor(float r_, float g_, float b_);
@@ -77,6 +75,10 @@ private:
     BOOL inUse;
     CBore3DtestDlg* owner;
     DECLARE_MESSAGE_MAP()
+
+    // Унаследовано через IBore3D
+    virtual BOOL Create(LPCSTR DialogName, HWND hwndOwner) override;
+    virtual void SetPosition(int cx, int cy) override;
 
 private:
     struct Implementation;

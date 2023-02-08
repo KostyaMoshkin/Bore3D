@@ -81,6 +81,9 @@
       <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="IBore3D.h">
+      <Filter>HiddenDialog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

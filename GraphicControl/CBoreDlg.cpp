@@ -98,7 +98,7 @@ void CBoreDlg::OnSize(UINT nType, int cx, int cy)
     if (!GetDlgItem(IDC_CUSTOM1)) 
         return;
 
-    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOZORDER);
+    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
 }
 
 BOOL CBoreDlg::Create(LPCSTR DialogName, HWND hwndOwner)
@@ -111,7 +111,7 @@ void CBoreDlg::SetPosition(int cx, int cy)
     if (!GetDlgItem(IDC_CUSTOM1))
         return;
 
-    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOZORDER);
+    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
 }
 
 IBore3D* IBore3D::Create3DBore()

@@ -29,15 +29,25 @@ BOOL CBoreDlg::Create(LPCSTR DialogName, CWnd* Owner)
     }
 
     inUse = TRUE; // Диалог используется
+
+    HINSTANCE hResourceOld = AfxGetResourceHandle();
+    AfxSetResourceHandle(g_hResource);
     // Создать диалог и получить результат создания
+    Owner = NULL;
     BOOL success = (CDialog::Create(CBoreDlg::IDD, Owner) != FALSE);
+    AfxSetResourceHandle(hResourceOld);
+
+    TRACE1("CBoreDlg::Create success=%d", success);
+
     owner = (CBore3DtestDlg*)Owner; // Собственник
     return success;
 }
 
 BOOL CBoreDlg::OnInitDialog()
 {
+    TRACE0("CBoreDlg::InitDialog!!!");
     CDialog::OnInitDialog();
+    TRACE0("CBoreDlg::After InitDialog!!!");
 
     if (!m_pImpl->m_controlGL.init())
         return 0;
@@ -45,9 +55,9 @@ BOOL CBoreDlg::OnInitDialog()
 	return 0;
 }
 
-void CBoreDlg::fillPicture(HDC hDC_)
+bool CBoreDlg::fillPicture(void* pBuffer, size_t nSize, int nBufferType)
 {
-    m_pImpl->m_controlGL.fillPicture(hDC_);
+    return m_pImpl->m_controlGL.fillPicture(pBuffer, nSize, nBufferType);
 }
 
 bool CBoreDlg::InitBore3D(IBoreData* pData, float fLogPerPixel)
@@ -88,17 +98,25 @@ void CBoreDlg::setZeroLineColor(float r_, float g_, float b_, int nWidth_)
 
 void CBoreDlg::DoDataExchange(CDataExchange* pDX)
 {
+    HINSTANCE hResourceOld = AfxGetResourceHandle();
+    AfxSetResourceHandle(g_hResource);
+
     CDialog::DoDataExchange(pDX);
 
-    DDX_Control(pDX, IDC_CUSTOM1, m_pImpl->m_controlGL);
+    DDX_Control(pDX, IDC_GC_CUSTOM1, m_pImpl->m_controlGL);
+    AfxSetResourceHandle(hResourceOld);
 }
 
 void CBoreDlg::OnSize(UINT nType, int cx, int cy)
 {
-    if (!GetDlgItem(IDC_CUSTOM1)) 
+    HINSTANCE hResourceOld = AfxGetResourceHandle();
+    AfxSetResourceHandle(g_hResource);
+
+    if (!GetDlgItem(IDC_GC_CUSTOM1))
         return;
 
-    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
+    GetDlgItem(IDC_GC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
+    AfxSetResourceHandle(hResourceOld);
 }
 
 BOOL CBoreDlg::Create(LPCSTR DialogName, HWND hwndOwner)
@@ -108,10 +126,14 @@ BOOL CBoreDlg::Create(LPCSTR DialogName, HWND hwndOwner)
 
 void CBoreDlg::SetPosition(int cx, int cy)
 {
-    if (!GetDlgItem(IDC_CUSTOM1))
+    HINSTANCE hResourceOld = AfxGetResourceHandle();
+    AfxSetResourceHandle(g_hResource);
+
+    if (!GetDlgItem(IDC_GC_CUSTOM1))
         return;
 
-    GetDlgItem(IDC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
+    GetDlgItem(IDC_GC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
+    AfxSetResourceHandle(hResourceOld);
 }
 
 IBore3D* IBore3D::Create3DBore()

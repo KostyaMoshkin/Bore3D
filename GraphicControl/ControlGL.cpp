@@ -190,35 +190,32 @@ namespace GraphicControl
 
     void ControlGL::SavePicture()
     {
-        glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, GL_BGRA, GL_UNSIGNED_BYTE, m_vPrintScreen.data());
 
-        HBITMAP resultBitmap = CreateBitmap(m_ptWindow.x, m_ptWindow.y, 1, 32, (void*)m_vPrintScreen.data());
+        if (m_nBufferSize == m_ptWindow.x * m_ptWindow.y)
+        {
+            glReadPixels(0, 0, m_ptWindow.x, m_ptWindow.y, m_nBufferType, GL_UNSIGNED_BYTE, m_pBuffer);
 
-        HDC MemDC = CreateCompatibleDC(m_saveHDC);
-
-        auto hOldBmp = SelectObject(MemDC, resultBitmap);
-
-        BitBlt(m_saveHDC, 0, 0, m_ptWindow.x, m_ptWindow.y, MemDC, 0, 0, SRCCOPY);
-
-        SelectObject(MemDC, hOldBmp);
-
-        DeleteDC(MemDC);
-
-        DeleteObject(resultBitmap);
+            m_bSavePictureResult = true;
+        }
     }
 
-    void ControlGL::fillPicture(HDC hDC_)
+    bool ControlGL::fillPicture(void* pBuffer, size_t nSize, int nBufferType)
     {
-        m_saveHDC = hDC_;
+        m_pBuffer = pBuffer;
+        m_nBufferType = nBufferType;
+        m_nBufferSize = nSize;
+        m_bSavePictureResult = false;
 
         OnPaint(true);
+
+        return m_bSavePictureResult;
     }
 
     // Register the window class if it has not already been registered.
     BOOL ControlGL::RegisterWindowClass()
     {
         WNDCLASS wndcls;
-        HINSTANCE hInst = AfxGetInstanceHandle();
+        HINSTANCE hInst = g_hModule;
 
         if (!(::GetClassInfo(hInst, CONTROLGL_CLASSNAME, &wndcls)))
         {
@@ -286,8 +283,6 @@ namespace GraphicControl
     void ControlGL::changeWindowSize(CRect rcWindow_)
     {
         m_ptWindow.SetPoint(rcWindow_.Width(), rcWindow_.Height());
-
-        m_vPrintScreen.resize(m_ptWindow.x * m_ptWindow.y * 4);
     }
 
     void ControlGL::OnPaint()

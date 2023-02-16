@@ -17,7 +17,7 @@ namespace GL
         float fLogPerPixel;
 
         int nCurveCount;
-        int nDriftCount;
+        int nDepthCount;
 
         std::vector<float> vDepths;
         std::vector<float> vRadiusCurve;
@@ -57,7 +57,7 @@ namespace GL
     {
         BufferBounder<VertexBuffer> vertexBounder(m_VertexBuffer);
 
-        int nVertexBufferSize = int(m_pImpl->nCurveCount * m_pImpl->nDriftCount * sizeof(float));
+        int nVertexBufferSize = int(m_pImpl->nCurveCount * m_pImpl->nDepthCount * sizeof(float));
 
         if (!m_VertexBuffer->bookSpace(nVertexBufferSize))
             return false;
@@ -73,21 +73,18 @@ namespace GL
 
         m_VertexBuffer->attribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, 0);
 
-        m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
-        m_pSufraceProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
-
         return true;
     }
 
     bool RenderBoreSurface::setSurfaceIndirect()
     {
-        std::vector<DrawElementsIndirectCommand> vSurfaceIndirect(m_pImpl->nCurveCount);
-        for (int i = 0; i < m_pImpl->nCurveCount; ++i)
+        std::vector<DrawElementsIndirectCommand> vSurfaceIndirect(m_pImpl->nDepthCount);
+        for (int i = 0; i < m_pImpl->nDepthCount; ++i)
         {
-            vSurfaceIndirect[i].count = (GLuint)m_pImpl->nDriftCount * 2 + 2;
+            vSurfaceIndirect[i].count = (GLuint)m_pImpl->nCurveCount * 2 + 2;
             vSurfaceIndirect[i].primCount = 1;
             vSurfaceIndirect[i].firstIndex = 0;
-            vSurfaceIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
+            vSurfaceIndirect[i].baseVertex = i * m_pImpl->nCurveCount;
             vSurfaceIndirect[i].baseInstance = 0;
         }
 
@@ -112,17 +109,17 @@ namespace GL
 
     bool RenderBoreSurface::setSurfaceIndex()
     {
-        std::vector<unsigned int> vSurfaceIndices(m_pImpl->nDriftCount * 2 + 2);  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
+        std::vector<unsigned int> vSurfaceIndices(m_pImpl->nCurveCount * 2 + 2);  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
 
-        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
+        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nCurveCount; ++i)
         {
-            vSurfaceIndices[i * 2] = m_pImpl->nDriftCount + i;
+            vSurfaceIndices[i * 2] = m_pImpl->nCurveCount + i;
             vSurfaceIndices[i * 2 + 1] = i;
         }
 
         //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
-        vSurfaceIndices[m_pImpl->nDriftCount * 2 + 0] = m_pImpl->nDriftCount;
-        vSurfaceIndices[m_pImpl->nDriftCount * 2 + 1] = 0;
+        vSurfaceIndices[m_pImpl->nCurveCount * 2 + 0] = m_pImpl->nCurveCount;
+        vSurfaceIndices[m_pImpl->nCurveCount * 2 + 1] = 0;
 
         BufferBounder<IndexBuffer> indexSurfaceBounder(m_pSurfaceIndex);
 
@@ -147,7 +144,7 @@ namespace GL
     {
         BufferBounder<ShaderStorageBuffer> depthBounder(m_pBufferDepth);
 
-        int nBufferDepthSize = int(m_pImpl->nCurveCount * sizeof(float));
+        int nBufferDepthSize = int(m_pImpl->nDepthCount * sizeof(float));
 
         if (!m_pBufferDepth->bookSpace(nBufferDepthSize))
             return false;
@@ -168,7 +165,7 @@ namespace GL
     {
         BufferBounder<ShaderStorageBuffer> angleBounder(m_pBufferAngle);
 
-        int nBufferAngleSize = int(m_pImpl->nCurveCount * sizeof(float));
+        int nBufferAngleSize = int(m_pImpl->nDepthCount * sizeof(float));
 
         if (!m_pBufferAngle->bookSpace(nBufferAngleSize))
             return false;
@@ -207,13 +204,13 @@ namespace GL
 
     bool RenderBoreSurface::setMeshIndirect()
     {
-        std::vector<DrawElementsIndirectCommand> vMeshIndirect(m_pImpl->nCurveCount - 1);
-        for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
+        std::vector<DrawElementsIndirectCommand> vMeshIndirect(m_pImpl->nDepthCount - 1);
+        for (int i = 0; i < m_pImpl->nDepthCount - 1; ++i)
         {
-            vMeshIndirect[i].count = (GLuint)m_pImpl->nDriftCount * 4;
+            vMeshIndirect[i].count = (GLuint)m_pImpl->nCurveCount * 4;
             vMeshIndirect[i].primCount = 1;
             vMeshIndirect[i].firstIndex = 0;
-            vMeshIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
+            vMeshIndirect[i].baseVertex = i * m_pImpl->nCurveCount;
             vMeshIndirect[i].baseInstance = 0;
         }
 
@@ -238,18 +235,18 @@ namespace GL
 
     bool RenderBoreSurface::setMeshIndex()
     {
-        std::vector<unsigned int> vMeshIndices(m_pImpl->nDriftCount * 4);
+        std::vector<unsigned int> vMeshIndices(m_pImpl->nCurveCount * 4);
 
-        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nDriftCount; ++i)
+        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nCurveCount; ++i)
         {
-            vMeshIndices[i * 4 + 0] = (GLuint)m_pImpl->nDriftCount + i;
+            vMeshIndices[i * 4 + 0] = (GLuint)m_pImpl->nCurveCount + i;
             vMeshIndices[i * 4 + 1] = i;
             vMeshIndices[i * 4 + 2] = i;
             vMeshIndices[i * 4 + 3] = i + 1;
         }
 
         //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
-        vMeshIndices[(m_pImpl->nDriftCount - 1) * 4 + 3] = 0;
+        vMeshIndices[(m_pImpl->nCurveCount - 1) * 4 + 3] = 0;
 
         BufferBounder<IndexBuffer> indexMeshBounder(m_pMeshIndex);
 
@@ -272,13 +269,13 @@ namespace GL
 
     bool RenderBoreSurface::setDriftIndirect()
     {
-        std::vector<DrawElementsIndirectCommand> vDriftIndirect(m_pImpl->nCurveCount - 1);
-        for (int i = 0; i < m_pImpl->nCurveCount - 1; ++i)
+        std::vector<DrawElementsIndirectCommand> vDriftIndirect(m_pImpl->nDepthCount - 1);
+        for (int i = 0; i < m_pImpl->nDepthCount - 1; ++i)
         {
             vDriftIndirect[i].count = (GLuint)2;
             vDriftIndirect[i].primCount = 1;
             vDriftIndirect[i].firstIndex = 0;
-            vDriftIndirect[i].baseVertex = i * m_pImpl->nDriftCount;
+            vDriftIndirect[i].baseVertex = i * m_pImpl->nCurveCount;
             vDriftIndirect[i].baseInstance = 0;
         }
 
@@ -305,7 +302,7 @@ namespace GL
     {
         std::vector<unsigned int> vDriftIndices(2);
 
-        vDriftIndices[0] = (GLuint)m_pImpl->nDriftCount;
+        vDriftIndices[0] = (GLuint)m_pImpl->nCurveCount;
         vDriftIndices[1] = 0;
 
         BufferBounder<IndexBuffer> indexMeshBounder(m_pDriftIndex);
@@ -349,7 +346,7 @@ namespace GL
         glMultiDrawElementsIndirect(GL_TRIANGLE_STRIP,
             GL_UNSIGNED_INT,
             nullptr,
-            m_pImpl->nCurveCount - 1,
+            m_pImpl->nDepthCount - 1,
             0);
 
         if (!m_bDrawMesh)
@@ -374,7 +371,7 @@ namespace GL
         glMultiDrawElementsIndirect(GL_LINES,
             GL_UNSIGNED_INT,
             nullptr,
-            m_pImpl->nCurveCount - 1,
+            m_pImpl->nDepthCount - 1,
             0);
 
         //---------------------------------------------------------------------------
@@ -389,10 +386,8 @@ namespace GL
         glMultiDrawElementsIndirect(GL_LINES,
             GL_UNSIGNED_INT,
             nullptr,
-            m_pImpl->nCurveCount - 1,
+            m_pImpl->nDepthCount - 1,
             0);
-
-        renderBounder.unbound();
     }
 
     bool RenderBoreSurface::InitBore3D(IBoreData* pData_, float fLogPerPixel_)
@@ -402,7 +397,7 @@ namespace GL
         m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();
 
         if (m_pImpl->nCurveCount > 0)
-            m_pImpl->nDriftCount = (int)m_pImpl->pData->GetRadiusCurve(0).size();
+            m_pImpl->nDepthCount = (int)m_pImpl->pData->GetDepths().size();
         else
             return false;
 
@@ -410,19 +405,28 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        m_pImpl->vDepths.resize(m_pImpl->nCurveCount); 
-        m_pImpl->vRotation.resize(m_pImpl->nCurveCount);
+        m_pImpl->vDepths.resize(m_pImpl->nDepthCount);
+        m_pImpl->vRotation.resize(m_pImpl->nDepthCount);
 
-        m_pImpl->vRadiusCurve.resize(m_pImpl->nCurveCount * m_pImpl->nDriftCount);
+        m_pImpl->vRadiusCurve.resize(m_pImpl->nCurveCount * m_pImpl->nDepthCount);
 
         //----------------------------------------------------------------------------------
 
-        for (int i = 0; i < m_pImpl->nCurveCount; ++i)
+        for (int i = 0; i < m_pImpl->nDepthCount; ++i)
         {
-            m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
+            if (m_pImpl->pData->GetRotation().empty())
+                m_pImpl->vRotation[i] = 0.f;
+            else
+                m_pImpl->vRotation[i] = (float)(m_pImpl->pData->GetRotation().data()[i]);
 
-            for (int j = 0; j < m_pImpl->nDriftCount; ++j)
-                m_pImpl->vRadiusCurve[i * m_pImpl->nDriftCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]) * fLogPerPixel_;
+            for (int j = 0; j < m_pImpl->nCurveCount; ++j)
+            {
+                if (m_pImpl->pData->IsDiameters())
+                    m_pImpl->vRadiusCurve[i * m_pImpl->nCurveCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]) / 2;
+                else
+                    m_pImpl->vRadiusCurve[i * m_pImpl->nCurveCount + j] = (float)(m_pImpl->pData->GetRadiusCurve(i).data()[j]);
+
+            }
         }
 
         BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
@@ -431,7 +435,7 @@ namespace GL
         if (!setVertexBuffer())
             return false;
 
-        renderBoreBounder.unbound();
+        m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
 
         //----------------------------------------------------------------------------------
 
@@ -458,7 +462,6 @@ namespace GL
         BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
 
         m_pMeshProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
-        m_pMeshProgram->setUniform1i("m_nDriftCount", &(m_pImpl->nDriftCount));
 
         //----------------------------------------------------------------------------------
 
@@ -513,12 +516,9 @@ namespace GL
 
         m_pImpl->pMapper = pMapper_;
 
-        for (int i = 0; i < m_pImpl->nCurveCount; ++i)
+        for (int i = 0; i < m_pImpl->nDepthCount; ++i)
         {
-            if (m_pImpl->pData->IsDiameters())
-                m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]) / 2;
-            else
-                m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
+            m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
 
             m_fDepthMin = std::min(m_fDepthMin, m_pImpl->vDepths[i]);
             m_fDepthMax = std::max(m_fDepthMax, m_pImpl->vDepths[i]);
@@ -548,12 +548,12 @@ namespace GL
     {
         m_bDrawMesh = bDrawMesh;
 
-        float fHalfWidth = float(pVisualRect->right);
+        float fHalfWidth = float(pVisualRect->right- pVisualRect->left)*0.5f;
 
         m_mPRV = glm::ortho(
-            float(pVisualRect->left), float(pVisualRect->right), 
-            m_pImpl->pMapper->LPToGeo((float)pVisualRect->top), m_pImpl->pMapper->LPToGeo((float)pVisualRect->bottom),
-            -float(pVisualRect->right - pVisualRect->left), float(pVisualRect->right - pVisualRect->left)
+            -fHalfWidth, fHalfWidth,
+            (float)pVisualRect->top, (float)pVisualRect->bottom,
+            -fHalfWidth, fHalfWidth
         );
 
         BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);

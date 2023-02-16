@@ -21,12 +21,16 @@ namespace GraphicControl
 	class GRAPHICCONTROL_API ControlGL : public CWnd
 	{
 		HDC m_GLHDC = nullptr;
-		HDC m_saveHDC = nullptr;
+
 		HGLRC m_rendContext = nullptr;
 
-		bool m_bNeedUpdate = true;
+		void* m_pBuffer = nullptr;
+		int m_nBufferType = 0;
+		size_t m_nBufferSize = 0;
 
-		std::vector<byte> m_vPrintScreen;
+		bool m_bSavePictureResult = false;
+
+		bool m_bNeedUpdate = true;
 
 		int m_nWindowSizeX = 10;
 		int m_nWindowSizeY = 10;
@@ -60,7 +64,7 @@ namespace GraphicControl
 	public:
 		void needUpdate(bool bUpdate_ = TRUE) { m_bNeedUpdate = bUpdate_;  }
 
-		void fillPicture(HDC hDC_);
+		bool fillPicture(void * pBuffer, size_t nSize, int nBufferType);
 
 	protected:
 		bool initWindow();

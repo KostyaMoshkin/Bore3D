@@ -14,15 +14,12 @@
 
 #include "IBore3D.h"
 
-#define IDD_DIALOG_HIDDEN               131
-#define IDC_CUSTOM1                     1009
-
 class CBore3DtestDlg;
 
 class GRAPHICCONTROL_API CBoreDlg : public CDialog, public IBore3D
 {
 public:
-	enum { IDD = IDD_DIALOG_HIDDEN};
+	enum { IDD = IDD_GC_DIALOG_HIDDEN};
 
 	CBoreDlg();
 	~CBoreDlg();
@@ -32,7 +29,7 @@ public:
     BOOL OnInitDialog();
 
 public:
-    void fillPicture(HDC hDC_);
+    bool fillPicture(void* pBuffer, size_t nSize, int nBufferType);
     // прототип метода для отображения части 3D-ствола скважины в bitmap
     // 
     bool InitBore3D(

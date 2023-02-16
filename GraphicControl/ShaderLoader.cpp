@@ -12,8 +12,8 @@ namespace shader {
 
 	static HMODULE GCM()
 	{
-		HMODULE hModule = nullptr;
-		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)GCM, &hModule);
+		HMODULE hModule = g_hModule;// nullptr;
+		//GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)GCM, &hModule);
 
 		return hModule;
 	}
@@ -26,7 +26,7 @@ namespace shader {
 		if (hModule == nullptr)
 			return std::string("");
 
-		HRSRC rc = ::FindResource(hModule, MAKEINTRESOURCEW(nhaderResourceID_), MAKEINTRESOURCEW(TEXTFILE));
+		HRSRC rc = ::FindResource(hModule, MAKEINTRESOURCE(nhaderResourceID_), MAKEINTRESOURCE(TEXTFILE));
 
 		if (rc == nullptr)
 			return std::string("");

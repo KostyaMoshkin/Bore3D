@@ -198,15 +198,28 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	RECT rcVisualRect;
 	rcVisualRect.left = -clientRect.Width();
 	rcVisualRect.right = clientRect.Width();
-	rcVisualRect.top = 0;
-	rcVisualRect.bottom = clientRect.Height();
+	rcVisualRect.top = 400;
+	rcVisualRect.bottom = 600;// clientRect.Height();
 
 	m_fRotationAngle += 360.0f / 30.0f;
 
-	float fIsometryAngle = 15.0f + m_fRotationAngle / 50.0f;
+	float fIsometryAngle = 15.0f;// +m_fRotationAngle / 50.0f;
 
 	m_boreGL->GetBitmap(&rcVisualRect, m_fRotationAngle, 2.0f, 4.1f, 0, clientRect.Width(), fIsometryAngle, true);
-	m_boreGL->fillPicture(hDC);
+
+	std::vector<byte> vPrintScreen(clientRect.Width() * clientRect.Height() * 4);
+
+#define GL_BGRA 0x80E1
+
+	m_boreGL->fillPicture(vPrintScreen.data(), clientRect.Width() * clientRect.Height(), GL_BGRA);
+
+	HBITMAP resultBitmap = CreateBitmap(clientRect.Width(), clientRect.Height(), 1, 32, (void*)vPrintScreen.data());
+	HDC MemDC = CreateCompatibleDC(hDC);
+	auto hOldBmp = SelectObject(MemDC, resultBitmap);
+	BitBlt(hDC, 0, 0, clientRect.Width(), clientRect.Height(), MemDC, 0, 0, SRCCOPY);
+	SelectObject(MemDC, hOldBmp);
+	DeleteDC(MemDC);
+	DeleteObject(resultBitmap);
 
 	return;
 }

@@ -14,7 +14,6 @@ uniform int m_nMinRadiusLP;
 uniform int m_nMaxRadiusLP;
 
 uniform int m_nCurveCount;
-uniform int m_nDriftCount;
 
 uniform mat4 m_MVP;
 
@@ -22,17 +21,17 @@ float Pi = 3.1415926;
 
 uint getDrift(uint nVertexId_)
 {
-	return nVertexId_ - (nVertexId_ / m_nDriftCount) * uint(m_nDriftCount);
+	return nVertexId_ - (nVertexId_ / m_nCurveCount) * uint(m_nCurveCount);
 }
 
 float getAngle(uint nVertexId_)
 {
-	return 360.0 * float(getDrift(nVertexId_)) / float(m_nDriftCount);
+	return 360.0 * float(getDrift(nVertexId_)) / float(m_nCurveCount);
 }
 
 int positionY()
 {
-	return gl_VertexID / m_nDriftCount;
+	return gl_VertexID / m_nCurveCount;
 }
 
 void main()

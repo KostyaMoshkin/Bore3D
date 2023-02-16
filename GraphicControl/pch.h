@@ -18,10 +18,10 @@
 #include <map>
 #include <fstream>
 #include <algorithm>
-//#include <omp.h>
-
-//#include <Windows.h>
 
 #include <glew.h>
+
+extern HMODULE g_hModule;
+extern HMODULE g_hResource;
 
 #endif //PCH_H

@@ -44,7 +44,7 @@ public:
 
     // !! Предлагаю заменить непосредственно рисование на метод, возвращающий HBITMAP (можно рассмотреть и другие варианты)
     //virtual HBITMAP fillPicture(HDC hDC_) = 0;
-    virtual void fillPicture(HDC hDC_) = 0;
+    virtual bool fillPicture(void * pBuffer, size_t nSize, int nBufferType) = 0;
 
     // палитра цветов, "натягиваемая" на диапозон значений радиусов fMinRadius, fMaxRadius);
     virtual bool InitPalette(const std::vector<COLORREF>& vecPalette) = 0;

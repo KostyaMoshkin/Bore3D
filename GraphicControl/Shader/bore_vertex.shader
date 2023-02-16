@@ -17,7 +17,6 @@ uniform int m_nMinRadiusLP;
 uniform int m_nMaxRadiusLP;
 
 uniform int m_nCurveCount;
-uniform int m_nDriftCount;
 
 uniform mat4 m_MVP;
 
@@ -27,17 +26,17 @@ float Pi = 3.1415926;
 
 uint getDrift(uint nVertexId_)
 {
-	return nVertexId_ - (nVertexId_ / m_nDriftCount) * uint(m_nDriftCount);
+	return nVertexId_ - (nVertexId_ / m_nCurveCount) * uint(m_nCurveCount);
 }
 
 float getAngle(uint nVertexId_)
 {
-	return 360.0 * float(getDrift(nVertexId_)) / float(m_nDriftCount);
+	return 360.0 * float(getDrift(nVertexId_)) / float(m_nCurveCount);
 }
 
 int positionY()
 {
-	return gl_VertexID / m_nDriftCount;
+	return gl_VertexID / m_nCurveCount;
 }
 
 void main()
@@ -57,7 +56,6 @@ void main()
 
 	gl_Position = m_MVP * vec4(vPosition, 1.0);
 
-	//gl_Position = vec4(gl_Position.x, gl_Position.y * cos(-m_fIsometryAngle) + gl_Position.z * sin(-m_fIsometryAngle), gl_Position.z, gl_Position.w);
 	gl_Position = vec4(gl_Position.x, gl_Position.y + gl_Position.z * sin(-m_fIsometryAngle), gl_Position.z, gl_Position.w);
 
 	fPaletteIndex = (m_fRadius - m_fPaletteValueMin) / (m_fPaletteValueMax - m_fPaletteValueMin);

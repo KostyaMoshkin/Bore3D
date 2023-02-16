@@ -13,7 +13,7 @@ BoreData::~BoreData()
 
 int BoreData::GetCurveCount()
 {
-	return (int)m_dataProvider.getData()->vfDepth.size();
+	return (int)m_dataProvider.getData()->vvfDistance[0].size();
 } // возвращает кол-во кривых радиусов
 
 const std::vector<float>& BoreData::GetDepths()

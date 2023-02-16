@@ -2,7 +2,10 @@
 
 uniform vec3 m_vMesColor;
 
+
+out vec4 color;
+
 void main()
 {
-	gl_FragColor = vec4(m_vMesColor, 1.0);
+	color = vec4(m_vMesColor, 1.0);
 }

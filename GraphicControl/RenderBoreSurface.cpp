@@ -482,10 +482,6 @@ namespace GL
         std::vector<float[3]> vPalette(vecPalette_.size());
         for (size_t i = 0; i < vPalette.size(); ++i)
         {
-            auto a = (vecPalette_[i] & rgbGreen);
-            auto b = (vecPalette_[i] & rgbGreen) >> 8;
-            auto c = (float)((vecPalette_[i] & rgbGreen) >> 8) / 255;
-
             vPalette[i][0] = (float)((vecPalette_[i] & rgbRed)       >> 0 ) / 255;
             vPalette[i][1] = (float)((vecPalette_[i] & rgbGreen)     >> 8 ) / 255;
             vPalette[i][2] = (float)((vecPalette_[i] & rgbBlue)      >> 16) / 255;

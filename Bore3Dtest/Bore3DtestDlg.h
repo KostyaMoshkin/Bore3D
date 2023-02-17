@@ -14,6 +14,8 @@ class CBore3DtestDlg : public CDialogEx
 
 	IBore3D* m_boreGL;
 
+	bool m_bBoreGLInit = false;
+
 	float m_fRotationAngle = 0;
 
 	std::shared_ptr<BoreData> m_pData = nullptr;

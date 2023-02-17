@@ -105,15 +105,27 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Крупный значок
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
+	if (!m_boreGL)
+		return false;
+
 	m_pData = std::make_shared<BoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
 	m_pDia = std::make_shared<DiaMapper>();
 
-	m_boreGL->Create("OPENGL DIALOG", this->GetSafeHwnd());
+	m_bBoreGLInit = m_boreGL->Create("OPENGL DIALOG");
 
-	m_boreGL->InitBore3D(m_pData.get(), 1.0f);
+	if (!m_bBoreGLInit)
+		return false;
+
+	m_bBoreGLInit = m_boreGL->InitBore3D(m_pData.get(), 1.0f);
+
+	if (!m_bBoreGLInit)
+		return false;
 
 	m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
-	m_boreGL->InitDiaMapper(m_pDia.get());
+	m_bBoreGLInit = m_boreGL->InitDiaMapper(m_pDia.get());
+
+	if (!m_bBoreGLInit)
+		return false;
 
 	std::vector<COLORREF> vPalette;
 	vPalette.push_back(0x00000000);
@@ -124,7 +136,11 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	vPalette.push_back(0x000000FF);
 	vPalette.push_back(0x00FF00FF);
 	vPalette.push_back(0x00FFFFFF);
-	m_boreGL->InitPalette(vPalette);
+
+	m_bBoreGLInit = m_boreGL->InitPalette(vPalette);
+
+	if (!m_bBoreGLInit)
+		return false;
 
 	m_boreGL->setBkgColor(1, 1, 1);
 	m_boreGL->setMesColor(0, 0, 0);
@@ -186,6 +202,9 @@ HCURSOR CBore3DtestDlg::OnQueryDragIcon()
 
 void CBore3DtestDlg::BN_OPENGL_CLICKED()
 {
+	if (!m_bBoreGLInit)
+		return;
+
 	CWnd* pWnd = GetDlgItem(IDC_PICTURE_BOX);
 	CDC* pCHC = pWnd->GetDC();
 	HDC hDC = *pCHC;

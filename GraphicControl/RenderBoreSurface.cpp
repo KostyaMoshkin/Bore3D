@@ -467,7 +467,7 @@ namespace GL
 
         m_bDataInit = true;
 
-        return false;
+        return true;
     }
 
     bool RenderBoreSurface::InitPalette(const std::vector<COLORREF>& vecPalette_)

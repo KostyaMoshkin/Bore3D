@@ -15,7 +15,7 @@ interface IBore3D
 {
 public:
     // »нициализаци€ скрытого окна
-    virtual BOOL Create(LPCSTR DialogName, HWND hwndOwner = NULL) = 0; // создать скрытое окно
+    virtual BOOL Create(LPCSTR DialogName) = 0; // создать скрытое окно
     virtual void SetPosition(int cx, int cy) = 0; // задать размеры скрытого окна
 
 
@@ -25,7 +25,7 @@ public:
         float fLogPerPixel // коэффициент соотношени€ между логическими единицами (используютс€ маппером) и пиксел€ми экрана
     ) = 0;
 
-    virtual void InitDiaMapper(
+    virtual bool InitDiaMapper(
         IDiaMapper* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пиксел€ми)
     ) = 0;
 

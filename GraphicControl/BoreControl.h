@@ -32,7 +32,7 @@ namespace GraphicControl
 			float fLogPerPixel // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
 		);
 
-		void InitDiaMapper(
+		bool InitDiaMapper(
 			IDiaMapper* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
 			);
 

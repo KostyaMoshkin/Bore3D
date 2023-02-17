@@ -55,19 +55,21 @@ namespace GraphicControl
         if (!beginDraw())
             return false;
 
-        m_pImpl->pRenderBoreSurface->InitBore3D(pData, fLogPerPixel);
+        bool bResult = m_pImpl->pRenderBoreSurface->InitBore3D(pData, fLogPerPixel);
         endDraw();
 
-        return true;
+        return bResult;
     }
 
-    void BoreControl::InitDiaMapper(IDiaMapper* pMapper_)
+    bool BoreControl::InitDiaMapper(IDiaMapper* pMapper_)
     {
         if (!beginDraw())
-            return;
+            return false;
 
-        m_pImpl->pRenderBoreSurface->InitDiaMapper(pMapper_);
+        bool bResult = m_pImpl->pRenderBoreSurface->InitDiaMapper(pMapper_);
         endDraw();
+
+        return bResult;
     }
 
     bool BoreControl::InitPalette(const std::vector<COLORREF>& vecPalette)
@@ -77,10 +79,10 @@ namespace GraphicControl
         if (!beginDraw())
             return false;
 
-        m_pImpl->pRenderBoreSurface->InitPalette(vecPalette);
+        bool bResult = m_pImpl->pRenderBoreSurface->InitPalette(vecPalette);
         endDraw();
 
-        return true;
+        return bResult;
     }
 
     int BoreControl::GetBitmap(const RECT* pVisualRect, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)

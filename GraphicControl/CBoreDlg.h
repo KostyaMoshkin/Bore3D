@@ -25,10 +25,6 @@ public:
 	~CBoreDlg();
 
 public:
-    BOOL Create(LPCSTR DialogName, CWnd* Owner = 0);
-    BOOL OnInitDialog();
-
-public:
     bool fillPicture(void* pBuffer, size_t nSize, int nBufferType);
     // прототип метода для отображения части 3D-ствола скважины в bitmap
     // 
@@ -37,7 +33,7 @@ public:
         float fLogPerPixel // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
     );
 
-    void InitDiaMapper(
+    bool InitDiaMapper(
         IDiaMapper* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
     );
 
@@ -70,11 +66,10 @@ private:
     // данный момент диалог
 
     BOOL inUse;
-    CBore3DtestDlg* owner;
     DECLARE_MESSAGE_MAP()
 
     // Унаследовано через IBore3D
-    virtual BOOL Create(LPCSTR DialogName, HWND hwndOwner) override;
+    virtual BOOL Create(LPCSTR DialogName) override;
     virtual void SetPosition(int cx, int cy) override;
 
 private:

@@ -72,13 +72,9 @@ namespace GL {
 
         if (nCompileStatus == GL_FALSE)
         {
-            //toLog("Shader compilation of file: " + m_sShaderFile);
-
             GLsizei logLength;
             GLchar  log[1024];
             glGetShaderInfoLog(id, sizeof(log), &logLength, log);
-
-            //toLog("Shader info log: " + std::string(log));
 
             glDeleteShader(id);
 

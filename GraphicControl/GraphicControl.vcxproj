@@ -219,8 +219,10 @@ copy .\Win32\Debug\GraphicControl.dll ..\..\Build\Debug\</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\bore_fragment.shader" />
+    <None Include="Shader\bore_geometry.shader" />
     <None Include="Shader\bore_vertex.shader" />
     <None Include="Shader\mesh_fragment.shader" />
+    <None Include="Shader\mesh_geometry.shader" />
     <None Include="Shader\mesh_vertex.shader" />
   </ItemGroup>
   <ItemGroup>

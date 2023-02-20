@@ -1,14 +1,16 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by GraphicControl.rc
+// Включаемый файл, созданный в Microsoft Visual C++.
+// Используется GraphicControl.rc
 //
 #define IDR_TEXTFILE1                   132
 #define IDR_TEXTFILE2                   133
 #define IDR_TEXTFILE3                   134
 #define IDR_TEXTFILE4                   135
-#define IDD_GC_DIALOG_HIDDEN            10136
+#define IDR_TEXTFILE5                   136
+#define IDR_TEXTFILE6                   137
 #define TEXTFILE                        256
-#define IDC_GC_CUSTOM1                  100001
+#define IDD_GC_DIALOG_HIDDEN            10136
+#define IDC_GC_CUSTOM1                  34465
 
 // Next default values for new objects
 // 

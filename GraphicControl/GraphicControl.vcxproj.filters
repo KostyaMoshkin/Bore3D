@@ -148,6 +148,12 @@
     <None Include="Shader\mesh_vertex.shader">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\bore_geometry.shader">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\mesh_geometry.shader">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GraphicControl.rc">

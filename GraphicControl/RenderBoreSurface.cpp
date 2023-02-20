@@ -39,8 +39,9 @@ namespace GL
 
         bool bAddSufraceShaderError = false;
 
-        bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_fragment, ShaderProgram::ShaderType::Fragment());
-        bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_vertex, ShaderProgram::ShaderType::Vertex());
+        bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_fragment,    ShaderProgram::ShaderType::Fragment());
+        bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_vertex,      ShaderProgram::ShaderType::Vertex());
+        bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_geometry,    ShaderProgram::ShaderType::Geometry());
 
         if (bAddSufraceShaderError)
             return false;
@@ -81,7 +82,7 @@ namespace GL
         std::vector<DrawElementsIndirectCommand> vSurfaceIndirect(m_pImpl->nDepthCount);
         for (int i = 0; i < m_pImpl->nDepthCount; ++i)
         {
-            vSurfaceIndirect[i].count = (GLuint)m_pImpl->nCurveCount * 2 + 2;
+            vSurfaceIndirect[i].count = (GLuint)m_pImpl->nCurveCount * 4;
             vSurfaceIndirect[i].primCount = 1;
             vSurfaceIndirect[i].firstIndex = 0;
             vSurfaceIndirect[i].baseVertex = i * m_pImpl->nCurveCount;
@@ -109,17 +110,21 @@ namespace GL
 
     bool RenderBoreSurface::setSurfaceIndex()
     {
-        std::vector<unsigned int> vSurfaceIndices(m_pImpl->nCurveCount * 2 + 2);  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
+        std::vector<unsigned int> vSurfaceIndices(m_pImpl->nCurveCount * 4);  // +2 т к надо замкнуть окружность, последн€€ точка соедин€етс€ с первой
 
-        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nCurveCount; ++i)
+        for (unsigned int i = 0; i < (unsigned int)m_pImpl->nCurveCount - 1; ++i)
         {
-            vSurfaceIndices[i * 2] = m_pImpl->nCurveCount + i;
-            vSurfaceIndices[i * 2 + 1] = i;
+            vSurfaceIndices[i * 4 + 0] = i;
+            vSurfaceIndices[i * 4 + 1] = m_pImpl->nCurveCount + i;
+            vSurfaceIndices[i * 4 + 2] = i + 1;
+            vSurfaceIndices[i * 4 + 3] = m_pImpl->nCurveCount + i + 1;
         }
 
         //  Ќеобходимо домолнить индексы, чтобы последн€€ точка в р€ду замкнулась с первой
-        vSurfaceIndices[m_pImpl->nCurveCount * 2 + 0] = m_pImpl->nCurveCount;
-        vSurfaceIndices[m_pImpl->nCurveCount * 2 + 1] = 0;
+        vSurfaceIndices[(m_pImpl->nCurveCount - 1) * 4 + 0] = m_pImpl->nCurveCount - 1;
+        vSurfaceIndices[(m_pImpl->nCurveCount - 1) * 4 + 1] = m_pImpl->nCurveCount - 1 + m_pImpl->nCurveCount;
+        vSurfaceIndices[(m_pImpl->nCurveCount - 1) * 4 + 2] = 0;
+        vSurfaceIndices[(m_pImpl->nCurveCount - 1) * 4 + 3] = m_pImpl->nCurveCount;
 
         BufferBounder<IndexBuffer> indexSurfaceBounder(m_pSurfaceIndex);
 
@@ -190,6 +195,7 @@ namespace GL
 
         bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_fragment, ShaderProgram::ShaderType::Fragment());
         bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_vertex, ShaderProgram::ShaderType::Vertex());
+        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_geometry, ShaderProgram::ShaderType::Geometry());
 
         if (bAddMeshShaderError)
             return false;
@@ -343,7 +349,7 @@ namespace GL
         BufferBounder<IndirectBuffer> indirectSurfaceBounder(m_pSurfaceIndirect);
         BufferBounder<IndexBuffer> indexSurfaceBounder(m_pSurfaceIndex);
 
-        glMultiDrawElementsIndirect(GL_TRIANGLE_STRIP,
+        glMultiDrawElementsIndirect(GL_LINES_ADJACENCY,
             GL_UNSIGNED_INT,
             nullptr,
             m_pImpl->nDepthCount - 1,
@@ -368,7 +374,7 @@ namespace GL
 
         glLineWidth(m_fZeroLineWidth);
 
-        glMultiDrawElementsIndirect(GL_LINES,
+        glMultiDrawElementsIndirect(GL_LINES_ADJACENCY,
             GL_UNSIGNED_INT,
             nullptr,
             m_pImpl->nDepthCount - 1,
@@ -383,7 +389,7 @@ namespace GL
 
         glLineWidth(1);
 
-        glMultiDrawElementsIndirect(GL_LINES,
+        glMultiDrawElementsIndirect(GL_LINES_ADJACENCY,
             GL_UNSIGNED_INT,
             nullptr,
             m_pImpl->nDepthCount - 1,
@@ -437,6 +443,9 @@ namespace GL
 
         m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
 
+        int nInterpolateCount = 360 / m_pImpl->nCurveCount / 5 + 1;
+        m_pSufraceProgram->setUniform1i("m_nInterpolateCount", &nInterpolateCount);
+
         //----------------------------------------------------------------------------------
 
         if (!setSurfaceIndex())
@@ -462,6 +471,10 @@ namespace GL
         BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
 
         m_pMeshProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
+        m_pMeshProgram->setUniform1i("m_nInterpolateCount", &nInterpolateCount);
+
+        int nMeshStep = 5;
+        m_pMeshProgram->setUniform1i("m_nMeshStep", &nMeshStep);
 
         //----------------------------------------------------------------------------------
 

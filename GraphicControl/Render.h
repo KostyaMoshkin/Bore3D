@@ -22,9 +22,11 @@
      {
          static const int bore_fragment     = IDR_TEXTFILE1;
          static const int bore_vertex       = IDR_TEXTFILE2;
+         static const int bore_geometry     = IDR_TEXTFILE5;
 
          static const int mesh_fragment     = IDR_TEXTFILE3;
          static const int mesh_vertex       = IDR_TEXTFILE4;
+         static const int mesh_geometry     = IDR_TEXTFILE6;
 
          static const char* getName(int ID_)
          {
@@ -32,8 +34,10 @@
              {
              case bore_vertex:      return "bore_vertex";
              case bore_fragment:    return "bore_fragment";
-             case mesh_vertex:      return "bore_vertex";
-             case mesh_fragment:    return "bore_fragment";
+             case bore_geometry:    return "bore_geometry";
+             case mesh_vertex:      return "mesh_vertex";
+             case mesh_fragment:    return "mesh_fragment";
+             case mesh_geometry:    return "mesh_geometry";
              default: return "";
              }
          }

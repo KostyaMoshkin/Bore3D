@@ -278,7 +278,7 @@ namespace GL
         std::vector<DrawElementsIndirectCommand> vDriftIndirect(m_pImpl->nDepthCount - 1);
         for (int i = 0; i < m_pImpl->nDepthCount - 1; ++i)
         {
-            vDriftIndirect[i].count = (GLuint)2;
+            vDriftIndirect[i].count = (GLuint)4;
             vDriftIndirect[i].primCount = 1;
             vDriftIndirect[i].firstIndex = 0;
             vDriftIndirect[i].baseVertex = i * m_pImpl->nCurveCount;
@@ -306,10 +306,12 @@ namespace GL
 
     bool RenderBoreSurface::setDriftIndex()
     {
-        std::vector<unsigned int> vDriftIndices(2);
+        std::vector<unsigned int> vDriftIndices(4);
 
         vDriftIndices[0] = (GLuint)m_pImpl->nCurveCount;
         vDriftIndices[1] = 0;
+        vDriftIndices[2] = 0;
+        vDriftIndices[3] = (GLuint)m_pImpl->nCurveCount;
 
         BufferBounder<IndexBuffer> indexMeshBounder(m_pDriftIndex);
 
@@ -370,6 +372,9 @@ namespace GL
         BufferBounder<IndirectBuffer>   indirectDriftBounder(m_pDriftIndirect);
         BufferBounder<IndexBuffer>      indexDriftBounder(m_pDriftIndex);
 
+        int nInterpolateCount = 0;
+        m_pMeshProgram->setUniform1i("m_nInterpolateCount", &nInterpolateCount);
+
         m_pMeshProgram->setUniformVecf("m_vMesColor", &m_vZeroLineColor[0]);
 
         glLineWidth(m_fZeroLineWidth);
@@ -386,6 +391,7 @@ namespace GL
         BufferBounder<IndexBuffer>          indexMeshBounder(m_pMeshIndex);
 
         m_pMeshProgram->setUniformVecf("m_vMesColor", &m_vMeshColor[0]);
+        m_pMeshProgram->setUniform1i("m_nInterpolateCount", &m_nInterpolateCount);
 
         glLineWidth(1);
 
@@ -443,8 +449,8 @@ namespace GL
 
         m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
 
-        int nInterpolateCount = 360 / m_pImpl->nCurveCount / 5 + 1;
-        m_pSufraceProgram->setUniform1i("m_nInterpolateCount", &nInterpolateCount);
+        m_nInterpolateCount = 360 / m_pImpl->nCurveCount / 5 + 1;
+        m_pSufraceProgram->setUniform1i("m_nInterpolateCount", &m_nInterpolateCount);
 
         //----------------------------------------------------------------------------------
 
@@ -471,7 +477,6 @@ namespace GL
         BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
 
         m_pMeshProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
-        m_pMeshProgram->setUniform1i("m_nInterpolateCount", &nInterpolateCount);
 
         int nMeshStep = 5;
         m_pMeshProgram->setUniform1i("m_nMeshStep", &nMeshStep);

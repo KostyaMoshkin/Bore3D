@@ -73,8 +73,8 @@ void main()
 
             //------------------------------------------------------------------------------------------
 
-            EmitPoint(fRadius2, vdata[0].fAddAngle, vdata[2].vDepth, fProportion2);
-            EmitPoint(fRadius3, vdata[0].fAddAngle, vdata[3].vDepth, fProportion3);
+            EmitPoint(fRadius2, vdata[2].fAddAngle, vdata[2].vDepth, fProportion2);
+            EmitPoint(fRadius3, vdata[3].fAddAngle, vdata[3].vDepth, fProportion3);
         }
 
     EndPrimitive();

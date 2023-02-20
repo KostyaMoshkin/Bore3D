@@ -39,6 +39,8 @@ namespace GL
 
         unsigned int m_nVAO;
 
+        int m_nInterpolateCount = 1;
+
         float m_fDepthMin;
         float m_fDepthMax;
 

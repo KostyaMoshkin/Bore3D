@@ -34,6 +34,9 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// поддержка DDX/DDV
 
+protected:
+	void Bore3DPaint();
+
 // Реализация
 protected:
 	HICON m_hIcon;
@@ -44,6 +47,5 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg void BN_OPENGL_CLICKED();
 };

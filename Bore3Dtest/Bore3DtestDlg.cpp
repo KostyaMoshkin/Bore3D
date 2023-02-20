@@ -6,6 +6,8 @@
 #include "resource.h"
 #include "afxdialogex.h"
 #include <WinUser.h>
+#include <chrono>
+#include <string>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -190,7 +192,7 @@ void CBore3DtestDlg::OnPaint()
 		CDialogEx::OnPaint();
 	}
 
-	BN_OPENGL_CLICKED();
+	Bore3DPaint();
 }
 
 // Система вызывает эту функцию для получения отображения курсора при перемещении
@@ -200,7 +202,7 @@ HCURSOR CBore3DtestDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CBore3DtestDlg::BN_OPENGL_CLICKED()
+void CBore3DtestDlg::Bore3DPaint()
 {
 	if (!m_bBoreGLInit)
 		return;
@@ -219,8 +221,6 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	rcVisualRect.right = clientRect.Width();
 	rcVisualRect.top = 400;
 	rcVisualRect.bottom = 600;// clientRect.Height();
-
-	m_fRotationAngle += 360.0f / 30.0f;
 
 	float fIsometryAngle = 15.0f;// +m_fRotationAngle / 50.0f;
 
@@ -241,4 +241,32 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	DeleteObject(resultBitmap);
 
 	return;
+}
+
+void CBore3DtestDlg::BN_OPENGL_CLICKED()
+{
+	int nCount = 0;
+
+	auto start = std::chrono::steady_clock::now();
+	bool bRun = true;
+
+	double fTimeLength = 5.0;
+
+	while (bRun)
+	{
+		Bore3DPaint();
+
+		auto end = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = end - start;
+		bRun = elapsed_seconds.count() < fTimeLength;
+
+		m_fRotationAngle = 360.0f * elapsed_seconds.count() / fTimeLength;
+
+		++nCount;
+	}
+
+	CString sFPS;
+	sFPS.Format(_T("%d"), int(1.0 * nCount / fTimeLength));
+
+	SetDlgItemText(IDC_STATIC, LPCTSTR(sFPS));
 }

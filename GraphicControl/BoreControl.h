@@ -29,7 +29,7 @@ namespace GraphicControl
 		// 
 		bool InitBore3D(
 			IBoreData* pData, // интерфейс доступа к данным развёртки
-			float fLogPerPixel // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
+			int nMeshStep_ // шаг между линиями горизонтальной сетки
 		);
 
 		bool InitDiaMapper(

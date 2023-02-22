@@ -6,6 +6,9 @@
 #include <IDiaMapper.h>
 
 #include <limits>
+#include <algorithm>
+
+#include <math.h>
 
 namespace GL
 {
@@ -353,8 +356,8 @@ namespace GL
 
         glMultiDrawElementsIndirect(GL_LINES_ADJACENCY,
             GL_UNSIGNED_INT,
-            nullptr,
-            m_pImpl->nDepthCount - 1,
+            (void*)(sizeof(DrawElementsIndirectCommand) * m_nStartDepthIndex),
+            m_nStopDepthIndex - m_nStartDepthIndex,
             0);
 
         if (!m_bDrawMesh)
@@ -365,7 +368,6 @@ namespace GL
         BufferBounder<ShaderProgram> meshBounder(m_pMeshProgram);
 
         BufferBounder<VertexBuffer>         vertexMeshBounder(m_VertexBuffer);
-        BufferBounder<ShaderStorageBuffer>  depthMeshBounder(m_pBufferDepth);
 
         //---------------------------------------------------------------------------
 
@@ -381,8 +383,8 @@ namespace GL
 
         glMultiDrawElementsIndirect(GL_LINES_ADJACENCY,
             GL_UNSIGNED_INT,
-            nullptr,
-            m_pImpl->nDepthCount - 1,
+            (void*)(sizeof(DrawElementsIndirectCommand) * m_nStartDepthIndex),
+            m_nStopDepthIndex - m_nStartDepthIndex,
             0);
 
         //---------------------------------------------------------------------------
@@ -397,12 +399,12 @@ namespace GL
 
         glMultiDrawElementsIndirect(GL_LINES_ADJACENCY,
             GL_UNSIGNED_INT,
-            nullptr,
-            m_pImpl->nDepthCount - 1,
+            (void*)(sizeof(DrawElementsIndirectCommand) * m_nStartDepthIndex),
+            m_nStopDepthIndex - m_nStartDepthIndex,
             0);
     }
 
-    bool RenderBoreSurface::InitBore3D(IBoreData* pData_, float fLogPerPixel_)
+    bool RenderBoreSurface::InitBore3D(IBoreData* pData_, int nMeshStep_)
     {
         m_pImpl->pData = pData_;
 
@@ -412,6 +414,8 @@ namespace GL
             m_pImpl->nDepthCount = (int)m_pImpl->pData->GetDepths().size();
         else
             return false;
+
+        m_nStopDepthIndex = m_pImpl->nDepthCount - 1;
 
         m_pImpl->bIsDiameters = m_pImpl->pData->IsDiameters();
 
@@ -478,7 +482,7 @@ namespace GL
 
         m_pMeshProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
 
-        int nMeshStep = 5;
+        int nMeshStep = std::max(1, nMeshStep_);
         m_pMeshProgram->setUniform1i("m_nMeshStep", &nMeshStep);
 
         //----------------------------------------------------------------------------------
@@ -525,18 +529,22 @@ namespace GL
 
     bool RenderBoreSurface::InitDiaMapper(IDiaMapper* pMapper_)
     {
-        m_fDepthMin = std::numeric_limits<float>::max();
-        m_fDepthMax = -std::numeric_limits<float>::max();
-
         m_pImpl->pMapper = pMapper_;
 
         for (int i = 0; i < m_pImpl->nDepthCount; ++i)
         {
             m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
 
-            m_fDepthMin = std::min(m_fDepthMin, m_pImpl->vDepths[i]);
-            m_fDepthMax = std::max(m_fDepthMax, m_pImpl->vDepths[i]);
+            // Для последующего ускорения поиска сохраняю значения с интервалом 10 индексов
+            if (!(i % 10) && i != 0)
+            {
+                float fDepthStepMin = std::min(m_pImpl->vDepths[i - 10], m_pImpl->vDepths[i]);
+                float fDepthStepMax = std::max(m_pImpl->vDepths[i - 10], m_pImpl->vDepths[i]);
+                m_vDepthSercher.push_back(std::tuple<int, float, float>(i - 10, fDepthStepMin, fDepthStepMax));
+            }
         }
+
+        m_bDepthIncreasing = m_pImpl->vDepths[0] < m_pImpl->vDepths[m_pImpl->nDepthCount - 1];
 
         //----------------------------------------------------------------------------------
 
@@ -557,18 +565,54 @@ namespace GL
         return true;
     }
 
+    void RenderBoreSurface::calcViewIndices(const RECT* pVisualRect_, float fIsometryAngle_, int nMaxRadiusLP_)
+    {
+        float fTop = (float)pVisualRect_->top - std::abs(nMaxRadiusLP_ * sin(fIsometryAngle_));
+        float fBottom = (float)pVisualRect_->bottom;
+
+        if (!m_bDepthIncreasing)
+            std::swap(fTop, fBottom);
+
+        auto pTop = std::find_if(m_vDepthSercher.begin(), m_vDepthSercher.end(),
+            [&](const std::tuple<int, float, float>& depthSercher)
+            {
+                return std::get<1>(depthSercher) <= fTop && std::get<2>(depthSercher) > fTop;
+            });
+
+        if (pTop != m_vDepthSercher.end())
+            m_nStartDepthIndex = std::max(std::get<0>(*pTop) - 2, 0);  // Вычитаю запас
+        else
+            m_nStartDepthIndex = 0;
+
+        auto pBottom = std::find_if(m_vDepthSercher.begin(), m_vDepthSercher.end(),
+            [&](const std::tuple<int, float, float>& depthSercher)
+            {
+                return std::get<1>(depthSercher) < fBottom && std::get<2>(depthSercher) >= fBottom;
+            });
+
+        if (pBottom != m_vDepthSercher.end())
+            m_nStopDepthIndex = std::min(std::get<0>(*pBottom) + 2, m_pImpl->nDepthCount - 1);  // Добавляю запас
+        else
+            m_nStopDepthIndex = m_pImpl->nDepthCount - 1;
+    }
 
     int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)
     {
         m_bDrawMesh = bDrawMesh;
 
-        float fHalfWidth = float(pVisualRect->right- pVisualRect->left)*0.5f;
+        float fHalfWidth = float(pVisualRect->right- pVisualRect->left) / 2;
 
         m_mPRV = glm::ortho(
             -fHalfWidth, fHalfWidth,
             (float)pVisualRect->top, (float)pVisualRect->bottom,
             -fHalfWidth, fHalfWidth
         );
+
+        //----------------------------------------------------------------------------------
+
+        calcViewIndices(pVisualRect, fIsometryAngle, nMaxRadiusLP);
+
+        //----------------------------------------------------------------------------------
 
         BufferBounder<ShaderProgram> surfaceBounder(m_pSufraceProgram);
 

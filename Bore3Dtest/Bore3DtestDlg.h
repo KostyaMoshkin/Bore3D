@@ -18,6 +18,10 @@ class CBore3DtestDlg : public CDialogEx
 
 	float m_fRotationAngle = 0;
 
+	int m_nGepthShift = 0;
+
+	std::vector<byte> m_vPrintScreen;
+
 	std::shared_ptr<BoreData> m_pData = nullptr;
 	std::shared_ptr<DiaMapper> m_pDia = nullptr;
 

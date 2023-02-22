@@ -118,7 +118,7 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	if (!m_bBoreGLInit)
 		return false;
 
-	m_bBoreGLInit = m_boreGL->InitBore3D(m_pData.get(), 1.0f);
+	m_bBoreGLInit = m_boreGL->InitBore3D(m_pData.get(), 15);
 
 	if (!m_bBoreGLInit)
 		return false;
@@ -207,6 +207,8 @@ void CBore3DtestDlg::Bore3DPaint()
 	if (!m_bBoreGLInit)
 		return;
 
+	++m_nGepthShift;
+
 	CWnd* pWnd = GetDlgItem(IDC_PICTURE_BOX);
 	CDC* pCHC = pWnd->GetDC();
 	HDC hDC = *pCHC;
@@ -219,20 +221,20 @@ void CBore3DtestDlg::Bore3DPaint()
 	RECT rcVisualRect;
 	rcVisualRect.left = -clientRect.Width();
 	rcVisualRect.right = clientRect.Width();
-	rcVisualRect.top = 400;
-	rcVisualRect.bottom = 600;// clientRect.Height();
+	rcVisualRect.top = 400 + m_nGepthShift;
+	rcVisualRect.bottom = 600 + m_nGepthShift;// clientRect.Height();
 
 	float fIsometryAngle = 15.0f;// +m_fRotationAngle / 50.0f;
 
 	m_boreGL->GetBitmap(&rcVisualRect, m_fRotationAngle, 2.0f, 4.1f, 0, clientRect.Width(), fIsometryAngle, true);
 
-	std::vector<byte> vPrintScreen(clientRect.Width() * clientRect.Height() * 4);
+	m_vPrintScreen.resize(clientRect.Width() * clientRect.Height() * 4);
 
 #define GL_BGRA 0x80E1
 
-	m_boreGL->fillPicture(vPrintScreen.data(), clientRect.Width() * clientRect.Height(), GL_BGRA);
+	m_boreGL->fillPicture(m_vPrintScreen.data(), clientRect.Width() * clientRect.Height(), GL_BGRA);
 
-	HBITMAP resultBitmap = CreateBitmap(clientRect.Width(), clientRect.Height(), 1, 32, (void*)vPrintScreen.data());
+	HBITMAP resultBitmap = CreateBitmap(clientRect.Width(), clientRect.Height(), 1, 32, (void*)m_vPrintScreen.data());
 	HDC MemDC = CreateCompatibleDC(hDC);
 	auto hOldBmp = SelectObject(MemDC, resultBitmap);
 	BitBlt(hDC, 0, 0, clientRect.Width(), clientRect.Height(), MemDC, 0, 0, SRCCOPY);
@@ -250,7 +252,7 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	auto start = std::chrono::steady_clock::now();
 	bool bRun = true;
 
-	double fTimeLength = 5.0;
+	float fTimeLength = 5.0f;
 
 	while (bRun)
 	{
@@ -260,7 +262,7 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 		std::chrono::duration<double> elapsed_seconds = end - start;
 		bRun = elapsed_seconds.count() < fTimeLength;
 
-		m_fRotationAngle = 360.0f * elapsed_seconds.count() / fTimeLength;
+		m_fRotationAngle = 360.0f * float(elapsed_seconds.count() / fTimeLength);
 
 		++nCount;
 	}

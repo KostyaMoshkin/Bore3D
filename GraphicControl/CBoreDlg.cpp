@@ -52,9 +52,9 @@ bool CBoreDlg::fillPicture(void* pBuffer, size_t nSize, int nBufferType)
     return m_pImpl->m_controlGL.fillPicture(pBuffer, nSize, nBufferType);
 }
 
-bool CBoreDlg::InitBore3D(IBoreData* pData, float fLogPerPixel)
+bool CBoreDlg::InitBore3D(IBoreData* pData, int nMeshStep_)
 {
-    return m_pImpl->m_controlGL.InitBore3D(pData, fLogPerPixel);
+    return m_pImpl->m_controlGL.InitBore3D(pData, nMeshStep_);
 }
 
 bool CBoreDlg::InitDiaMapper(IDiaMapper* pMapper_)

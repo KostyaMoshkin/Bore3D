@@ -41,8 +41,15 @@ namespace GL
 
         int m_nInterpolateCount = 1;
 
-        float m_fDepthMin;
-        float m_fDepthMax;
+        // Вектор индексов и соответствующих интервалов глубин
+        std::vector<std::tuple<int, float, float>> m_vDepthSercher;
+
+        // Индексы отображения глубин
+        int m_nStartDepthIndex = 0;
+        int m_nStopDepthIndex = 0;
+
+        //  Возрастания или убывание значений глубины
+        bool m_bDepthIncreasing = true;
 
         bool m_bDrawMesh = false;
 
@@ -86,6 +93,8 @@ namespace GL
         bool setDriftIndirect();
         bool setDriftIndex();
 
+        void calcViewIndices(const RECT* , float, int );
+
     public:
         // Унаследовано через Render
         bool init() override;
@@ -97,7 +106,7 @@ namespace GL
         // прототип метода для отображения части 3D-ствола скважины в bitmap
         bool InitBore3D(
             IBoreData* pData_, // интерфейс доступа к данным развёртки
-            float fLogPerPixel_ // коэффициент соотношения между логическими единицами (используются маппером) и пикселями экрана
+            int nMeshStep_ // шаг между линиями горизонтальной сетки
         );
 
         bool InitPalette(const std::vector<COLORREF>& vecPalette_);

@@ -48,14 +48,14 @@ namespace GraphicControl
         return bResult;
     }
 
-    bool BoreControl::InitBore3D(IBoreData* pData, float fLogPerPixel)
+    bool BoreControl::InitBore3D(IBoreData* pData, int nMeshStep_)
     {
         needUpdate();
 
         if (!beginDraw())
             return false;
 
-        bool bResult = m_pImpl->pRenderBoreSurface->InitBore3D(pData, fLogPerPixel);
+        bool bResult = m_pImpl->pRenderBoreSurface->InitBore3D(pData, nMeshStep_);
         endDraw();
 
         return bResult;

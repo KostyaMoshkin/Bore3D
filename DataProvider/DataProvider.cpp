@@ -2,6 +2,8 @@
 #include "framework.h"
 #include "DataProvider.h"
 
+#include <algorithm>
+
 namespace DataProvider
 {
     static std::vector<std::string> split(std::string sLine_, std::string sDelimiter_)
@@ -49,7 +51,9 @@ namespace DataProvider
     {
         std::vector<std::string> sFields = getStringValues(sLine_);
 
-        if (sFields.size() < 5)
+        int nCurveCount = (int)sFields.size();
+
+        if (nCurveCount < 5)
             return;
 
         for (const std::string& value : sFields)
@@ -59,12 +63,12 @@ namespace DataProvider
         geoPoint_.vfDepth.push_back((float)atof(sFields[0].c_str()));
 
         std::vector<float> vDistance;
-        for (size_t i = 1; i < sFields.size(); ++i)
+        for (size_t i = 1; i < nCurveCount; ++i)
             vDistance.push_back((float)atof(sFields[i].c_str()));
 
         geoPoint_.vvfDistance.push_back(vDistance);
 
-        float fRandomRotaion = 1.0f * std::rand() / RAND_MAX * 5.0f;
+        float fRandomRotaion = 1.0f * std::rand() / RAND_MAX * 1.0f;
 
         geoPoint_.vfRotation.push_back(fRandomRotaion);
     }
@@ -88,12 +92,14 @@ namespace DataProvider
 
         while (std::getline(file, sLine))
         {
+            //if (++i > 300)
+            //    continue;
             addGeoPoint(m_data, sLine);
-            if (++i > 200)
-                break;
         }
 
         file.close();
+
+        std::sort(m_data.vfDepth.begin(), m_data.vfDepth.end(), [](float a, float b) { return a < b; });
 
         return true;
     }

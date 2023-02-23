@@ -25,6 +25,11 @@ class CBore3DtestDlg : public CDialogEx
 	std::shared_ptr<BoreData> m_pData = nullptr;
 	std::shared_ptr<DiaMapper> m_pDia = nullptr;
 
+	CWnd* m_pWnd = nullptr;
+	HDC m_hDC = nullptr;
+
+	CRect m_clientRect;
+
 	// Создание
 public:
 	CBore3DtestDlg(CWnd* pParent = nullptr);	// стандартный конструктор

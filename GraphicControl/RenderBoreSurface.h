@@ -50,6 +50,7 @@ namespace GL
 
         //  Возрастания или убывание значений глубины
         bool m_bDepthIncreasing = true;
+        const int m_nDepthOptimisationStep = 10;
 
         bool m_bDrawMesh = false;
 
@@ -93,7 +94,7 @@ namespace GL
         bool setDriftIndirect();
         bool setDriftIndex();
 
-        void calcViewIndices(const RECT* , float, int );
+        void calcViewIndices(const RECT* , float, float);
 
     public:
         // Унаследовано через Render

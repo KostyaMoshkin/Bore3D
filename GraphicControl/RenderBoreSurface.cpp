@@ -536,11 +536,11 @@ namespace GL
             m_pImpl->vDepths[i] = (float)m_pImpl->pMapper->GeoToLP(m_pImpl->pData->GetDepths().data()[i]);
 
             // Для последующего ускорения поиска сохраняю значения с интервалом 10 индексов
-            if (!(i % 10) && i != 0)
+            if (!(i % m_nDepthOptimisationStep) && i != 0)
             {
-                float fDepthStepMin = std::min(m_pImpl->vDepths[i - 10], m_pImpl->vDepths[i]);
-                float fDepthStepMax = std::max(m_pImpl->vDepths[i - 10], m_pImpl->vDepths[i]);
-                m_vDepthSercher.push_back(std::tuple<int, float, float>(i - 10, fDepthStepMin, fDepthStepMax));
+                float fDepthStepMin = std::min(m_pImpl->vDepths[i - m_nDepthOptimisationStep], m_pImpl->vDepths[i]);
+                float fDepthStepMax = std::max(m_pImpl->vDepths[i - m_nDepthOptimisationStep], m_pImpl->vDepths[i]);
+                m_vDepthSercher.push_back(std::tuple<int, float, float>(i - m_nDepthOptimisationStep, fDepthStepMin, fDepthStepMax));
             }
         }
 
@@ -565,9 +565,9 @@ namespace GL
         return true;
     }
 
-    void RenderBoreSurface::calcViewIndices(const RECT* pVisualRect_, float fIsometryAngle_, int nMaxRadiusLP_)
+    void RenderBoreSurface::calcViewIndices(const RECT* pVisualRect_, float fIsometryAngle_, float fMaxRadius_)
     {
-        float fTop = (float)pVisualRect_->top - std::abs(nMaxRadiusLP_ * sin(fIsometryAngle_));
+        float fTop = (float)pVisualRect_->top - fMaxRadius_;
         float fBottom = (float)pVisualRect_->bottom;
 
         if (!m_bDepthIncreasing)
@@ -580,7 +580,7 @@ namespace GL
             });
 
         if (pTop != m_vDepthSercher.end())
-            m_nStartDepthIndex = std::max(std::get<0>(*pTop) - 2, 0);  // Вычитаю запас
+            m_nStartDepthIndex = std::max(std::get<0>(*pTop) - 2, 0);  // Вычитаю запас 2
         else
             m_nStartDepthIndex = 0;
 
@@ -591,7 +591,7 @@ namespace GL
             });
 
         if (pBottom != m_vDepthSercher.end())
-            m_nStopDepthIndex = std::min(std::get<0>(*pBottom) + 2, m_pImpl->nDepthCount - 1);  // Добавляю запас
+            m_nStopDepthIndex = std::min(std::get<0>(*pBottom) + m_nDepthOptimisationStep + 2, m_pImpl->nDepthCount - 1);  // Добавляю запас 2
         else
             m_nStopDepthIndex = m_pImpl->nDepthCount - 1;
     }
@@ -610,7 +610,7 @@ namespace GL
 
         //----------------------------------------------------------------------------------
 
-        calcViewIndices(pVisualRect, fIsometryAngle, nMaxRadiusLP);
+        calcViewIndices(pVisualRect, fIsometryAngle, fHalfWidth);
 
         //----------------------------------------------------------------------------------
 

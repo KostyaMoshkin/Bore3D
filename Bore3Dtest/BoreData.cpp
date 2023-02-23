@@ -3,7 +3,7 @@
 
 BoreData::BoreData(const char* sFileName_)
 {
-	m_dataProvider.init(sFileName_);
+	m_bInit = m_dataProvider.init(sFileName_);
 }
 
 BoreData::~BoreData()

@@ -51,7 +51,7 @@ END_MESSAGE_MAP()
 
 
 CBore3DtestDlg::CBore3DtestDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_BORE3DTEST_DIALOG, pParent)
+	: CDialogEx(IDD_BORE3DTEST_DIALOG, pParent), m_clientRect(0, 0, 0, 0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_pParent = pParent;
@@ -110,7 +110,11 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	if (!m_boreGL)
 		return false;
 
-	m_pData = std::make_shared<BoreData>("E:\\VisualStudioProjects\\Bore3D\\3D-развёртка.txt");
+	m_pData = std::make_shared<BoreData>("Bore3D.txt");
+
+	if (!m_pData->isInit())
+		return false;
+
 	m_pDia = std::make_shared<DiaMapper>();
 
 	m_bBoreGLInit = m_boreGL->Create("OPENGL DIALOG");
@@ -118,7 +122,7 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	if (!m_bBoreGLInit)
 		return false;
 
-	m_bBoreGLInit = m_boreGL->InitBore3D(m_pData.get(), 15);
+	m_bBoreGLInit = m_boreGL->InitBore3D(m_pData.get(), 10);
 
 	if (!m_bBoreGLInit)
 		return false;
@@ -147,6 +151,10 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	m_boreGL->setBkgColor(1, 1, 1);
 	m_boreGL->setMesColor(0, 0, 0);
 	m_boreGL->setZeroLineColor(0.8f, 0.8f, 0.8f, 3);
+
+	m_pWnd = GetDlgItem(IDC_PICTURE_BOX);
+	CDC* pCHC = m_pWnd->GetDC();
+	m_hDC = *pCHC;
 
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
@@ -207,37 +215,36 @@ void CBore3DtestDlg::Bore3DPaint()
 	if (!m_bBoreGLInit)
 		return;
 
+	CRect clientRect;
+	m_pWnd->GetClientRect(&m_clientRect);
+
+	if (clientRect.Width() != m_clientRect.Width() || clientRect.Height() != m_clientRect.Height())
+	{
+		m_boreGL->SetPosition(m_clientRect.Width(), m_clientRect.Height());
+		m_vPrintScreen.resize(m_clientRect.Width() * m_clientRect.Height() * 4);
+	}
+
 	++m_nGepthShift;
 
-	CWnd* pWnd = GetDlgItem(IDC_PICTURE_BOX);
-	CDC* pCHC = pWnd->GetDC();
-	HDC hDC = *pCHC;
-
-	CRect clientRect;
-	pWnd->GetClientRect(&clientRect);
-
-	m_boreGL->SetPosition(clientRect.Width(), clientRect.Height());
-
 	RECT rcVisualRect;
-	rcVisualRect.left = -clientRect.Width();
-	rcVisualRect.right = clientRect.Width();
+	rcVisualRect.left = -m_clientRect.Width();
+	rcVisualRect.right = m_clientRect.Width();
 	rcVisualRect.top = 400 + m_nGepthShift;
-	rcVisualRect.bottom = 600 + m_nGepthShift;// clientRect.Height();
+	rcVisualRect.bottom = 1600 + m_nGepthShift;
 
 	float fIsometryAngle = 15.0f;// +m_fRotationAngle / 50.0f;
 
-	m_boreGL->GetBitmap(&rcVisualRect, m_fRotationAngle, 2.0f, 4.1f, 0, clientRect.Width(), fIsometryAngle, true);
+	m_boreGL->GetBitmap(&rcVisualRect, m_fRotationAngle, 2.0f, 4.1f, 0, m_clientRect.Width(), fIsometryAngle, true);
 
-	m_vPrintScreen.resize(clientRect.Width() * clientRect.Height() * 4);
 
 #define GL_BGRA 0x80E1
 
-	m_boreGL->fillPicture(m_vPrintScreen.data(), clientRect.Width() * clientRect.Height(), GL_BGRA);
+	m_boreGL->fillPicture(m_vPrintScreen.data(), m_clientRect.Width() * m_clientRect.Height(), GL_BGRA);
 
-	HBITMAP resultBitmap = CreateBitmap(clientRect.Width(), clientRect.Height(), 1, 32, (void*)m_vPrintScreen.data());
-	HDC MemDC = CreateCompatibleDC(hDC);
+	HBITMAP resultBitmap = CreateBitmap(m_clientRect.Width(), m_clientRect.Height(), 1, 32, (void*)m_vPrintScreen.data());
+	HDC MemDC = CreateCompatibleDC(m_hDC);
 	auto hOldBmp = SelectObject(MemDC, resultBitmap);
-	BitBlt(hDC, 0, 0, clientRect.Width(), clientRect.Height(), MemDC, 0, 0, SRCCOPY);
+	BitBlt(m_hDC, 0, 0, m_clientRect.Width(), m_clientRect.Height(), MemDC, 0, 0, SRCCOPY);
 	SelectObject(MemDC, hOldBmp);
 	DeleteDC(MemDC);
 	DeleteObject(resultBitmap);

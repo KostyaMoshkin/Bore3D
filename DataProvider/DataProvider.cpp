@@ -51,7 +51,7 @@ namespace DataProvider
     {
         std::vector<std::string> sFields = getStringValues(sLine_);
 
-        int nCurveCount = (int)sFields.size();
+        size_t nCurveCount = sFields.size();
 
         if (nCurveCount < 5)
             return;

@@ -9,6 +9,7 @@
 #include <algorithm>
 
 #include <math.h>
+#include <omp.h>
 
 namespace GL
 {
@@ -196,9 +197,9 @@ namespace GL
 
         bool bAddMeshShaderError = false;
 
-        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_fragment, ShaderProgram::ShaderType::Fragment());
-        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_vertex, ShaderProgram::ShaderType::Vertex());
-        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_geometry, ShaderProgram::ShaderType::Geometry());
+        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_fragment,  ShaderProgram::ShaderType::Fragment());
+        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_vertex,    ShaderProgram::ShaderType::Vertex());
+        bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_geometry,  ShaderProgram::ShaderType::Geometry());
 
         if (bAddMeshShaderError)
             return false;
@@ -254,7 +255,7 @@ namespace GL
             vMeshIndices[i * 4 + 3] = i + 1;
         }
 
-        //  Необходимо домолнить индексы, чтобы последняя точка в ряду замкнулась с первой
+        //  Необходимо дополнить индексы, чтобы последняя точка в ряду замкнулась с первой
         vMeshIndices[(m_pImpl->nCurveCount - 1) * 4 + 3] = 0;
 
         BufferBounder<IndexBuffer> indexMeshBounder(m_pMeshIndex);
@@ -337,8 +338,10 @@ namespace GL
 
 	void RenderBoreSurface::draw()
 	{
+#ifdef DEBUG
         if (!(m_bDataInit && m_bMiaInit && m_bPaletteInit && m_bProgramInit))
             return;
+#endif // DEBUG
 
         glClearColor(m_vBkgColor[0], m_vBkgColor[1], m_vBkgColor[2], 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -408,10 +411,10 @@ namespace GL
     {
         m_pImpl->pData = pData_;
 
-        m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();
+        m_pImpl->nDepthCount = (int)m_pImpl->pData->GetDepths().size();
 
-        if (m_pImpl->nCurveCount > 0)
-            m_pImpl->nDepthCount = (int)m_pImpl->pData->GetDepths().size();
+        if (m_pImpl->nDepthCount > 0)
+            m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();
         else
             return false;
 
@@ -453,7 +456,11 @@ namespace GL
 
         m_pSufraceProgram->setUniform1i("m_nCurveCount", &(m_pImpl->nCurveCount));
 
-        m_nInterpolateCount = 360 / m_pImpl->nCurveCount / 5 + 1;
+        //  Максимальный угол между вершинами после интерполяции по углу
+        const unsigned nGradusStep = 5;
+        int nInterpolateCount = 360 / m_pImpl->nCurveCount / nGradusStep;
+        m_nInterpolateCount = (360 == m_pImpl->nCurveCount * nGradusStep) ? nInterpolateCount : nInterpolateCount + 1;
+
         m_pSufraceProgram->setUniform1i("m_nInterpolateCount", &m_nInterpolateCount);
 
         //----------------------------------------------------------------------------------
@@ -567,33 +574,42 @@ namespace GL
 
     void RenderBoreSurface::calcViewIndices(const RECT* pVisualRect_, float fIsometryAngle_, float fMaxRadius_)
     {
+        //  Корректировка на те слои, которые попадают в окно из-за изометрии
         float fTop = (float)pVisualRect_->top - fMaxRadius_;
         float fBottom = (float)pVisualRect_->bottom;
 
         if (!m_bDepthIncreasing)
             std::swap(fTop, fBottom);
 
-        auto pTop = std::find_if(m_vDepthSercher.begin(), m_vDepthSercher.end(),
-            [&](const std::tuple<int, float, float>& depthSercher)
+#pragma omp sections
+        {
+#pragma omp section
             {
-                return std::get<1>(depthSercher) <= fTop && std::get<2>(depthSercher) > fTop;
-            });
+                auto pTop = std::find_if(m_vDepthSercher.begin(), m_vDepthSercher.end(),
+                    [&](const std::tuple<int, float, float>& depthSercher)
+                    {
+                        return std::get<1>(depthSercher) <= fTop && std::get<2>(depthSercher) > fTop;
+                    });
 
-        if (pTop != m_vDepthSercher.end())
-            m_nStartDepthIndex = std::max(std::get<0>(*pTop) - 2, 0);  // Вычитаю запас 2
-        else
-            m_nStartDepthIndex = 0;
-
-        auto pBottom = std::find_if(m_vDepthSercher.begin(), m_vDepthSercher.end(),
-            [&](const std::tuple<int, float, float>& depthSercher)
+                if (pTop != m_vDepthSercher.end())
+                    m_nStartDepthIndex = std::max(std::get<0>(*pTop) - 2, 0);  // Вычитаю запас 2
+                else
+                    m_nStartDepthIndex = 0;
+            }
+#pragma omp section
             {
-                return std::get<1>(depthSercher) < fBottom && std::get<2>(depthSercher) >= fBottom;
-            });
+                auto pBottom = std::find_if(m_vDepthSercher.begin(), m_vDepthSercher.end(),
+                    [&](const std::tuple<int, float, float>& depthSercher)
+                    {
+                        return std::get<1>(depthSercher) < fBottom && std::get<2>(depthSercher) >= fBottom;
+                    });
 
-        if (pBottom != m_vDepthSercher.end())
-            m_nStopDepthIndex = std::min(std::get<0>(*pBottom) + m_nDepthOptimisationStep + 2, m_pImpl->nDepthCount - 1);  // Добавляю запас 2
-        else
-            m_nStopDepthIndex = m_pImpl->nDepthCount - 1;
+                if (pBottom != m_vDepthSercher.end())
+                    m_nStopDepthIndex = std::min(std::get<0>(*pBottom) + m_nDepthOptimisationStep + 2, m_pImpl->nDepthCount - 1);  // Добавляю запас 2
+                else
+                    m_nStopDepthIndex = m_pImpl->nDepthCount - 1;
+            }
+        }
     }
 
     int RenderBoreSurface::GetBitmap(const RECT* pVisualRect, float fRotation, float fMinRadius, float fMaxRadius, int nMinRadiusLP, int nMaxRadiusLP, float fIsometryAngle, bool bDrawMesh)

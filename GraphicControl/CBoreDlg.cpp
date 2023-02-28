@@ -39,7 +39,10 @@ BOOL CBoreDlg::Create(LPCSTR DialogName)
     AfxSetResourceHandle(hResourceOld);
 
     if (!success)
+    {
+        m_sErrorMessage += "CBoreDlg::Create (" + std::to_string(__LINE__) + ") : " + " ошибка CDialog::Create." + "\n";
         return false;
+    }
 
     if (!m_pImpl->m_controlGL.init())
         return false;
@@ -114,6 +117,15 @@ void CBoreDlg::SetPosition(int cx, int cy)
 
     GetDlgItem(IDC_GC_CUSTOM1)->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
     AfxSetResourceHandle(hResourceOld);
+}
+
+std::string CBoreDlg::getErrorMessage()
+{
+    std::string sErrorMessage(m_sErrorMessage);
+
+    m_sErrorMessage.clear();
+
+    return sErrorMessage + m_pImpl->m_controlGL.getErrorMessage();
 }
 
 IBore3D* IBore3D::Create3DBore()

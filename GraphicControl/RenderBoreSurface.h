@@ -32,6 +32,8 @@ namespace GL
             GLuint  baseInstance;
         } DrawElementsIndirectCommand;
 
+        std::string m_sErrorMessage;
+
         std::array<float, 3> m_vBkgColor = { 1, 1, 1 };
         std::array<float, 3> m_vMeshColor = { 0, 0, 0 };
         std::array<float, 3> m_vZeroLineColor = { 1, 1, 1 };
@@ -126,6 +128,8 @@ namespace GL
             bool bDrawMesh
         );
 
+        virtual std::string getErrorMessage() override;
+
     public:
         void setBkgColor(float r_, float g_, float b_);
         void setMesColor(float r_, float g_, float b_);
@@ -137,5 +141,5 @@ namespace GL
     private:
         struct Implementation;
         std::shared_ptr<Implementation> m_pImpl;
-    };
+};
 }

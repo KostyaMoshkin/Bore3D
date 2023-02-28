@@ -34,15 +34,33 @@ namespace GraphicControl
             return true;
 
         if (!initWindow())
+        {
+            m_sErrorMessage += "ControlGL::init (" + std::to_string(__LINE__) + ") : " + " ошибка initWindow." + "\n";
             return false;
+        }
 
         if (!initGlew())
+        {
+            m_sErrorMessage += "ControlGL::init (" + std::to_string(__LINE__) + ") : " + " ошибка initGlew." + "\n";
             return false;
+        }
 
         if (!createContext())
+        {
+            m_sErrorMessage += "ControlGL::init (" + std::to_string(__LINE__) + ") : " + " ошибка createContext." + "\n";
             return false;
+        }
 
         return true;
+    }
+
+    std::string ControlGL::getErrorMessage()
+    {
+        std::string sErrorMessage(m_sErrorMessage);
+
+        m_sErrorMessage.clear();
+
+        return sErrorMessage;
     }
 
     bool ControlGL::beginDraw()

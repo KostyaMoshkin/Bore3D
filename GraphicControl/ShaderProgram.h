@@ -19,6 +19,7 @@ namespace GL {
         unsigned m_nProgramId;
 
         std::string m_sShaderFile;
+        std::string m_sErrorMessage;
 
     public:
         struct ShaderType
@@ -46,6 +47,8 @@ namespace GL {
 
         bool addShader(const char* sVertexShaderFile_, int shaderType_);
         bool addShader(int nhaderResourceID_, int shaderType_);
+
+        std::string getErrorMessage();
 
     public:
         void setUniformMat4f(const char* name_, const GLfloat* mat4_);

@@ -120,19 +120,28 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	m_bBoreGLInit = m_boreGL->Create("OPENGL DIALOG");
 
 	if (!m_bBoreGLInit)
+	{
+		m_sErrorMessage = m_boreGL->getErrorMessage();
 		return false;
+	}
 
 	//  Второй параметр - индекси рисуемой горизонтальной линии. 1 - каждая линия, 10 - каждая десятая.
 	m_bBoreGLInit = m_boreGL->InitBore3D(m_pData.get(), 10);
 
 	if (!m_bBoreGLInit)
+	{
+		m_sErrorMessage = m_boreGL->getErrorMessage();
 		return false;
+	}
 
 	m_pDia->SetGeoRangeLPRange(10, 1000, 100, 300);
 	m_bBoreGLInit = m_boreGL->InitDiaMapper(m_pDia.get());
 
 	if (!m_bBoreGLInit)
+	{
+		m_sErrorMessage = m_boreGL->getErrorMessage();
 		return false;
+	}
 
 	std::vector<COLORREF> vPalette;
 	vPalette.push_back(0x00000000);
@@ -147,7 +156,10 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	m_bBoreGLInit = m_boreGL->InitPalette(vPalette);
 
 	if (!m_bBoreGLInit)
+	{
+		m_sErrorMessage = m_boreGL->getErrorMessage();
 		return false;
+	}
 
 	m_boreGL->setBkgColor(1, 1, 1);
 	m_boreGL->setMesColor(0, 0, 0);
@@ -276,7 +288,7 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 	}
 
 	CString sFPS;
-	sFPS.Format(_T("%d"), int(1.0 * nCount / fTimeLength));
+	sFPS.Format(_T("%d"), int(nCount / fTimeLength));
 
 	SetDlgItemText(IDC_STATIC, LPCTSTR(sFPS));
 }

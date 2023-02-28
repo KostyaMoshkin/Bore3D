@@ -18,6 +18,8 @@ class CBore3DtestDlg;
 
 class GRAPHICCONTROL_API CBoreDlg : public CDialog, public IBore3D
 {
+    std::string m_sErrorMessage;
+
 public:
 	enum { IDD = IDD_GC_DIALOG_HIDDEN};
 
@@ -49,6 +51,8 @@ public:
         float fIsometryAngle, // угол изометрической проекции
         bool bDrawMesh
     ) override;
+
+    virtual std::string getErrorMessage() override;
 
 public:
     void setBkgColor(float r_, float g_, float b_);

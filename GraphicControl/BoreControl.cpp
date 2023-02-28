@@ -36,8 +36,11 @@ namespace GraphicControl
 
     bool BoreControl::init()
     {
-        ControlGL::init();
-
+        if (!ControlGL::init())
+        {
+            m_sErrorMessage += ControlGL::getErrorMessage();
+            return false;
+        }
 
         if (!beginDraw())
             return false;
@@ -128,5 +131,14 @@ namespace GraphicControl
         endDraw();
 
         return true;
+    }
+
+    std::string BoreControl::getErrorMessage()
+    {
+        std::string sErrorMessage(m_sErrorMessage);
+
+        m_sErrorMessage.clear();
+
+        return sErrorMessage + m_pImpl->pRenderBoreSurface->getErrorMessage();
     }
 }

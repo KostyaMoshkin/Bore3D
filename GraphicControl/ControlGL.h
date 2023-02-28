@@ -35,6 +35,8 @@ namespace GraphicControl
 		int m_nWindowSizeX = 10;
 		int m_nWindowSizeY = 10;
 
+		std::string m_sErrorMessage;
+
 	protected:
 		CPoint m_ptWindow;
 
@@ -60,6 +62,8 @@ namespace GraphicControl
 	public:
 		virtual void paint() = 0;
 		virtual bool init();
+
+		virtual std::string getErrorMessage();
 
 	public:
 		void needUpdate(bool bUpdate_ = TRUE) { m_bNeedUpdate = bUpdate_;  }

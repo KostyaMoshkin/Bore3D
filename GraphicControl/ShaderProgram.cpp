@@ -39,13 +39,7 @@ namespace GL {
         if (xShader.empty())
             return false;
 
-        if (m_sShaderFile.empty())
-            m_sShaderFile = std::string(ShaderName::getName(nShaderResourceID_));
-        else
-        {
-            m_sShaderFile += "; ";
-            m_sShaderFile += std::string(ShaderName::getName(nShaderResourceID_));
-        }
+        m_sShaderFile = std::string(ShaderName::getName(nShaderResourceID_));
 
         unsigned int vs = compileShader(shaderType_, xShader.c_str());
 
@@ -58,6 +52,15 @@ namespace GL {
         m_vShader.push_back(vs);
 
         return true;
+    }
+
+    std::string ShaderProgram::getErrorMessage()
+    {
+        std::string sErrorMessage(m_sErrorMessage);
+
+        m_sErrorMessage.clear();
+
+        return sErrorMessage;
     }
 
     unsigned int ShaderProgram::compileShader(unsigned int sh_type, const char* source_)
@@ -75,6 +78,7 @@ namespace GL {
             GLsizei logLength;
             GLchar  log[1024];
             glGetShaderInfoLog(id, sizeof(log), &logLength, log);
+            m_sErrorMessage += "ShaderProgram::compileShader (" + std::to_string(__LINE__) + ") : " + std::string(log) + std::string(" in shader: ") + m_sShaderFile + "\n";
 
             glDeleteShader(id);
 
@@ -104,10 +108,10 @@ namespace GL {
             int nLog_length = 0;
             glGetProgramiv(m_nProgramId, GL_INFO_LOG_LENGTH, &nLog_length);
 
-            char buf[2048];
-            glGetProgramInfoLog(m_nProgramId, nLog_length, &nLog_length, buf);
+            char log[2048];
+            glGetProgramInfoLog(m_nProgramId, nLog_length, &nLog_length, log);
 
-            //toLog("ShaderProgram::compileProgram(). The function 'glGetProgramiv' return an error: " + std::string(buf) + std::string(" in shader: ") + m_sShaderFile);
+            m_sErrorMessage += "ShaderProgram::compileProgram (" + std::to_string(__LINE__) + ") : " + std::string(log) + "\n";
 
             for (size_t i = 0; i < m_vShader.size(); ++i)
             {

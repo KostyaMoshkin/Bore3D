@@ -20,6 +20,8 @@ class CBore3DtestDlg : public CDialogEx
 
 	int m_nGepthShift = 0;
 
+	std::string m_sErrorMessage;
+
 	std::vector<byte> m_vPrintScreen;
 
 	std::shared_ptr<BoreData> m_pData = nullptr;

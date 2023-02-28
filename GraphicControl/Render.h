@@ -70,6 +70,8 @@
             virtual void bound() = 0;
             virtual void unbound() = 0;
 
+            virtual std::string getErrorMessage() = 0;
+
       public:
           void setVisible(bool bVisible_) { m_bVisible = bVisible_; }
           bool isVisible() { return m_bVisible; }

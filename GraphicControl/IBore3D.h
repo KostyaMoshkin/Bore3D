@@ -11,6 +11,8 @@
 #include <IBoreData.h>
 #include <IDiaMapper.h>
 
+#include <string>
+
 interface IBore3D
 {
 public:
@@ -29,6 +31,7 @@ public:
         IDiaMapper* pMapper_ // отображение глубина <--> логические единицы по вертикали (не путать с пикселями)
     ) = 0;
 
+    virtual std::string getErrorMessage() = 0;
 
     virtual int GetBitmap(
         const RECT* pVisualRect, // прямоугольник в логических единицах отображающий часть 3D-ствола (top,bottom соответствует fTop,fBottom при преобразовании в pMapper)

@@ -15,6 +15,8 @@ namespace GraphicControl
 
 	class GRAPHICCONTROL_API BoreControl : public ControlGL
 	{
+		std::string m_sErrorMessage;
+
 	public:
 		BoreControl();
 		~BoreControl();
@@ -48,6 +50,8 @@ namespace GraphicControl
 			float fIsometryAngle, // угол изометрической проекции
 			bool bDrawMesh
 		);
+
+		virtual std::string getErrorMessage() override;
 
 	public:
 		bool setBkgColor(float r_, float g_, float b_);

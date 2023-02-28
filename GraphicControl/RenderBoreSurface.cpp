@@ -11,6 +11,8 @@
 #include <math.h>
 #include <omp.h>
 
+#define ERRORMESSAGE(msg) std::string(__FILE__) + std::string(" (") + std::to_string(__LINE__) + std::string(") : ") + std::string(msg) + std::string("\n")
+
 namespace GL
 {
     struct RenderBoreSurface::Implementation
@@ -48,10 +50,16 @@ namespace GL
         bAddSufraceShaderError |= !pSufraceProgram->addShader(ShaderName::bore_geometry,    ShaderProgram::ShaderType::Geometry());
 
         if (bAddSufraceShaderError)
+        {
+            m_sErrorMessage += pSufraceProgram->getErrorMessage();
             return false;
+        }
 
         if (!pSufraceProgram->init())
+        {
+            m_sErrorMessage += pSufraceProgram->getErrorMessage();
             return false;
+        }
 
         m_pSufraceProgram = pSufraceProgram;
 
@@ -65,7 +73,10 @@ namespace GL
         int nVertexBufferSize = int(m_pImpl->nCurveCount * m_pImpl->nDepthCount * sizeof(float));
 
         if (!m_VertexBuffer->bookSpace(nVertexBufferSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<VertexBuffer> vertexMounter(m_VertexBuffer);
@@ -73,7 +84,10 @@ namespace GL
             if (void* pPosition = vertexMounter.get_buffer())
                 memcpy(pPosition, m_pImpl->vRadiusCurve.data(), nVertexBufferSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         m_VertexBuffer->attribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, 0);
@@ -98,7 +112,10 @@ namespace GL
         int nSurfaceIndirectSize = int(vSurfaceIndirect.size() * sizeof(DrawElementsIndirectCommand));
 
         if (!m_pSurfaceIndirect->bookSpace(nSurfaceIndirectSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<IndirectBuffer> indirectMounter(m_pSurfaceIndirect);
@@ -106,7 +123,10 @@ namespace GL
             if (void* pPosition = indirectMounter.get_buffer())
                 memcpy(pPosition, vSurfaceIndirect.data(), nSurfaceIndirectSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -135,7 +155,10 @@ namespace GL
         int nSurfaceIndexSize = (int)vSurfaceIndices.size() * sizeof(unsigned int);
 
         if (!m_pSurfaceIndex->bookSpace(nSurfaceIndexSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<IndexBuffer> indexSurfaceMounter(m_pSurfaceIndex);
@@ -143,7 +166,10 @@ namespace GL
             if (void* pPosition = indexSurfaceMounter.get_buffer())
                 memcpy(pPosition, vSurfaceIndices.data(), nSurfaceIndexSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -156,7 +182,10 @@ namespace GL
         int nBufferDepthSize = int(m_pImpl->nDepthCount * sizeof(float));
 
         if (!m_pBufferDepth->bookSpace(nBufferDepthSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<ShaderStorageBuffer> depthMounter(m_pBufferDepth);
@@ -164,7 +193,10 @@ namespace GL
             if (void* pPosition = depthMounter.get_buffer())
                 memcpy(pPosition, m_pImpl->vDepths.data(), nBufferDepthSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -177,7 +209,10 @@ namespace GL
         int nBufferAngleSize = int(m_pImpl->nDepthCount * sizeof(float));
 
         if (!m_pBufferAngle->bookSpace(nBufferAngleSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<ShaderStorageBuffer> angleMounter(m_pBufferAngle);
@@ -185,7 +220,10 @@ namespace GL
             if (void* pPosition = angleMounter.get_buffer())
                 memcpy(pPosition, m_pImpl->vRotation.data(), nBufferAngleSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -202,10 +240,16 @@ namespace GL
         bAddMeshShaderError |= !pMeshProgram->addShader(ShaderName::mesh_geometry,  ShaderProgram::ShaderType::Geometry());
 
         if (bAddMeshShaderError)
+        {
+            m_sErrorMessage += pMeshProgram->getErrorMessage();
             return false;
+        }
 
         if (!pMeshProgram->init())
+        {
+            m_sErrorMessage += pMeshProgram->getErrorMessage();
             return false;
+        }
 
         m_pMeshProgram = pMeshProgram;
 
@@ -229,7 +273,10 @@ namespace GL
         int nMeshIndirectSize = int(vMeshIndirect.size() * sizeof(DrawElementsIndirectCommand));
 
         if (!m_pMeshIndirect->bookSpace(nMeshIndirectSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<IndirectBuffer> indirectMounter(m_pMeshIndirect);
@@ -237,7 +284,10 @@ namespace GL
             if (void* pPosition = indirectMounter.get_buffer())
                 memcpy(pPosition, vMeshIndirect.data(), nMeshIndirectSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -263,7 +313,10 @@ namespace GL
         int nMeshIndexSize = (int)vMeshIndices.size() * sizeof(unsigned int);
 
         if (!m_pMeshIndex->bookSpace(nMeshIndexSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<IndexBuffer> indexMeshMounter(m_pMeshIndex);
@@ -271,7 +324,10 @@ namespace GL
             if (void* pPosition = indexMeshMounter.get_buffer())
                 memcpy(pPosition, vMeshIndices.data(), nMeshIndexSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -294,7 +350,10 @@ namespace GL
         int nDriftIndirectSize = int(vDriftIndirect.size() * sizeof(DrawElementsIndirectCommand));
 
         if (!m_pDriftIndirect->bookSpace(nDriftIndirectSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<IndirectBuffer> indirectMounter(m_pDriftIndirect);
@@ -302,7 +361,10 @@ namespace GL
             if (void* pPosition = indirectMounter.get_buffer())
                 memcpy(pPosition, vDriftIndirect.data(), nDriftIndirectSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -322,7 +384,10 @@ namespace GL
         int nDriftIndexSize = (int)vDriftIndices.size() * sizeof(unsigned int);
 
         if (!m_pDriftIndex->bookSpace(nDriftIndexSize))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Невозможно выделить память.");
             return false;
+        }
 
         {
             BufferMounter<IndexBuffer> indexMeshMounter(m_pDriftIndex);
@@ -330,7 +395,10 @@ namespace GL
             if (void* pPosition = indexMeshMounter.get_buffer())
                 memcpy(pPosition, vDriftIndices.data(), nDriftIndexSize);
             else
+            {
+                m_sErrorMessage += ERRORMESSAGE("Невозможно получить указатель.");
                 return false;
+            }
         }
 
         return true;
@@ -416,7 +484,10 @@ namespace GL
         if (m_pImpl->nDepthCount > 0)
             m_pImpl->nCurveCount = m_pImpl->pData->GetCurveCount();
         else
+        {
+            m_sErrorMessage += ERRORMESSAGE("Ошибка массива глубин");
             return false;
+        }
 
         m_nStopDepthIndex = m_pImpl->nDepthCount - 1;
 
@@ -502,7 +573,10 @@ namespace GL
     bool RenderBoreSurface::InitPalette(const std::vector<COLORREF>& vecPalette_)
     {
         if (vecPalette_.size() < 1)
+        {
+            m_sErrorMessage += ERRORMESSAGE("Массив палитры пустой.");
             return false;
+        }
 
         const COLORREF rgbRed   = 0x000000FF;
         const COLORREF rgbGreen = 0x0000FF00;
@@ -527,7 +601,10 @@ namespace GL
         BufferBounder<TextureBuffer> paletteBounder(m_pPaletteBuffer);
 
         if (!m_pPaletteBuffer->fillBuffer1D(GL_RGB, vPalette.size(), GL_RGB, GL_FLOAT, vPalette.data()))
+        {
+            m_sErrorMessage += ERRORMESSAGE("Ошибка загрузки палитры в GPU.");
             return false;
+        }
 
         m_bPaletteInit = true;
 
@@ -682,6 +759,15 @@ namespace GL
         m_vZeroLineColor[0] = r_;
         m_vZeroLineColor[1] = g_;
         m_vZeroLineColor[2] = b_;
+    }
+
+    std::string RenderBoreSurface::getErrorMessage()
+    {
+        std::string sErrorMessage(m_sErrorMessage);
+
+        m_sErrorMessage.clear();
+
+        return sErrorMessage;
     }
 
     bool RenderBoreSurface::init()

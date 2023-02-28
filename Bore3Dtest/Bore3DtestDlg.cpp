@@ -122,6 +122,7 @@ BOOL CBore3DtestDlg::OnInitDialog()
 	if (!m_bBoreGLInit)
 		return false;
 
+	//  Второй параметр - индекси рисуемой горизонтальной линии. 1 - каждая линия, 10 - каждая десятая.
 	m_bBoreGLInit = m_boreGL->InitBore3D(m_pData.get(), 10);
 
 	if (!m_bBoreGLInit)
@@ -224,13 +225,11 @@ void CBore3DtestDlg::Bore3DPaint()
 		m_vPrintScreen.resize(m_clientRect.Width() * m_clientRect.Height() * 4);
 	}
 
-	++m_nGepthShift;
-
 	RECT rcVisualRect;
 	rcVisualRect.left = -m_clientRect.Width();
 	rcVisualRect.right = m_clientRect.Width();
 	rcVisualRect.top = 400 + m_nGepthShift;
-	rcVisualRect.bottom = 1600 + m_nGepthShift;
+	rcVisualRect.bottom = 600 + m_nGepthShift;
 
 	float fIsometryAngle = 15.0f;// +m_fRotationAngle / 50.0f;
 
@@ -272,6 +271,8 @@ void CBore3DtestDlg::BN_OPENGL_CLICKED()
 		m_fRotationAngle = 360.0f * float(elapsed_seconds.count() / fTimeLength);
 
 		++nCount;
+
+		++m_nGepthShift;
 	}
 
 	CString sFPS;

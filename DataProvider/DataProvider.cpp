@@ -62,8 +62,10 @@ namespace DataProvider
 
         geoPoint_.vfDepth.push_back((float)atof(sFields[0].c_str()));
 
+        const int nStartPointNumber = 0;
+
         std::vector<float> vDistance;
-        for (size_t i = 1; i < nCurveCount; ++i)
+        for (size_t i = 1 + nStartPointNumber; i < nCurveCount; ++i)
             vDistance.push_back((float)atof(sFields[i].c_str()));
 
         geoPoint_.vvfDistance.push_back(vDistance);

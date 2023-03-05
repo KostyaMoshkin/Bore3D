@@ -51,7 +51,7 @@
       <Filter>DataProvider</Filter>
     </ClCompile>
     <ClCompile Include="IDiaMapper.cpp">
-      <Filter>DataProvider</Filter>
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

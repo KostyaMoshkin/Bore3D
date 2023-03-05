@@ -8,6 +8,7 @@
 #include <WinUser.h>
 #include <chrono>
 #include <string>
+#include <memory>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -50,13 +51,12 @@ END_MESSAGE_MAP()
 // Диалоговое окно CBore3DtestDlg
 
 
-CBore3DtestDlg::CBore3DtestDlg(CWnd* pParent /*=nullptr*/)
+CBore3DtestDlg::CBore3DtestDlg(CWnd* pParent)
 	: CDialogEx(IDD_BORE3DTEST_DIALOG, pParent), m_clientRect(0, 0, 0, 0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_pParent = pParent;
 
-	m_boreGL = IBore3D::Create3DBore();
+	m_boreGL = std::make_shared<IBore3D>(IBore3D::Create3DBore());
 }
 
 CBore3DtestDlg::~CBore3DtestDlg()
@@ -240,8 +240,8 @@ void CBore3DtestDlg::Bore3DPaint()
 	RECT rcVisualRect;
 	rcVisualRect.left = -m_clientRect.Width();
 	rcVisualRect.right = m_clientRect.Width();
-	rcVisualRect.top = 400 + m_nGepthShift;
-	rcVisualRect.bottom = 600 + m_nGepthShift;
+	rcVisualRect.top = 460 + m_nGepthShift;
+	rcVisualRect.bottom = 800 + m_nGepthShift;
 
 	float fIsometryAngle = 15.0f;// +m_fRotationAngle / 50.0f;
 

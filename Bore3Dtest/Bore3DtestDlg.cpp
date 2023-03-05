@@ -8,7 +8,6 @@
 #include <WinUser.h>
 #include <chrono>
 #include <string>
-#include <memory>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,7 +55,7 @@ CBore3DtestDlg::CBore3DtestDlg(CWnd* pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	m_boreGL = std::make_shared<IBore3D>(IBore3D::Create3DBore());
+	m_boreGL = IBore3D::Create3DBore();
 }
 
 CBore3DtestDlg::~CBore3DtestDlg()

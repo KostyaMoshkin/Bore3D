@@ -10,7 +10,7 @@
 // Диалоговое окно CBore3DtestDlg
 class CBore3DtestDlg : public CDialogEx
 {
-	std::shared_ptr<IBore3D> m_boreGL;
+	IBore3D* m_boreGL;
 
 	bool m_bBoreGLInit = false;
 
